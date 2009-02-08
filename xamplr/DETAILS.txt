@@ -1,0 +1,104 @@
+Xampl is a tool for developing Ruby programs. It facilitates the 'M' part
+of an MVC architecture. It is meant to be very easy to use, supportive of
+idiomatic Ruby usage, and mostly invisible.
+
+Features:
+  - pure Ruby, no libraries required except those shipped with Ruby 1.8.2
+  - uses XML to declaratively describe a class structure
+    - uses a collection of example XML documents, no schema are required
+    - supports arbitrary object graphs, not just XML-like trees
+    - Ruby idiomatic facilities to navigate the object structures (e.g. named
+      arrays, hash, iterator support, uses blocks, etc.)
+    - support empty, simple (text content only), data (no or limited text
+      content, but with arbitrary element content), and mixed content (where
+      text and element content can be intermingled)
+    - maintains 'document order' of objects
+    - keeps track of parents
+    - can compare two clusters for equality (limited, but will be improved)
+    - maps XML namespaces to Ruby modules (with handy defaults) and you can
+      suggest preferred namespace prefixes for XML output
+    - converts XML element and attributes names to valid (and predictable)
+      Ruby names
+    - includes an XML pull parser (very fast)
+    - code generation is template driven, so the adventurous can change what
+      is generated
+    - includes a simple but powerful and fast templating engine
+    - includes a simple-minded but effective hash-like class that maintains
+      insertion order (fast insertion, lookup, and iteration, but at the
+      expense of delete)
+    - naming conventions are used when generating code (but these conventions
+      can be changed)
+    - additions to the XML will very rarely break existing code, and so
+      incremental development of functionality is supported
+    - generated code is readable and debuggable
+    - a command line tool to generate the code, or you can generate at runtime
+  - XML binding to the classes (i.e. parsing an XML file will produce an
+    object graph)
+  - can augment existing classes
+  - programmer adds functionality by opening the class or module, no worries
+    about the code generator overwriting your changes
+  - object structures can generate XML output (and there is an XML pretty
+    printer used for emphasising human readable XML output)
+  - easy to use persistence mechanism
+    - persistence is in terms of clusters of objects, the cluster is updated
+      all at once
+    - lazy loading of persisted clusters
+    - LRU cache (of clusters)
+    - the changed clusters are available for inspection
+    - XML, Ruby, and YAML persistence mechanism (purposely no Marshal support)
+    - persist to memory, or hard drive (optional persistence to an FSDB)
+    - sync and rollback (even with memory persistence); this is a weak form
+      of transaction support
+    - 'automatic' and 'manual' modes of persistence ('automatic' means that
+      any xampl cluster created while a persister is active will be
+      automatically managed by that persister, manual means that you have
+      to introduce the xampl cluster to the persister)
+    - fast alternative to persistence that does not support rollback
+    - xampl objects can hold arbitrary attribute values through the
+      persistence 'cycle' if using Ruby or YAML persistence (even xampl
+      object); with XML you won't loose anything but all attributes will
+      be strings after restoration.
+    - multiple persisters, possibly with differing persistence mechanisms,
+      are supported
+    - dead easy single user applications (e.g. desktop apps, CGI), almost as
+      easy for multiple user applications and webapps
+    - you can add your own persister types (and formats for that matter)
+  - general purpose Visitor pattern facility, with pre and post visit methods,
+    cycle and revisit detection and handling
+  - lots of hooks
+  - many unit tests, all execute without warning when run with the -w Ruby flag
+  - there are some examples, and the beginnings of a tutorial in the form of
+    a series of examples that lead you through the core parts of xampl
+
+Features that are coming soon:
+  - many more hooks
+  - more sophisticated augmentation of existing classes
+  - indexing and querying of the persisted object structures
+  - more persisters (e.g. sqlite)
+  - real transactions
+  - a better comparison function (that deals with cyclic structures at all, and
+    better with non-tree acyclic structures)
+
+Known Bugs or Potential Problems or Suspected Problems
+  - generated attribute names may conflict with Ruby keywords and this is not
+    a nice thing to witness (this is easy to fix, but I don't want to do this
+    until the next release at the earliest)
+  - I don't know if this will work on Windows -- I tried, but I don't have a
+    windows machine to test this with -- there might be some pathname stuff
+    assuming unix (but I hope not)
+  - some of the code is unnecessarily ugly (e.g. some of the visitor internals)
+  - there are no Ruby docs (but I promise... really)
+  - comparison of cyclic structures will crash
+
+License: GPL. An alternative license may be negotiated, contact me.
+
+While the Ruby version of xampl is brand new it is based on a Java
+tool that I've been developing since 1998 and in its fifth generation.
+There are many features in the Java version that are not available in
+this library, but that is either just a matter of time, or they will
+never be needed because Ruby programs don't need the help.
+
+The Java version of the tool has been used to write a number of large
+webapps, and a few smaller desktop applications, and even an applet.
+
+There is a Common Lisp/CLOS version coming.

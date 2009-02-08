@@ -1,0 +1,6 @@
+xampl for ruby is a pure ruby version of a software development tool that I've been working on/using in Java for six or seven years. It is a framework generating tool, in its way, that supports things like xml bindings, transparent persistence, general programing facilities, and code generation. It uses XML as a kind of DSL to achieve this.
+
+There are some articles on my blog, in the xampl category, that describe xampl in more detail http://recursive.ca/hutch/index.php?cat=26
+
+I'm planning to release xampl as a gem, and would like rubyforge to host that gem. At some point source control as well. A mailing list would be nice. General announcements I suppose.
+

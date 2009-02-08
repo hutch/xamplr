@@ -1,0 +1,20 @@
+| 
+| some_number = 42
+| def gen_some_number
+|   42 + rand
+| end
+|
+
+ Hello there(play_more)! #{@message}
+
+|
+| another_number = 99
+| result << play()
+|
+
+    some number: [[[#{some_number}]]]
+gen some number: [[[#{gen_some_number}]]]
+ another number: [[[#{another_number}]]]
+
+play again:... #{play}
+play_more _____________________________________________________

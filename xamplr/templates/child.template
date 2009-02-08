@@ -1,0 +1,47 @@
+
+  module #{element.class_name}AsChild
+    def #{element.attribute_name}_child
+      accessed
+      @#{element.attribute_name}_child
+    end
+
+    def #{element.attribute_name}_child=(v)
+      accessed
+      @#{element.attribute_name}_child = v
+    end
+
+    alias #{element.attribute_name} #{element.attribute_name}_child
+    alias #{element.attribute_name}= #{element.attribute_name}_child=
+  
+    def init_#{element.attribute_name}_as_child
+      @#{element.attribute_name}_child = []
+    end
+
+    def add_#{element.attribute_name}(#{element.attribute_name})
+      accessed
+      @children << #{element.attribute_name}
+      @#{element.attribute_name}_child << #{element.attribute_name}
+      #{element.attribute_name}.add_parent(self)
+      changed
+      return #{element.attribute_name}
+    end
+  
+    def new_#{element.attribute_name}
+      accessed
+      #{element.attribute_name} = #{element.class_name}.new
+      yield(#{element.attribute_name}) if block_given?
+      return add_#{element.attribute_name}(#{element.attribute_name})
+    end
+
+    def ensure_#{element.attribute_name}
+      accessed
+      new_#{element.attribute_name} if 0 == #{element.attribute_name}.size
+    end
+
+    def remove_#{element.attribute_name}(#{element.attribute_name})
+      accessed
+      changed
+      @#{element.attribute_name}_child.delete(#{element.attribute_name})
+      @children.delete(#{element.attribute_name})
+    end
+  end

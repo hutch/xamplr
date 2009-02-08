@@ -1,0 +1,13 @@
+| 
+| some_number = 42
+| def gen_some_number
+|   42 + rand
+| end
+|
+
+ Hello there!
+
+    some number: [[[#{some_number}]]]
+gen some number: [[[#{gen_some_number}]]]
+
+

@@ -1,0 +1,35 @@
+|
+| fields = %w( foo bar foobar barfoo )
+|
+| macro('field'){|name| "int #{ name };" }
+|
+| macro('setter') do |name|
+|   <<-c
+|     int set_#{ name }(self, value)
+|       object * self;
+|       int value;
+|     {
+|       return( self->#{ name } = value );
+|     }
+|   c
+| end
+|
+| macro('getter') do |name|
+|   <<-c
+|     int get_#{ name }(self)
+|       object * self;
+|     {
+|       return( self->#{ name } );
+|     }
+|   c
+| end
+
+struct object {
+|
+| fields.each{|f| field f}
+|
+};
+
+|
+| fields.each{|f| setter(f); getter(f); }
+|

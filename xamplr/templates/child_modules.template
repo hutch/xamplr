@@ -1,0 +1,5 @@
+| if @element.indexed_by_attr then
+|   child_indexed(result)
+| else
+|   child(result)
+| end

@@ -1,0 +1,313 @@
+
+|
+  class #{@element.class_name}
+|
+|if @element.persisted then
+|
+    include Xampl::XamplPersistedObject
+  
+    @@default_persister_format = nil
+
+    def default_persister_format
+      @@default_persister_format
+    end
+    def #{@element.class_name}.default_persister_format
+      @@default_persister_format
+    end
+    def #{@element.class_name}.set_default_persister_format(format)
+      @@default_persister_format = format
+    end
+
+|
+|else
+|
+    include Xampl::XamplObject
+|
+|end
+|
+    include Xampl::XamplWithDataContent
+
+    @@tag = "#{@element.name}"
+    @@ns = "#{@element.namespace}"
+    @@ns_tag = "{#{@element.namespace}}#{@element.name}"
+    @@module_name = "#{@package_name}"
+    @@safe_name = "#{@package_name}_#{@element.attribute_name}"
+    @@attributes = [
+|
+|@element.attribute_child.each{ | attribute |
+|  if attribute.namespace then
+|
+                     [ :@#{attribute.name}, "#{attribute.tag_name}", "#{attribute.namespace}" ],
+|
+|  else
+|
+                     [ :@#{attribute.name}, "#{attribute.tag_name}" ],
+|
+|  end
+|}
+|
+                   ]
+|
+|@element.child_element_child.each{ | child_element |
+|  element_class_name = @lookup_element[child_element.name].class_name
+|  element_package = @lookup_element[child_element.name].package
+|
+    include #{element_package}::#{element_class_name}AsChild
+|
+|}
+|
+|
+|if @element.persisted then
+|
+
+    @@to_yaml_properties = [ "@#{@element.indexed_by_attr}" ]
+    @@to_yaml_properties_all = [
+|
+|else
+|
+
+    @@to_yaml_properties     = [
+|
+|end
+|
+|@element.attribute_child.each{ | attribute |
+|
+                                 "@#{attribute.name}",
+|
+|}
+|
+                                 "@children",
+                                 "@_content"
+                               ] 
+
+    def to_yaml_properties
+|
+|if @element.persisted then
+|
+      if is_yaml_root(self) then
+        return @@to_yaml_properties_all
+      else
+        return @@to_yaml_properties
+      end
+|
+|else
+|
+      @@to_yaml_properties
+|
+|end
+|
+    end
+|
+|if @element.persisted then
+|
+
+    def #{@element.class_name}.lookup(pid)
+      Xampl.lookup(#{@element.class_name}, pid)
+    end
+
+    def #{@element.class_name}.[](pid)
+      Xampl.lookup(#{@element.class_name}, pid)
+    end
+|
+|end
+|
+|@element.attribute_child.each{ | attribute |
+|  if attribute.name == @element.indexed_by_attr and @element.persisted then
+|
+
+    def #{attribute.name}
+      @#{attribute.name}
+    end
+
+    def #{attribute.name}=(v)
+      accessed
+			# This is kind of optimistic, I think you are in trouble if you do this
+      Xampl.auto_uncache(self) if @#{attribute.name}
+      @#{attribute.name} = v
+      changed
+      Xampl.auto_cache(self) if v
+    end
+|
+|  else
+|
+
+    def #{attribute.name}
+      accessed
+      @#{attribute.name}
+    end
+
+    def #{attribute.name}=(v)
+     accessed
+     changed
+     @#{attribute.name} = v
+    end
+|
+|  end
+|}
+|
+|  if @element.indexed_by_attr then
+|
+
+    def initialize(index=nil)
+      @#{@element.indexed_by_attr} = index if index
+      super()
+|
+| else
+|
+  
+    def initialize
+      super
+|
+|end
+|
+|if 0 < @element.attribute_child.size then
+|
+
+|
+|end
+|
+|@element.attribute_child.each{ | attribute |
+|
+      @#{attribute.name} = nil if not defined? @#{attribute.name}
+|
+|}
+|
+
+      init_xampl_object
+      init_data_content
+|
+|@element.child_element_child.each{ | child_element |
+|  element_attribute_name = @lookup_element[child_element.name].attribute_name
+|
+      init_#{element_attribute_name}_as_child
+|
+|}
+|
+  
+      yield(self) if block_given?
+      init_hook
+
+      changed
+    end
+
+    def clear_non_persistent_index_attributes
+|
+|@element.attribute_child.each{ | attribute |
+|  unless attribute.name == @element.indexed_by_attr and @element.persisted then
+|
+      @#{attribute.name} = nil
+|
+|  end
+|}
+|
+    end
+  
+    def append_to(other)
+      other.add_#{@element.attribute_name}(self)
+    end
+  
+|
+|if @element.persisted then
+|
+    def #{@element.class_name}.persisted?
+      return :#{@element.indexed_by_attr}
+    end
+
+    def persisted?
+      return :#{@element.indexed_by_attr}
+    end
+
+|
+|else
+|
+    def #{@element.class_name}.persisted?
+      return nil
+    end
+
+    def persisted?
+      return nil
+    end
+
+|
+|end
+|
+    def #{@element.class_name}.tag
+      @@tag
+    end
+  
+    def #{@element.class_name}.ns
+      @@ns
+    end
+  
+    def #{@element.class_name}.ns_tag
+      @@ns_tag
+    end
+
+    def #{@element.class_name}.safe_name
+      @@safe_name
+    end
+  
+    def #{@element.class_name}.module_name
+      @@module_name
+    end
+  
+    def tag
+      @@tag
+    end
+  
+    def ns
+      @@ns
+    end
+  
+    def ns_tag
+      @@ns_tag
+    end
+
+    def safe_name
+      @@safe_name
+    end
+  
+    def module_name
+      @@module_name
+    end
+  
+    def attributes
+      @@attributes
+    end
+|
+|if @element.indexed_by_attr
+|
+  
+    def indexed_by
+      :#{@element.indexed_by_attr}
+    end
+  
+    def get_the_index
+      @#{@element.indexed_by_attr}
+    end
+  
+    def set_the_index(index)
+      @#{@element.indexed_by_attr} = index
+    end
+|
+|end
+|
+   
+    def substitute_in_visit(visitor)
+      return visitor.substitute_in_visit_#{@element.attribute_name}(self) || self
+    end
+   
+    def before_visit(visitor)
+      visitor.before_visit_#{@element.attribute_name}(self)
+    end
+   
+    def visit(visitor)
+      visitor.visit_#{@element.attribute_name}(self)
+    end
+   
+    def after_visit(visitor)
+      visitor.after_visit_#{@element.attribute_name}(self)
+    end
+
+    Xampl::FromXML::register(#{@element.class_name}::tag, #{@element.class_name}::ns_tag, #{@element.class_name})
+  end
