@@ -57,7 +57,6 @@ module Xampl
   end
   
   def Xampl.enable_persister(name, kind=nil, format=nil)
-    
     kind = kind || @@default_persister_kind
     format = format || @@default_persister_format
     @@persister = @@known_persisters[name]
@@ -117,6 +116,11 @@ module Xampl
   
   @@xampl_lock = Sync.new
 
+  @@verbose_transactions = true
+  def Xampl.verboseTransactions(v)
+    @@verbose_transactions = v
+  end
+
   def Xampl.transaction(thing, kind=nil, automatic=true, format=nil, &block)
     if String === thing then
       name = thing
@@ -149,10 +153,13 @@ module Xampl
           Xampl.auto_persistence(original_automatic)
           if rollback then
             if exception then
-              puts "ROLLBACK(#{__LINE__}):: #{exception}" if rollback
-              print exception.backtrace.join("\n") if rollback
+              puts "ROLLBACK(#{__LINE__}):: #{exception}" if rollback and @@verbose_transactions
+              #print exception.backtrace.join("\n") if rollback
+              raise exception # hutch 2090213
             else
-              puts "ROLLBACK(#{__LINE__}):: UNKNOWN CAUSE" if rollback
+              if @@verbose_transactions and rollback then
+                puts "ROLLBACK(#{__LINE__}):: UNKNOWN CAUSE" if rollback
+              end
             end
           end
   			  Xampl.rollback if rollback
