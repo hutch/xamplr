@@ -155,7 +155,7 @@ module Xampl
             if exception then
               puts "ROLLBACK(#{__LINE__}):: #{exception}" if rollback and @@verbose_transactions
               #print exception.backtrace.join("\n") if rollback
-              raise exception # hutch 2090213
+              raise exception
             else
               if @@verbose_transactions and rollback then
                 puts "ROLLBACK(#{__LINE__}):: UNKNOWN CAUSE" if rollback
