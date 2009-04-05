@@ -62,6 +62,11 @@ module Xampl
     @@persister = @@known_persisters[name]
     
     if @@persister then
+      # TODO -- if we know the persister, why are we being so anal about kind and format???
+      
+      kind = @@persister.kind || kind
+      format = @@persister.format || format
+      
       #raise XamplException.new(:live_across_rollback) if @@persister.rolled_back
       if kind and kind != @@persister.kind then
         raise IncompatiblePersisterRequest.new(@@persister, "kind", kind, @@persister.kind)
@@ -826,5 +831,9 @@ module Xampl
   require "persister/simple"
   require "persister/in-memory"
   require "persister/filesystem"
+  
+  if require 'rufus/tokyo' then
+    require "persister/tokyo-cabinet"
+  end
 end
 

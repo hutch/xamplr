@@ -1,0 +1,50 @@
+
+filesystem
+
+expt: done: 63.976926
+real	1m8.280s
+user	0m4.593s
+sys	0m3.894s
+
+expt: done: 61.239873
+real	1m1.625s
+user	0m8.458s
+sys	0m3.421s
+
+40312 repo
+
+reader...
+start loop: 53.955502
+Total age: 50005000
+done: 64.717261:: 53.955502 + 10.761759
+
+real  1m5.544s
+user  0m59.011s
+sys 0m1.088s
+------------------------
+
+tokyo cabinet
+
+done: 8.114006
+real	0m8.523s
+user	0m5.784s
+sys	0m2.406s
+
+done: 12.131434
+real	0m12.523s
+user	0m10.215s
+sys	0m2.053s
+
+2492  repo-tc
+
+
+reader...
+start loop: 57.218548
+Total age: 50005000
+done: 63.47015:: 57.218548 + 6.251602
+
+real  1m3.855s
+user  1m1.839s
+sys 0m1.105s
+
+

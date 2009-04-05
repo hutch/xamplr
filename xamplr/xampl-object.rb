@@ -372,6 +372,10 @@ module Xampl
         introduce_persister(nil)
       end
     end
+
+    def describe_yourself
+      nil
+    end
   end
 
   class XMLText
