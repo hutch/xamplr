@@ -30,11 +30,11 @@ module Xampl
         @new_cache.each{ | name1, map1 |
           if map1 then
             cache_map1 = @cache[name1]
-            @cache[name1] = cache_map1 = {} unless cache_map1 
+            @cache[name1] = cache_map1 = {} unless cache_map1
             map1.each{ | name2, map2 |
               if map2 then
                 cache_map2 = cache_map1[name2]
-                cache_map1[name2] = cache_map2 = self.fresh_cache unless cache_map2 
+                cache_map1[name2] = cache_map2 = self.fresh_cache unless cache_map2
 
                 map2.each{ | pid, xampl |
                   cache_map2[pid] = xampl
@@ -54,7 +54,7 @@ module Xampl
             if map2 then
               map2.each{ | pid, xampl |
                 @changed.delete(xampl)
-              xampl.invalidate
+                xampl.invalidate
               }
             end
           }
@@ -99,27 +99,27 @@ module Xampl
       xampl = Xampl.lookup_in_map(@cache, klass, pid)
       if xampl then
         if target and target != xampl then
-				  target.invalidate
+          target.invalidate
           raise XamplException.new(:cache_conflict)
-				end
+        end
         unless xampl.load_needed then
           @cache_hits = @cache_hits + 1
           return xampl, target
         end
-				return xampl, xampl
+        return xampl, xampl
       end
 
       xampl = Xampl.lookup_in_map(@new_cache, klass, pid)
       if xampl then
         if target and target != xampl then
-				  target.invalidate
+          target.invalidate
           raise XamplException.new(:cache_conflict)
-				end
+        end
         unless xampl.load_needed then
           @cache_hits = @cache_hits + 1
           return xampl, target
         end
-				return xampl, xampl
+        return xampl, xampl
       end
 
       return nil, target
@@ -158,8 +158,8 @@ module Xampl
     end
 
     def read(klass, pid, target=nil)
-			xampl, target = read_from_cache(klass, pid, target)
-			return xampl if xampl and !target
+      xampl, target = read_from_cache(klass, pid, target)
+      return xampl if xampl and !target
 
       representation = Xampl.lookup_in_map(@module_map, klass, pid)
       return nil unless representation

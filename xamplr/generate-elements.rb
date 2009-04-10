@@ -9,7 +9,7 @@ options = Xampl.make(Options) { | options |
   options.new_index_attribute("id")
   options.new_index_attribute("pid").persisted = true
 
-  options.resolve("http://xampl.com/generator","XamplGenerator", "gen")
+  options.resolve("http://xampl.com/generator", "XamplGenerator", "gen")
 }
 
 XamplGenerator.from_command_line(options)

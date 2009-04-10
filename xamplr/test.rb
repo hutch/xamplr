@@ -18,13 +18,13 @@ options = Xampl.make(Options) { | options |
   options.new_index_attribute("id")
   options.new_index_attribute("pid").persisted = true
 
-  options.resolve("http://xampl.com/example","XamplExample", "ex")
-  options.resolve("http://xampl.com/example/special","XamplExampleSpecial", "exs")
+  options.resolve("http://xampl.com/example", "XamplExample", "ex")
+  options.resolve("http://xampl.com/example/special", "XamplExampleSpecial", "exs")
 }
 generator = Generator.new(options)
 
 the_xml_file = File.join(".", "xml", "example.xml")
-if(0 < ARGV.size) then
+if (0 < ARGV.size) then
   File.open(the_xml_file){ | f |
     s = f.read
     generator.comprehend_from_strings([s])
@@ -32,7 +32,7 @@ if(0 < ARGV.size) then
       eval(module_definition, nil, name, 1)
     }
 
-    #generator.print_stats
+  #generator.print_stats
   }
   include XamplExample
 else
@@ -50,7 +50,7 @@ class TestXampl < Test::Unit::TestCase
 
   def setup
     Xampl.disable_all_persisters
-	  #FromXML.reset_registry
+    #FromXML.reset_registry
   end
 
   def test_simple_xampl
@@ -167,28 +167,28 @@ class TestXampl < Test::Unit::TestCase
       }
     }
 
-###    desc1 = Description.new
-###    desc1.kind = "desc1"
-###
-###    desc1.add_content("hello ")
-###    emph_content_1 = "there"
-###    desc1.new_emph.content = emph_content_1
-###    desc1.add_content("! How ")
-###    emph_content_2 = "are"
-###    desc1.new_emph.content = emph_content_2
-###    desc1.add_content(" you?")
-###
-###    thing = Thing.new
-###    thing.pid = "thing"
-###    assert(thing.is_changed)
-###    thing.new_stuff.kind = "stuff1"
-###    assert_not_nil(thing.is_changed)
-###    thing.is_changed = nil
-###    thing.add_description(desc1)
-###    assert_not_nil(thing.is_changed)
-###
-###    big_thing = Thing.new
-###    big_thing.add_thing(thing)
+    ###    desc1 = Description.new
+    ###    desc1.kind = "desc1"
+    ###
+    ###    desc1.add_content("hello ")
+    ###    emph_content_1 = "there"
+    ###    desc1.new_emph.content = emph_content_1
+    ###    desc1.add_content("! How ")
+    ###    emph_content_2 = "are"
+    ###    desc1.new_emph.content = emph_content_2
+    ###    desc1.add_content(" you?")
+    ###
+    ###    thing = Thing.new
+    ###    thing.pid = "thing"
+    ###    assert(thing.is_changed)
+    ###    thing.new_stuff.kind = "stuff1"
+    ###    assert_not_nil(thing.is_changed)
+    ###    thing.is_changed = nil
+    ###    thing.add_description(desc1)
+    ###    assert_not_nil(thing.is_changed)
+    ###
+    ###    big_thing = Thing.new
+    ###    big_thing.add_thing(thing)
     assert_equal("<ex:thing pid='big_thing' xmlns:ex='http://xampl.com/example' xmlns:exs='http://xampl.com/example/special'><ex:thing pid='thing'><ex:stuff kind='stuff1'/><ex:description kind='desc1'>hello <ex:emph>there</ex:emph>! How <ex:emph>are</ex:emph> you?</ex:description></ex:thing></ex:thing>",
                  big_thing.test_to_xml)
 
@@ -205,20 +205,20 @@ class TestXampl < Test::Unit::TestCase
     big_thing = Xampl.make(Thing){ | big_thing |
       big_thing.pid = "big_thing"
       big_thing.ensure_thing("thing"){ | thing |
-			  thing.info = "first";
+        thing.info = "first";
       }
       big_thing.ensure_thing("thing"){ | thing |
-			  flunk "What are you doing in here?"
-			  thing.info = "second";
+        flunk "What are you doing in here?"
+        thing.info = "second";
       }
     }
 
     assert_equal(1, big_thing.thing.length)
     assert_equal("first", big_thing.thing[0].info)
 
-		desc = Description.new
-		desc.ensure_emph
-		assert_equal(1, desc.emph.length)
+    desc = Description.new
+    desc.ensure_emph
+    assert_equal(1, desc.emph.length)
     #NOTE -- ensure_emph used to be aliased to new_emph, now it just makes
     #        sure that there is at least one emph
   end
@@ -328,11 +328,11 @@ class TestXampl < Test::Unit::TestCase
     #pp = FromXML.new
     #pp.setup_parse_string(big_thing.test_to_xml)
     #while not pp.endDocument?
-      #event = pp.next_interesting_event
-      #puts event
-      #if (event == Xampl_PP::TEXT) then
-        #puts "TEXT [[[" << pp.text << "]]]"
-      #end
+    #event = pp.next_interesting_event
+    #puts event
+    #if (event == Xampl_PP::TEXT) then
+    #puts "TEXT [[[" << pp.text << "]]]"
+    #end
     #end
 
     pp = FromXML.new
@@ -376,7 +376,7 @@ class TestXampl < Test::Unit::TestCase
     assert_same(thing.key_value_child[0], thing.key_value_child["one"])
     assert_same(thing.key_value_child[1], thing.key_value_child["two"])
 
-		thing.new_key_value("one").value = "1a"
+    thing.new_key_value("one").value = "1a"
 
     assert_same(thing.key_value_child[0], thing.key_value_child["two"])
     assert_same(thing.key_value_child[1], thing.key_value_child["one"])
@@ -387,20 +387,20 @@ class TestXampl < Test::Unit::TestCase
   def test_indexed_remove
     thing = Thing.new
     thing.new_key_value("one").value = "1"
-		thing.remove_key_value(thing.key_value["one"])
+    thing.remove_key_value(thing.key_value["one"])
 
-		assert_equal(0, thing.children.size)
-		assert_equal(0, thing.key_value_child.size)
+    assert_equal(0, thing.children.size)
+    assert_equal(0, thing.key_value_child.size)
 
     thing = Thing.new
     thing.new_key_value("one").value = "1"
     thing.new_key_value("two").value = "2"
-		thing.remove_key_value(thing.key_value["one"])
+    thing.remove_key_value(thing.key_value["one"])
 
-		assert_equal(1, thing.children.size)
-		assert_equal(1, thing.key_value_child.size)
-		assert_not_nil(thing.key_value["two"])
-		assert_equal("2", thing.key_value["two"].value)
+    assert_equal(1, thing.children.size)
+    assert_equal(1, thing.key_value_child.size)
+    assert_not_nil(thing.key_value["two"])
+    assert_equal("2", thing.key_value["two"].value)
 
   end
 
@@ -602,7 +602,7 @@ class TestXampl < Test::Unit::TestCase
 
     # no sync after thing's creation, so thing should NOT exist after rollback
     found = Xampl.lookup(Thing, "thing")
-    assert_nil(found) 
+    assert_nil(found)
 
     assert_equal(original_persister, thing.persister)
 
@@ -648,7 +648,7 @@ class TestXampl < Test::Unit::TestCase
 
     # a sync done BEFORE the second 'stuff' was added to thing
     found = Xampl.lookup(Thing, "thing")
-    assert_equal(thing, found) 
+    assert_equal(thing, found)
 
     assert_equal(original_persister, current_persister)
     assert_equal(original_persister, thing.persister)
@@ -657,9 +657,9 @@ class TestXampl < Test::Unit::TestCase
     assert_equal(1, thing.stuff.size)
     assert_equal(1, found.stuff.size)
 
-#    assert_xampl_exception(:live_across_rollback){
-#      thing.new_stuff
-#    }
+    #    assert_xampl_exception(:live_across_rollback){
+    #      thing.new_stuff
+    #    }
 
     writes = Xampl.sync
 
@@ -765,7 +765,7 @@ class TestXampl < Test::Unit::TestCase
     end
 
     #Xampl.transaction(name, :filesystem, automatic=true) do
-      #Xampl.print_stats
+    #Xampl.print_stats
     #end
 
     Xampl.transaction(name, :filesystem, automatic=true) do
@@ -946,7 +946,7 @@ class TestXampl < Test::Unit::TestCase
 
     # no sync after thing's creation, so thing should NOT exist after rollback
     found = Xampl.lookup(Thing, "thing")
-    assert_nil(found) 
+    assert_nil(found)
 
     assert_equal(original_persister, thing.persister)
 
@@ -993,7 +993,7 @@ class TestXampl < Test::Unit::TestCase
 
     # a sync done BEFORE the second 'stuff' was added to thing
     found = Xampl.lookup(Thing, "thing")
-    assert_equal(found.object_id, thing.object_id) 
+    assert_equal(found.object_id, thing.object_id)
 
     assert_equal(original_persister, current_persister)
     assert_equal(current_persister, thing.persister)
@@ -1007,7 +1007,7 @@ class TestXampl < Test::Unit::TestCase
     assert(!thing.load_needed)
     assert(!thing.is_changed)
 
-    assert_equal(found.object_id, thing.object_id) 
+    assert_equal(found.object_id, thing.object_id)
     assert_equal(1, thing.stuff.size)
     assert_equal(1, found.stuff.size)
 
@@ -1103,7 +1103,7 @@ class TestXampl < Test::Unit::TestCase
   def test_generator_with_no_namespace
     generator = Generator.new
     generator.comprehend_from_strings([
-%Q{
+            %Q{
 <things xmlns:xampl='http://xampl.com/example/special'>
   <thing pid=''>
     <description kind=''>blah <emph>blah</emph> blah</description>
@@ -1288,7 +1288,7 @@ class TestXampl < Test::Unit::TestCase
 
     #generator.generate_to_directory(nil)
   end
-  
+
 
   def test_choose_names
     choose_name_test_helper("abcd", "Abcd", "abcd")
@@ -1410,46 +1410,46 @@ class TestXampl < Test::Unit::TestCase
     root = Thing.new("root")
     root.info = "root"
 
-		(branch1 = Branch.new).info='one'
-		(branch2 = Branch.new).info='two'
-		(branch3 = Branch.new).info='three'
-		(branch4 = Branch.new).info='four'
-		(branch5 = Branch.new).info='five'
+    (branch1 = Branch.new).info='one'
+    (branch2 = Branch.new).info='two'
+    (branch3 = Branch.new).info='three'
+    (branch4 = Branch.new).info='four'
+    (branch5 = Branch.new).info='five'
 
-		#puts branch1.pp_xml
+    #puts branch1.pp_xml
 
-		#
-		#                1
-		#             2     3
-		#                4
-		#                1
-		#        and 5 is a child of 1, 2, 3, and 4
+    #
+    #                1
+    #             2     3
+    #                4
+    #                1
+    #        and 5 is a child of 1, 2, 3, and 4
 
-		root << branch1
+    root << branch1
 
-		branch1 << branch2
-		branch1 << branch3
+    branch1 << branch2
+    branch1 << branch3
 
-		branch2 << branch4
-		branch3 << branch4
+    branch2 << branch4
+    branch3 << branch4
 
-		branch4 << branch1
+    branch4 << branch1
 
-		branch1 << branch5
-		branch2 << branch5
-		branch3 << branch5
-		branch4 << branch5
+    branch1 << branch5
+    branch2 << branch5
+    branch3 << branch5
+    branch4 << branch5
 
     #assert_xampl_exception(:cycle_detected_in_xampl_cluster){
     assert_xampl_exception(:cycle_detected_in_xampl_cluster){
-		  xml = PersistXML.new("").start(root).done
-		}
+      xml = PersistXML.new("").start(root).done
+    }
 
     assert_xampl_exception(:cycle_detected_in_xampl_cluster){
       Xampl.sync
-		}
+    }
 
-		#there is one thing and 5 branches, so 6 different things
+    #there is one thing and 5 branches, so 6 different things
     assert_equal(6, CountingVisitor.new.start(root).count)
 
     pp_xml = root.pp_xml
@@ -1573,19 +1573,19 @@ class TestXampl < Test::Unit::TestCase
   end
 
   def check_parents(xampl, parent=nil)
-    if(nil != parent) then
+    if (nil != parent) then
       found = false
       xampl.parents.each{ | p |
-        found = true if(parent == p)
+        found = true if (parent == p)
       }
       assert(found)
     else
-      if(xampl.kind_of? XamplObject)
+      if (xampl.kind_of? XamplObject)
         assert((nil == xampl.parents) || (0 == xampl.parents.size))
       end
     end
     xampl.children.each{ | child |
-      check_parents(child, xampl) if(child.kind_of? XamplObject)
+      check_parents(child, xampl) if (child.kind_of? XamplObject)
     }
   end
 end

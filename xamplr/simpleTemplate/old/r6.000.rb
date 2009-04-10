@@ -25,7 +25,7 @@ module TemplateEngine
   def #{method_name}(result=\"\")
 		tmp = ""
     result << \"\"
-"
+      "
       while line = file.gets
         if line[0] == ?|
           r << "   #{line[1..-1]}"
@@ -40,7 +40,7 @@ module TemplateEngine
     end
   end
 
-	def compile_scripts()
+  def compile_scripts()
     files.each { | script_name |
       method_name = File::basename(script_name, ".*")
       the_script = build_script(script_name, method_name)

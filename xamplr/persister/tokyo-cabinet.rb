@@ -1,47 +1,89 @@
 module Xampl
 
-  require "fileutils"
-  require 'rufus/tokyo'
-  require "persister/caching"
+  require 'fileutils'
+  require 'tokyocabinet'
+  require 'persister/caching'
 
-  class TokyoCabinetPersister < AbstractCachingPersister 
+  class TokyoCabinetPersister < AbstractCachingPersister
+    include TokyoCabinet
+
+    def note_errors(msg="TokyoCabinet Error:: %s\n")
+      result = yield
+
+      rmsg = nil
+      unless result then
+        rmsg = sprintf(msg, @tc_db.errmsg(@tc_db.ecode))
+        STDERR.printf(rmsg)
+        caller(0).each do |trace|
+          STDERR.puts(trace)
+        end
+      end
+      return rmsg
+    end
 
     def initialize(name=nil, format=nil, root=File.join(".", "repo"))
       super(root, name, format)
-      
+
       FileUtils.mkdir_p(@root_dir) unless File.exist?(@root_dir)
-      @tc_db = Rufus::Tokyo::Table.new("#{@root_dir}/repo.tct", :mode => 'wc', :opts => 'ld', :mutex => true)
+      filename = "#{@root_dir}/repo.tct"
+
+      @tc_db = TDB.new
+      note_errors("TC:: tuning error: %s\n") do
+        @tc_db.tune(-1, -1, -1, TDB::TDEFLATE)
+      end
+
+      note_errors("TC:: open error: %s\n") do
+        @tc_db.open(filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB ) #TDB::OTSYNC slows it down by almost 50 times
+      end
+
+      #      note_errors("TC:: optimisation error: %s\n") do
+      #        @tc_db.optimize(-1, -1, -1, TDB::TDEFLATE)
+      #      end
     end
 
     def TokyoCabinetPersister.kind
       :tokyo_cabinet
     end
 
-		def kind
+    def kind
       TokyoCabinetPersister.kind
-		end
+    end
 
-    def rollback_cleanup
-		  super
-      # @db.clear_cache -- TODO is something like this needed with TC?
-		end
+    def do_sync_write
+      @time_stamp = Time.now.to_f.to_s
 
-		def do_sync_write
-		  @time_stamp = Time.now.to_f.to_s
-		  
-		  @tc_db.transaction do
-        @changed.each { | xampl, ignore | write(xampl) }
+      begin
+        note_errors("TC:: tranbegin error: %s\n") do
+          @tc_db.tranbegin
+        end
+
+        @changed.each do |xampl, ignore|
+          write(xampl)
+        end
+      rescue => e
+        msg = note_errors("TC:: trancommit error: %s\n") do
+          @tc_db.tranabort
+        end
+        raise "TokyoCabinetPersister Error:: #{ msg }/#{ e }"
+      else
+        note_errors("TC:: trancommit error: %s\n") do
+          @tc_db.trancommit
+        end
       end
-		end
-		
-		def query
-		  results = @tc_db.query do | q |
-		    yield q
-		  end
-      # p results
-      
+    end
+
+    def query
+      query = TableQuery.new(@tc_db)
+
+      yield query
+
+      result_keys = query.search
+      results = result_keys.collect { | key | @tc_db[ key ] }
+
       class_cache = {}
       results.each do | result |
+        next unless result
+
         class_name = result['class']
         result_class = class_cache[class_name]
         unless result_class then
@@ -52,39 +94,38 @@ module Xampl
               result_class = Kernel.const_get( chunk )
             end
           end
-          
+
           class_cache[class_name] = result_class
         end
 
-        result_pid = result['pid']
-
-        x = self.lookup(result_class, result['pid'])
-        result['xampl'] = x if x
+        result['xampl'] = self.lookup(result_class, result['pid'])
       end
-      
-		  results
-	  end
+
+      results
+    end
 
     def write(xampl)
       raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index
 
       place = File.join(xampl.class.name.split("::"), xampl.get_the_index)
-      
       data = represent(xampl)
-      
+
       xampl_hash = {
-        'class' => xampl.class.name,
-        'pid' => xampl.get_the_index,
-        'time-stamp' => @time_stamp,
-        'xampl' => data
+              'class' => xampl.class.name,
+              'pid' => xampl.get_the_index,
+              'time-stamp' => @time_stamp,
+              'xampl' => data
       }
-      
+
       hash = xampl.describe_yourself
       if hash then
         xampl_hash = hash.merge(xampl_hash)
       end
 
-			@tc_db[place] = xampl_hash
+      note_errors("TC:: write error: %s\n") do
+        @tc_db.put(place, xampl_hash)
+#        @tc_db.putcat(place, xampl_hash) #dubious use in xampl
+      end
 
       @write_count = @write_count + 1
       xampl.changes_accepted
@@ -92,20 +133,220 @@ module Xampl
     end
 
     def read_representation(klass, pid)
-      # place = place_name(klass, pid)
       place = File.join(klass.name.split("::"), pid)
       representation = nil
-      @tc_db.transaction do
-  			representation = @tc_db[place]['xampl']
-		  end
-		  
+
+      meta = @tc_db[place]
+      representation = meta['xampl'] if meta
+
       # puts "read: #{ place }, size: #{ representation.size }"
       # puts representation[0..100]
-      
+
       return representation
     end
   end
 
-	Xampl.register_persister_kind(TokyoCabinetPersister)
+  #
+  # Derrived from rufus-tyrant, but simplified significantly, and using the
+  # TokyoCabinet named constants rather than numbers
+  #
+
+  class TableQuery
+    include TokyoCabinet
+
+    OPERATORS = {
+            # strings...
+
+            :streq => TDBQRY::QCSTREQ, # string equality
+            :eq => TDBQRY::QCSTREQ,
+            :eql => TDBQRY::QCSTREQ,
+            :equals => TDBQRY::QCSTREQ,
+
+            :strinc => TDBQRY::QCSTRINC, # string include
+            :inc => TDBQRY::QCSTRINC, # string include
+            :includes => TDBQRY::QCSTRINC, # string include
+
+            :strbw => TDBQRY::QCSTRBW, # string begins with
+            :bw => TDBQRY::QCSTRBW,
+            :starts_with => TDBQRY::QCSTRBW,
+            :strew => TDBQRY::QCSTREW, # string ends with
+            :ew => TDBQRY::QCSTREW,
+            :ends_with => TDBQRY::QCSTREW,
+
+            :strand => TDBQRY::QCSTRAND, # string which include all the tokens in the given exp
+            :and => TDBQRY::QCSTRAND,
+
+            :stror => TDBQRY::QCSTROR, # string which include at least one of the tokens
+            :or => TDBQRY::QCSTROR,
+
+            :stroreq => TDBQRY::QCSTROREQ, # string which is equal to at least one token
+
+            :strorrx => TDBQRY::QCSTRRX, # string which matches the given regex
+            :regex => TDBQRY::QCSTRRX,
+            :matches => TDBQRY::QCSTRRX,
+
+            # numbers...
+
+            :numeq => TDBQRY::QCNUMEQ, # equal
+            :numequals => TDBQRY::QCNUMEQ,
+            :numgt => TDBQRY::QCNUMGT, # greater than
+            :gt => TDBQRY::QCNUMGT,
+            :numge => TDBQRY::QCNUMGE, # greater or equal
+            :ge => TDBQRY::QCNUMGE,
+            :gte => TDBQRY::QCNUMGE,
+            :numlt => TDBQRY::QCNUMLT, # greater or equal
+            :lt => TDBQRY::QCNUMLT,
+            :numle => TDBQRY::QCNUMLE, # greater or equal
+            :le => TDBQRY::QCNUMLE,
+            :lte => TDBQRY::QCNUMLE,
+            :numbt => TDBQRY::QCNUMBT, # a number between two tokens in the given exp
+            :bt => TDBQRY::QCNUMBT,
+            :between => TDBQRY::QCNUMBT,
+
+            :numoreq => TDBQRY::QCNUMOREQ # number which is equal to at least one token
+    }
+
+    TDBQCNEGATE = TDBQRY::QCNEGATE
+    TDBQCNOIDX = TDBQRY::QCNOIDX
+
+    DIRECTIONS = {
+            :strasc => TDBQRY::QOSTRASC,
+            :strdesc => TDBQRY::QOSTRDESC,
+            :asc => TDBQRY::QOSTRASC,
+            :desc => TDBQRY::QOSTRDESC,
+            :numasc => TDBQRY::QONUMASC,
+            :numdesc => TDBQRY::QONUMDESC
+    }
+
+    #
+    # Creates a query for a given Rufus::Tokyo::Table
+    #
+    # Queries are usually created via the #query (#prepare_query #do_query)
+    # of the Table instance.
+    #
+    # Methods of interest here are :
+    #
+    #   * #add (or #add_condition)
+    #   * #order_by
+    #   * #limit
+    #
+    # also
+    #
+    #   * #pk_only
+    #   * #no_pk
+    #
+
+    def initialize (table)
+      @query = TDBQRY::new(table)
+      @opts = {}
+    end
+
+    #
+    # Performs the search
+    #
+
+    def search
+      @query.search
+    end
+
+    #
+    # Adds a condition
+    #
+    #   table.query { |q|
+    #     q.add 'name', :equals, 'Oppenheimer'
+    #     q.add 'age', :numgt, 35
+    #   }
+    #
+    # Understood 'operators' :
+    #
+    #   :streq # string equality
+    #   :eq
+    #   :eql
+    #   :equals
+    #
+    #   :strinc # string include
+    #   :inc # string include
+    #   :includes # string include
+    #
+    #   :strbw # string begins with
+    #   :bw
+    #   :starts_with
+    #   :strew # string ends with
+    #   :ew
+    #   :ends_with
+    #
+    #   :strand # string which include all the tokens in the given exp
+    #   :and
+    #
+    #   :stror # string which include at least one of the tokens
+    #   :or
+    #
+    #   :stroreq # string which is equal to at least one token
+    #
+    #   :strorrx # string which matches the given regex
+    #   :regex
+    #   :matches
+    #
+    #   # numbers...
+    #
+    #   :numeq # equal
+    #   :numequals
+    #   :numgt # greater than
+    #   :gt
+    #   :numge # greater or equal
+    #   :ge
+    #   :gte
+    #   :numlt # greater or equal
+    #   :lt
+    #   :numle # greater or equal
+    #   :le
+    #   :lte
+    #   :numbt # a number between two tokens in the given exp
+    #   :bt
+    #   :between
+    #
+    #   :numoreq # number which is equal to at least one token
+    #
+
+    def add (colname, operator, val, affirmative=true, no_index=true)
+      op = operator.is_a?(Fixnum) ? operator : OPERATORS[operator]
+      op = op | TDBQRY::QCNEGATE unless affirmative
+      op = op | TDBQRY::QCNOIDX if no_index
+
+      @query.addcond(colname, op, val)
+    end
+
+    alias :add_condition :add
+
+    #
+    # Sets the max number of records to return for this query.
+    #
+    # (If you're using TC >= 1.4.10 the optional 'offset' (skip) parameter
+    # is accepted)
+    #
+
+    def limit (i, offset=-1)
+      @query.setlimit(i, offset)
+    end
+
+    #
+    # Sets the sort order for the result of the query
+    #
+    # The 'direction' may be :
+    #
+    #   :strasc # string ascending
+    #   :strdesc
+    #   :asc # string ascending
+    #   :desc
+    #   :numasc # number ascending
+    #   :numdesc
+    #
+
+    def order_by (colname, direction=:strasc)
+      @query.setorder(colname, DIRECTIONS[direction])
+    end
+  end
+
+  Xampl.register_persister_kind(TokyoCabinetPersister)
 end
 

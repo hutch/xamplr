@@ -15,7 +15,6 @@ module TokyoCabinetExperimental
   found = Xampl.transaction("setup") do
     @@persister.query do | q |
       q.add_condition('age', :numle, '50')
-      q.order_by('age', :numasc)
     end
   end
   query_done = Time.now

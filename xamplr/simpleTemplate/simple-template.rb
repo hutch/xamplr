@@ -1,17 +1,16 @@
-
 module TemplateEngine
-	attr_accessor :method_to_file_name, :file_name_to_method
+  attr_accessor :method_to_file_name, :file_name_to_method
 
-	def initialize
-		@method_to_file_name = Hash.new()
-		@file_name_to_method = Hash.new()
-	end
+  def initialize
+    @method_to_file_name = Hash.new()
+    @file_name_to_method = Hash.new()
+  end
 
-#  def macro(name, &block)
-#    Kernel.send(:define_method, name) { |*args|
-#      puts block.call(args)
-#    }
-#  end
+  #  def macro(name, &block)
+  #    Kernel.send(:define_method, name) { |*args|
+  #      puts block.call(args)
+  #    }
+  #  end
 
   def build_script(template_file_name, method_name)
 
@@ -25,30 +24,30 @@ module TemplateEngine
     # from Ruby code, result << sprintf("hello %s", "world") in the template
     # will get its output where expected.
 
-		found_template_file_name = nil
-		$LOAD_PATH.each{ | directory |
-		  possible_template_file_name = File.join(directory, template_file_name)
-		  if File.exists?(possible_template_file_name)
-			  found_template_file_name = possible_template_file_name
-			end
-		}
-		return unless found_template_file_name
+    found_template_file_name = nil
+    $LOAD_PATH.each{ | directory |
+      possible_template_file_name = File.join(directory, template_file_name)
+      if File.exists?(possible_template_file_name)
+        found_template_file_name = possible_template_file_name
+      end
+    }
+    return unless found_template_file_name
     File.open(found_template_file_name) do | file |
-			tmp = ""
+      tmp = ""
       r = "
   def #{method_name}(result=\"\")
     result << \"\"
-"
+      "
       while line = file.gets
         if line[0] == ?|
-				  if(0 < tmp.length)
+          if (0 < tmp.length)
             r << "    result << \"#{tmp.gsub("\"", "\\\"")}\""
-					  tmp = ""
-					end
+            tmp = ""
+          end
           r << "   #{line[1..-1]}"
         else
           #tmp << line.chomp << "\n"
-					tmp << line
+          tmp << line
         end
       end
       r << "    result << \"#{tmp.gsub("\"", "\\\"")}\""
@@ -59,13 +58,13 @@ module TemplateEngine
     end
   end
 
-	def compile_scripts(files)
+  def compile_scripts(files)
     files.each { | script_name |
       method_name = File::basename(script_name, ".*")
-			## DEBUG ## puts "COMPILE: [[#{method_name}]]"
+      ## DEBUG ## puts "COMPILE: [[#{method_name}]]"
 
-			@method_to_file_name[method_name] = script_name;
-			@file_name_to_method[script_name] = method_name;
+      @method_to_file_name[method_name] = script_name;
+      @file_name_to_method[script_name] = method_name;
 
       the_script = build_script(script_name, method_name)
       ## DEBUG ## puts the_script

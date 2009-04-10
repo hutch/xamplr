@@ -36,31 +36,31 @@ class TestXampl < Test::Unit::TestCase
       eval(module_definition, nil, name, 1)
     }
 
-		parser = FromXML.new
-		conflict = parser.parse_string(xml)
+    parser = FromXML.new
+    conflict = parser.parse_string(xml)
 
-	  assert(conflict)
-		assert_equal("hansel", conflict.name)
-		assert_equal("hansel"[0], conflict.name[0])
-		assert_equal("blah", conflict.xname_child[0].name)
-		assert_equal("blah", conflict.name_child[0].name)
-		assert_nil(conflict.name['blah'])
+    assert(conflict)
+    assert_equal("hansel", conflict.name)
+    assert_equal("hansel"[0], conflict.name[0])
+    assert_equal("blah", conflict.xname_child[0].name)
+    assert_equal("blah", conflict.name_child[0].name)
+    assert_nil(conflict.name['blah'])
   end
 
   def check_parents(xampl, parent=nil)
-    if(nil != parent) then
+    if (nil != parent) then
       found = false
       xampl.parents.each{ | p |
-        found = true if(parent == p)
+        found = true if (parent == p)
       }
       assert(found)
     else
-      if(xampl.kind_of? XamplObject)
+      if (xampl.kind_of? XamplObject)
         assert((nil == xampl.parents) || (0 == xampl.parents.size))
       end
     end
     xampl.children.each{ | child |
-      check_parents(child, xampl) if(child.kind_of? XamplObject)
+      check_parents(child, xampl) if (child.kind_of? XamplObject)
     }
   end
 end

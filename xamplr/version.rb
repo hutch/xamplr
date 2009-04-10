@@ -11,8 +11,8 @@ module Xampl
       throw :refuse_to_version unless repo_name
 
       @repo_root = repo_root
-      @repo_root << '/' unless '/'[-1] == @repo_root[-1] 
-      
+      @repo_root << '/' unless '/'[-1] == @repo_root[-1]
+
       @repo_path = "#{@repo_root}#{repo_name}"
       @repo_name = repo_name
 
@@ -42,7 +42,7 @@ module Xampl
 
     def make_new_version(version_stream, existing_versions, description)
 
-      existing_versions.reverse!    
+      existing_versions.reverse!
       cmd = []
       eliminate = []
       existing_versions.each_with_index do | version, i |

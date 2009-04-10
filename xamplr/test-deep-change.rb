@@ -8,7 +8,7 @@ include Xampl
 
 class TestRollback < Test::Unit::TestCase
 
-    xml = %Q{
+  xml = %Q{
 <sack pid='white'>
   <bag mark='one'>
     <thing info='something'>hello</thing>
@@ -19,11 +19,11 @@ class TestRollback < Test::Unit::TestCase
 </sack>
     }
 
-    Generator.new.go(:strings => [ xml ],
-                     :directory => "step7")
+  Generator.new.go(:strings => [ xml ],
+                   :directory => "step7")
 
-    require "step7/XamplAdHoc"
-    include XamplAdHoc
+  require "step7/XamplAdHoc"
+  include XamplAdHoc
 
   def test_change
     pname = "test_change"

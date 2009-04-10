@@ -10,7 +10,7 @@ class TestXampl < Test::Unit::TestCase
 
   def xtest_dummy_fieldarray
     ia = []
-		ia.fields = []
+    ia.fields = []
 
     ia << 0 << 1 << 2
 
@@ -81,43 +81,43 @@ class TestXampl < Test::Unit::TestCase
 
   def test_two
     a = IndexedArray.new
-		b = IndexedArray.new
+    b = IndexedArray.new
 
-		a["one"] = 1
-		a["two"] = 2
-		a["three"] = 3
+    a["one"] = 1
+    a["two"] = 2
+    a["three"] = 3
 
-#		a.each_pair { | k, v |
-#		  puts "a:: k: #{k}, v: #{v}"
-#		}
-#		a.dump("a")
-#		b.each_pair { | k, v |
-#		  puts "b:: k: #{k}, v: #{v}"
-#		}
-#		b.dump("b")
+    #		a.each_pair { | k, v |
+    #		  puts "a:: k: #{k}, v: #{v}"
+    #		}
+    #		a.dump("a")
+    #		b.each_pair { | k, v |
+    #		  puts "b:: k: #{k}, v: #{v}"
+    #		}
+    #		b.dump("b")
 
 
-		b["three"] = 300
-		b["two"] = 200
-		b["one"] = 100
+    b["three"] = 300
+    b["two"] = 200
+    b["one"] = 100
 
-		assert_equal(1, a["one"])
-		assert_equal(2, a["two"])
-		assert_equal(3, a["three"])
+    assert_equal(1, a["one"])
+    assert_equal(2, a["two"])
+    assert_equal(3, a["three"])
 
-		assert_equal(1, a[0])
-		assert_equal(2, a[1])
-		assert_equal(3, a[2])
+    assert_equal(1, a[0])
+    assert_equal(2, a[1])
+    assert_equal(3, a[2])
 
-		assert_equal(300, b["three"])
-		assert_equal(200, b["two"])
-		assert_equal(100, b["one"])
-		assert_equal(300, b[0]) ### returns 100 here
-		assert_equal(200, b[1])
-		assert_equal(100, b[2])
+    assert_equal(300, b["three"])
+    assert_equal(200, b["two"])
+    assert_equal(100, b["one"])
+    assert_equal(300, b[0]) ### returns 100 here
+    assert_equal(200, b[1])
+    assert_equal(100, b[2])
 
-#		a.dump("a")
-#		b.dump("b")
+    #		a.dump("a")
+    #		b.dump("b")
 
   end
 
@@ -125,44 +125,44 @@ class TestXampl < Test::Unit::TestCase
     a = []
     a.fields = []
 
-		b = []
-		b.fields = []
+    b = []
+    b.fields = []
 
-		a["one"] = 1
-		a["two"] = 2
-		a["three"] = 3
+    a["one"] = 1
+    a["two"] = 2
+    a["three"] = 3
 
-#		a.each_pair { | k, v |
-#		  puts "a:: k: #{k}, v: #{v}"
-#		}
-#		a.dump("a")
-#		b.each_pair { | k, v |
-#		  puts "b:: k: #{k}, v: #{v}"
-#		}
-#		b.dump("b")
+    #		a.each_pair { | k, v |
+    #		  puts "a:: k: #{k}, v: #{v}"
+    #		}
+    #		a.dump("a")
+    #		b.each_pair { | k, v |
+    #		  puts "b:: k: #{k}, v: #{v}"
+    #		}
+    #		b.dump("b")
 
 
-		b["three"] = 300
-		b["two"] = 200
-		b["one"] = 100
+    b["three"] = 300
+    b["two"] = 200
+    b["one"] = 100
 
-		assert_equal(1, a["one"])
-		assert_equal(2, a["two"])
-		assert_equal(3, a["three"])
+    assert_equal(1, a["one"])
+    assert_equal(2, a["two"])
+    assert_equal(3, a["three"])
 
-		assert_equal(1, a[0])
-		assert_equal(2, a[1])
-		assert_equal(3, a[2])
+    assert_equal(1, a[0])
+    assert_equal(2, a[1])
+    assert_equal(3, a[2])
 
-		assert_equal(300, b["three"])
-		assert_equal(200, b["two"])
-		assert_equal(100, b["one"])
-		assert_equal(300, b[0]) ### returns 100 here
-		assert_equal(200, b[1])
-		assert_equal(100, b[2])
+    assert_equal(300, b["three"])
+    assert_equal(200, b["two"])
+    assert_equal(100, b["one"])
+    assert_equal(300, b[0]) ### returns 100 here
+    assert_equal(200, b[1])
+    assert_equal(100, b[2])
 
-#		a.dump("a")
-#		b.dump("b")
+    #		a.dump("a")
+    #		b.dump("b")
 
   end
 

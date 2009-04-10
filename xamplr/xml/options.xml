@@ -1,11 +1,12 @@
 <options xmlns='http://xampl.com/generator'>
 
-  <index-attribute name='name' />
-  <index-attribute name='id' />
-  <index-attribute name='pid' persisted='true'/>
+    <index-attribute name='name'/>
+    <index-attribute name='id'/>
+    <index-attribute name='pid'
+                     persisted='true'/>
 
-  <resolve pkg='XoxAdHoc'/>
-  <resolve namespace='http://xampl.com/generator'
-           pkg='XamplGenerator'
-					 preferred_prefix='gen'/>
+    <resolve pkg='XoxAdHoc'/>
+    <resolve namespace='http://xampl.com/generator'
+             pkg='XamplGenerator'
+             preferred_prefix='gen'/>
 </options>

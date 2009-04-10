@@ -1,16 +1,15 @@
-
 module Xampl
 
   class RubyPrinter
 
     $USE_A_PROC = false
 
-	  def initialize
-		  @obj_count = 0
-			@map = {}
-			@lookup_map={}
-		end
-  
+    def initialize
+      @obj_count = 0
+      @map = {}
+      @lookup_map={}
+    end
+
     def show_attributes(thing, name, depth)
       return "" unless thing.attributes
 
@@ -26,15 +25,15 @@ module Xampl
       else
         thing.attributes.each{ | attribute |
           value = thing.instance_variable_get(attribute[0])
-          
+
           if value then
-						if value.kind_of?(XamplObject) then
+            if value.kind_of?(XamplObject) then
               vname = "root_#{@obj_count += 1}"
               out << to_ruby_as_attr(value, depth, vname)
               out << indent << "#{name}.instance_variable_set(:#{attribute[0]}, #{vname})\n"
-						else
+            else
               out << indent << "#{name}.instance_variable_set(:#{attribute[0]}, #{value.inspect})\n"
-						end
+            end
           end
         }
       end
@@ -49,8 +48,8 @@ module Xampl
       return out << indent << "#{name}.load_needed = true\n" if thing.persist_required and (1 < depth)
 
       if (!thing.kind_of? XamplWithMixedContent) and
-         (!thing.kind_of? XamplWithoutContent) and
-         thing._content then
+              (!thing.kind_of? XamplWithoutContent) and
+              thing._content then
         out << indent << "#{name} << #{thing._content.inspect}\n"
       end
       thing.children.each{ | child |
@@ -90,7 +89,7 @@ module Xampl
       else
         thing.attributes.each{ | attribute |
           value = thing.instance_variable_get(attribute[0])
-          
+
           if value then
             out << "      " << "xampl.instance_variable_set(:#{attribute[0]}, #{value.inspect})\n"
           end
@@ -106,19 +105,19 @@ module Xampl
         if child.kind_of? XamplObject and (nil == @map[child]) then
           cname = "v_#{child.safe_name}_#{@obj_count += 1}"
 
-					@map[child] = cname
+          @map[child] = cname
 
           cout = ""
           cout << show_attributes_flat(child, 1 + depth)
 
           if 0 < cout.size then
-					  if child.persist_required then
+            if child.persist_required then
               out << "    " << "#{cname} = #{child.class.to_s}['#{child.get_the_index}']\n"
-						else
+            else
               out << "    " << "#{cname} = #{child.class.to_s}.new { | xampl |\n"
               out << cout
               out << "    " << "}\n"
-						end
+            end
           else
             out << "    " << "#{cname} = #{child.class.to_s}.new\n"
           end
@@ -127,52 +126,52 @@ module Xampl
       }
       return out
     end
-  
+
     def show_children_stitch_start(thing, depth)
       @lookup_map.merge!(@map)
-			return show_children_stitch(thing, depth)
-		end
+      return show_children_stitch(thing, depth)
+    end
 
     def show_children_stitch(thing, depth)
       out = ""
-			
+
       return out if thing.persist_required and (0 < depth)
 
-			name = @map[thing]
-			if name then
-			  @map.delete(thing)
-			else
-			  return out
-			end
+      name = @map[thing]
+      if name then
+        @map.delete(thing)
+      else
+        return out
+      end
 
       if (!thing.kind_of? XamplWithMixedContent) and
-         (!thing.kind_of? XamplWithoutContent) and
-         thing._content then
+              (!thing.kind_of? XamplWithoutContent) and
+              thing._content then
         out << "    " << "#{name} << #{thing._content.inspect}\n"
       end
       thing.children.each{ | child |
         if child.kind_of? XamplObject then
           out << "    " << "#{name} << #{@lookup_map[child]}\n"
-				else
+        else
           out << "    " << "#{name} << #{child.inspect}\n"
-				end
+        end
       }
       thing.children.each{ | child |
         if child.kind_of? XamplObject then
           out << show_children_stitch(child, 1 + depth)
-				end
+        end
       }
       return out
     end
-  
+
     def to_ruby(thing, depth=0, name="root")
       thing.accessed
 
-		  @obj_count = 0
-			@map = {}
-			@lookup_map={}
+      @obj_count = 0
+      @map = {}
+      @lookup_map={}
 
-			@map[thing] = name
+      @map[thing] = name
 
       if $USE_A_PROC then
         return %Q{
@@ -180,9 +179,9 @@ module XamplRubyDefinition
   @@proc = Proc.new { | target |
     #{name} = target ? target : #{thing.class.to_s}.new
 #{show_attributes(thing, name, depth)}
-#{show_children_flat(thing, name, depth)}
-#{show_children_stitch_start(thing, depth)}
-    #{name}
+        #{show_children_flat(thing, name, depth)}
+        #{show_children_stitch_start(thing, depth)}
+        #{name}
   }
 end
 }
@@ -192,9 +191,9 @@ module XamplRubyDefinition
   def XamplRubyDefinition.build_it(target)
     #{name} = target ? target : #{thing.class.to_s}.new
 #{show_attributes(thing, name, depth)}
-#{show_children_flat(thing, name, depth)}
-#{show_children_stitch_start(thing, depth)}
-    #{name}
+        #{show_children_flat(thing, name, depth)}
+        #{show_children_stitch_start(thing, depth)}
+        #{name}
   end
 end
 }
@@ -204,14 +203,14 @@ end
     def to_ruby_as_attr(thing, depth, name)
       thing.accessed
 
-			@map[thing] = name
+      @map[thing] = name
 
       return %Q{
-    #{name} = #{thing.class.name}.new
+      #{name} = #{thing.class.name}.new
 #{show_attributes(thing, name, depth)}
-#{show_children_flat(thing, name, depth)}
-#{show_children_stitch_start(thing, depth)}
-}
+      #{show_children_flat(thing, name, depth)}
+      #{show_children_stitch_start(thing, depth)}
+      }
     end
   end
-end  
+end

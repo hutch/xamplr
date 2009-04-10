@@ -13,13 +13,13 @@ module Xampl
   end
 
   def Xampl.block_future_changes(on=true)
-    if(@@persister) then
+    if (@@persister) then
       @@persister.block_changes = on
     end
   end
 
   def Xampl.auto_persistence(on=true)
-    if(@@persister) then
+    if (@@persister) then
       @@persister.automatic = on
     end
   end
@@ -39,7 +39,7 @@ module Xampl
 
   @@default_persister_kind = :simple
   @@default_persister_format = :xml_format
-  
+
   def Xampl.default_persister_kind
     @@default_persister_kind
   end
@@ -55,18 +55,18 @@ module Xampl
     @@default_persister_format = format
     #puts "SET FORMAT format: #{@@default_persister_format}, kind: #{@@default_persister_kind}"
   end
-  
+
   def Xampl.enable_persister(name, kind=nil, format=nil)
     kind = kind || @@default_persister_kind
     format = format || @@default_persister_format
     @@persister = @@known_persisters[name]
-    
+
     if @@persister then
       # TODO -- if we know the persister, why are we being so anal about kind and format???
-      
+
       kind = @@persister.kind || kind
       format = @@persister.format || format
-      
+
       #raise XamplException.new(:live_across_rollback) if @@persister.rolled_back
       if kind and kind != @@persister.kind then
         raise IncompatiblePersisterRequest.new(@@persister, "kind", kind, @@persister.kind)
@@ -79,12 +79,12 @@ module Xampl
     unless @@persister then
       # puts "CREATE PERSISTER #{name}, format: #{format}, kind: #{kind}"
       @@persister = @@persister_kinds[kind].new(name, format)
-      if(nil != name) then
+      if (nil != name) then
         @@known_persisters[name] = @@persister
       end
     end
 
-	  @@persister 
+    @@persister
   end
 
   def Xampl.print_known_persisters
@@ -112,13 +112,13 @@ module Xampl
     GC.start
     GC.start
   end
-  
+
   def Xampl.drop_persister(name)
     Xampl.print_known_persisters
     @@known_persisters.delete(name)
     Xampl.print_known_persisters
   end
-  
+
   @@xampl_lock = Sync.new
 
   @@verbose_transactions = true
@@ -137,23 +137,23 @@ module Xampl
 
     if block_given? then
       @@xampl_lock.synchronize(:EX) do
-  	    initial_persister = @@persister
+        initial_persister = @@persister
         Xampl.enable_persister(name, kind, format)
 
-  		  rollback = true
+        rollback = true
         exception = nil
         original_automatic = @@persister.automatic
-  			begin
-  				#TODO -- impose some rules on nested transactions/enable_persisters??
+        begin
+          #TODO -- impose some rules on nested transactions/enable_persisters??
           Xampl.auto_persistence(automatic)
-  		    result = yield
+          result = yield
           Xampl.block_future_changes(true)
           Xampl.sync
-  			  rollback = false
+          rollback = false
           return result
         rescue => e
           exception = e
-  			ensure
+        ensure
           Xampl.block_future_changes(false)
           Xampl.auto_persistence(original_automatic)
           if rollback then
@@ -167,11 +167,11 @@ module Xampl
               end
             end
           end
-  			  Xampl.rollback if rollback
-  	      @@persister = initial_persister
-  			end
+          Xampl.rollback if rollback
+          @@persister = initial_persister
+        end
       end
-		end
+    end
   end
 
   def Xampl.read_only_transaction(thing, kind=nil, automatic=true, format=nil, &block)
@@ -186,24 +186,24 @@ module Xampl
     target_persister = nil
     if block_given? then
       @@xampl_lock.synchronize(:EX) do
-  	    initial_persister = @@persister
+        initial_persister = @@persister
         Xampl.enable_persister(name, kind, format)
         target_persister = @@persister
 
-  		  rollback = true
+        rollback = true
         original_automatic = @@persister.automatic
         @changed ||= nil
         original_changed = @changed
         @changed = {}
-  			begin
+        begin
           Xampl.auto_persistence(false)
           #Xampl.block_future_changes(true)
 
-  		    yield
-  			  rollback = false
+          yield
+          rollback = false
         rescue => e
           exception = e
-  			ensure
+        ensure
           Xampl.auto_persistence(original_automatic)
           #Xampl.block_future_changes(false)
 
@@ -213,24 +213,24 @@ module Xampl
             if rollback then
               puts "ROLLBACK(#{__LINE__}):: #{exception}"
               print exception.backtrace.join("\n")
-  			      Xampl.rollback
+              Xampl.rollback
             end
-  	        @@persister = initial_persister
+            @@persister = initial_persister
           else
             puts "CHANGED COUNT: #{@changed.size}"
             @changed = original_changed
 
             puts "ROLLBACK(#{__LINE__}) #{exception}" if rollback
             print exception.backtrace.join("\n")
-  			    Xampl.rollback
+            Xampl.rollback
 
-  	        @@persister = initial_persister
+            @@persister = initial_persister
 
             raise BlockedChange.new(target_persister)
           end
-  			end
+        end
       end
-		end
+    end
   end
 
   def Xampl.read_only(target_persister)
@@ -238,33 +238,33 @@ module Xampl
     name = target_persister.name
 
     if block_given? then
-	    initial_persister = @@persister
+      initial_persister = @@persister
       Xampl.enable_persister(name, target_persister.kind, target_persister.format)
 
-		  rollback = true
+      rollback = true
       original_automatic = @@persister.automatic
       original_changed = @changed
       @changed = {}
-			begin
+      begin
         Xampl.auto_persistence(false)
         #Xampl.block_future_changes(true)
 
-		    yield
-			  rollback = false
-			ensure
-####        Xampl.auto_persistence(original_automatic)
-####        #Xampl.block_future_changes(false)
-####
-####        if 0 < @changed.size then
-####          puts "CHANGED COUNT: #{@changed.size}"
-####          raise BlockedChange.new(target_persister)
-####        end
-####
-####        @changed = original_changed
-####
-####        puts "ROLLBACK(#{__LINE__})" if rollback
-####			  Xampl.rollback if rollback
-####	      @@persister = initial_persister
+        yield
+        rollback = false
+      ensure
+        ####        Xampl.auto_persistence(original_automatic)
+        ####        #Xampl.block_future_changes(false)
+        ####
+        ####        if 0 < @changed.size then
+        ####          puts "CHANGED COUNT: #{@changed.size}"
+        ####          raise BlockedChange.new(target_persister)
+        ####        end
+        ####
+        ####        @changed = original_changed
+        ####
+        ####        puts "ROLLBACK(#{__LINE__})" if rollback
+        ####			  Xampl.rollback if rollback
+        ####	      @@persister = initial_persister
 
         Xampl.auto_persistence(original_automatic)
         #Xampl.block_future_changes(false)
@@ -273,21 +273,21 @@ module Xampl
           @changed = original_changed
 
           puts "ROLLBACK(#{__LINE__})" if rollback
-			    Xampl.rollback if rollback
-	        @@persister = initial_persister
+          Xampl.rollback if rollback
+          @@persister = initial_persister
         else
           puts "CHANGED COUNT: #{@changed.size}"
           @changed = original_changed
 
           puts "ROLLBACK(#{__LINE__})" if rollback
-			    Xampl.rollback
+          Xampl.rollback
 
-	        @@persister = initial_persister
+          @@persister = initial_persister
 
           raise BlockedChange.new(target_persister)
         end
-			end
-		end
+      end
+    end
   end
 
   def Xampl.introduce_to_persister(xampl)
@@ -369,7 +369,7 @@ module Xampl
 
     puts "LOOKUP LAZY(#{klass.name}, #{pid}) -- EXISTING: #{xampl}"
     return xampl if xampl
-    
+
     #xampl = @@persister.lookup(klass, pid) if nil != persister
     if nil != persister then
       xampl = klass.new(pid) if nil != persister
@@ -385,7 +385,7 @@ module Xampl
     xampl, ignore = @@persister.find_known(klass, pid) if nil != persister
     return xampl
   end
-  
+
   def Xampl.write_to_cache(xampl)
     @@persister.write_to_cache(xampl)
   end
@@ -546,21 +546,21 @@ module Xampl
         end
         @changed[xampl] = xampl
 #         puts "!!!! change recorded ==> #{@changed.size}/#{count_changed} #{@changed.object_id} !!!!"
-#         @changed.each{ | thing, ignore |
-#           puts "             changed: #{thing}, index: #{thing.get_the_index},  changed: #{thing.is_changed}"
-#         }
+        #         @changed.each{ | thing, ignore |
+        #           puts "             changed: #{thing}, index: #{thing.get_the_index},  changed: #{thing.is_changed}"
+        #         }
       end
     end
-    
+
     def has_not_changed(xampl)
-#       puts "!!!! has_not_changed #{xampl} #{xampl.get_the_index} -- in @changed: #{nil != @changed[xampl]}"
+      #       puts "!!!! has_not_changed #{xampl} #{xampl.get_the_index} -- in @changed: #{nil != @changed[xampl]}"
       @changed.delete(xampl) if xampl
     end
-    
+
     def count_changed
 #      @changed.each{ | thing, ignore |
-#        puts "changed: #{thing}, index: #{thing.get_the_index}"
-#      }
+      #        puts "changed: #{thing}, index: #{thing.get_the_index}"
+      #      }
       return @changed.size
     end
 
@@ -598,22 +598,22 @@ module Xampl
     end
 
     def represent(xampl)
-#puts "REPRESENT #{xampl} load needed: #{xampl.load_needed}"
-#      return nil if xampl.load_needed
+      #puts "REPRESENT #{xampl} load needed: #{xampl.load_needed}"
+      #      return nil if xampl.load_needed
       case xampl.default_persister_format || @format
-        when nil, :xml_format then
-          return xampl.persist
-        when :ruby_format then
-          return xampl.to_ruby
-        when :yaml_format then
-          return xampl.as_yaml
+      when nil, :xml_format then
+        return xampl.persist
+      when :ruby_format then
+        return xampl.to_ruby
+      when :yaml_format then
+        return xampl.as_yaml
       end
     end
 
     def realise(representation, target=nil)
       # Normally we'd expect to see the representation in the @format format, but
       # that isn't necessarily the case. Try to work out what the format might be...
-      
+
       if representation =~ /^</ then
         return XamplObject.realise_from_xml_string(representation, target)
       elsif representation =~ /^-/ then
@@ -621,7 +621,7 @@ module Xampl
       else
         XamplObject.from_ruby(representation, target)
       end
-      
+
       # case @format
       #   when nil, :xml_format then
       #     return XamplObject.realise_from_xml_string(representation, target)
@@ -648,34 +648,34 @@ module Xampl
 
     def lookup(klass, pid)
       #raise XamplException.new(:live_across_rollback) if @rolled_back
-      
+
       # puts "LOOKUP:: klass: #{klass} pid: #{pid}"
-      
+
       begin
         busy(true)
         xampl = read(klass, pid)
       ensure
         busy(false)
       end
-      
+
       return xampl
     end
 
     def find_known(klass, pid)
       #raise XamplException.new(:live_across_rollback) if @rolled_back
-      
+
       xampl = read_from_cache(klass, pid, nil)
-      
+
       return xampl
     end
 
     def lazy_load(target, klass, pid)
       # puts "LAZY_LOAD:: klass: #{klass} pid: #{pid} target: #{target}"
-      
+
       xampl = read(klass, pid, target)
-      
+
       # puts "   LAZY_LOAD --> #{xampl}"
-      
+
       return xampl
     end
 
@@ -683,7 +683,7 @@ module Xampl
       puts "Changed::#{msg}:"
       @changed.each { | xampl, ignore | puts "   #{xampl.tag} #{xampl.get_the_index}" }
     end
-    
+
     def do_sync_write
       unchanged_in_changed_list = 0
       @changed.each { | xampl, ignore |
@@ -697,25 +697,25 @@ module Xampl
     def sync
       #raise XamplException.new(:live_across_rollback) if @rolled_back
       begin
-#puts "SYNC"
-#puts "SYNC"
-#puts "SYNC changed: #{@changed.size}" if 0 < @changed.size
-#@changed.each do | key, value |
-  ##puts "   #{key.class.name}"
-  ##puts "key: #{key.class.name}, value: #{value.class.name}"
-  #puts key.to_xml
-#end
-#puts "SYNC"
-#puts "SYNC"
+        #puts "SYNC"
+        #puts "SYNC"
+        #puts "SYNC changed: #{@changed.size}" if 0 < @changed.size
+        #@changed.each do | key, value |
+        ##puts "   #{key.class.name}"
+        ##puts "key: #{key.class.name}, value: #{value.class.name}"
+        #puts key.to_xml
+        #end
+        #puts "SYNC"
+        #puts "SYNC"
 
-#if 0 < @changed.size then
-#puts "SYNC changed: #{@changed.size}"
-##caller(0).each do | trace |
-##  next if /xamplr/ =~ trace
-##  puts "  #{trace}"
-##  break if /actionpack/ =~ trace
-##end   
-#end
+        #if 0 < @changed.size then
+        #puts "SYNC changed: #{@changed.size}"
+        ##caller(0).each do | trace |
+        ##  next if /xamplr/ =~ trace
+        ##  puts "  #{trace}"
+        ##  break if /actionpack/ =~ trace
+        ##end
+        #end
         busy(true)
         @syncing = true
 
@@ -808,6 +808,7 @@ module Xampl
 
   class IncompatiblePersisterRequest < Exception
     attr_reader :msg
+
     def initialize(persister, feature_name, requested_feature_value, actual_feature_value)
       @msg = "persister #{persister.name}:: requested feature: #{feature_name} #{requested_feature_value}, actual: #{actual_feature_value}"
     end
@@ -819,6 +820,7 @@ module Xampl
 
   class MixedPersisters < Exception
     attr_reader :msg
+
     def initialize(active, local)
       @msg = "mixed persisters:: active #{active.name}, local: #{local.name}"
     end
@@ -831,7 +833,7 @@ module Xampl
   require "persister/simple"
   require "persister/in-memory"
   require "persister/filesystem"
-  
+
   if require 'rufus/tokyo' then
     require "persister/tokyo-cabinet"
   end

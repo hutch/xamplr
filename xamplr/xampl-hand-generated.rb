@@ -1,13 +1,13 @@
 module XamplGenerator
 
   require "xampl"
-	include Xampl
+  include Xampl
 
   XamplObject.ns_preferred_prefix("http://xampl.com/generator", "gen")
 
   module ElementsAsChild
     require "indexed-array"
-  
+
     def elements_child
       accessed
       @elements_child
@@ -20,21 +20,21 @@ module XamplGenerator
 
     alias elements elements_child
     alias elements= elements_child=
-  
+
     def init_elements_as_child
       @elements_child = IndexedArray.new
     end
-  
+
     def add_elements(elements)
       accessed
       index = elements.get_the_index
-      if(nil == index) then
+      if (nil == index) then
         throw "no value for the index 'pid' of elements defined in : " << elements.pp_xml
       end
 
       existing = @elements_child[index]
 
-			self.remove_elements(index) if existing and (existing != elements)
+      self.remove_elements(index) if existing and (existing != elements)
 
       @children << elements
       @elements_child[index] = elements
@@ -44,7 +44,7 @@ module XamplGenerator
       changed
       return elements
     end
-  
+
     def new_elements(index)
       accessed
 
@@ -60,21 +60,21 @@ module XamplGenerator
       accessed
 
       elements = @elements_child[index]
-		  return elements if elements 
+      return elements if elements
 
       elements = Elements.lookup(index) if Xampl.persister and Xampl.persister.automatic
       elements = Elements.new(index) unless elements
 
       yield(elements) if block_given?
       return add_elements(elements)
-		end
+    end
 
     def remove_elements(index)
       accessed
-			changed
-	    unless String === index or Symbol === index then
+      changed
+      unless String === index or Symbol === index then
         index = index.get_the_index
-			end
+      end
       elements = @elements_child.delete(index) if index
       @children.delete(elements)
     end
@@ -82,7 +82,7 @@ module XamplGenerator
 
   module ElementAsChild
     require "indexed-array"
-  
+
     def element_child
       accessed
       @element_child
@@ -95,21 +95,21 @@ module XamplGenerator
 
     alias element element_child
     alias element= element_child=
-  
+
     def init_element_as_child
       @element_child = IndexedArray.new
     end
-  
+
     def add_element(element)
       accessed
       index = element.get_the_index
-      if(nil == index) then
+      if (nil == index) then
         throw "no value for the index 'name' of element defined in : " << element.pp_xml
       end
 
       existing = @element_child[index]
 
-			self.remove_element(index) if existing and (existing != element)
+      self.remove_element(index) if existing and (existing != element)
 
       @children << element
       @element_child[index] = element
@@ -119,7 +119,7 @@ module XamplGenerator
       changed
       return element
     end
-  
+
     def new_element(index)
       accessed
 
@@ -134,20 +134,20 @@ module XamplGenerator
       accessed
 
       element = @element_child[index]
-		  return element if element 
+      return element if element
 
       element = Element.new(index) unless element
 
       yield(element) if block_given?
       return add_element(element)
-		end
+    end
 
     def remove_element(index)
       accessed
-			changed
-	    unless String === index or Symbol === index then
+      changed
+      unless String === index or Symbol === index then
         index = index.get_the_index
-			end
+      end
       element = @element_child.delete(index) if index
       @children.delete(element)
     end
@@ -155,7 +155,7 @@ module XamplGenerator
 
   module ChildElementAsChild
     require "indexed-array"
-  
+
     def child_element_child
       accessed
       @child_element_child
@@ -168,21 +168,21 @@ module XamplGenerator
 
     alias child_element child_element_child
     alias child_element= child_element_child=
-  
+
     def init_child_element_as_child
       @child_element_child = IndexedArray.new
     end
-  
+
     def add_child_element(child_element)
       accessed
       index = child_element.get_the_index
-      if(nil == index) then
+      if (nil == index) then
         throw "no value for the index 'name' of child_element defined in : " << child_element.pp_xml
       end
 
       existing = @child_element_child[index]
 
-			self.remove_child_element(index) if existing and (existing != child_element)
+      self.remove_child_element(index) if existing and (existing != child_element)
 
       @children << child_element
       @child_element_child[index] = child_element
@@ -192,7 +192,7 @@ module XamplGenerator
       changed
       return child_element
     end
-  
+
     def new_child_element(index)
       accessed
 
@@ -207,20 +207,20 @@ module XamplGenerator
       accessed
 
       child_element = @child_element_child[index]
-		  return child_element if child_element 
+      return child_element if child_element
 
       child_element = ChildElement.new(index) unless child_element
 
       yield(child_element) if block_given?
       return add_child_element(child_element)
-		end
+    end
 
     def remove_child_element(index)
       accessed
-			changed
-	    unless String === index or Symbol === index then
+      changed
+      unless String === index or Symbol === index then
         index = index.get_the_index
-			end
+      end
       child_element = @child_element_child.delete(index) if index
       @children.delete(child_element)
     end
@@ -228,7 +228,7 @@ module XamplGenerator
 
   module AttributeAsChild
     require "indexed-array"
-  
+
     def attribute_child
       accessed
       @attribute_child
@@ -241,21 +241,21 @@ module XamplGenerator
 
     alias attribute attribute_child
     alias attribute= attribute_child=
-  
+
     def init_attribute_as_child
       @attribute_child = IndexedArray.new
     end
-  
+
     def add_attribute(attribute)
       accessed
       index = attribute.get_the_index
-      if(nil == index) then
+      if (nil == index) then
         throw "no value for the index 'name' of attribute defined in : " << attribute.pp_xml
       end
 
       existing = @attribute_child[index]
 
-			self.remove_attribute(index) if existing and (existing != attribute)
+      self.remove_attribute(index) if existing and (existing != attribute)
 
       @children << attribute
       @attribute_child[index] = attribute
@@ -265,7 +265,7 @@ module XamplGenerator
       changed
       return attribute
     end
-  
+
     def new_attribute(index)
       accessed
 
@@ -280,20 +280,20 @@ module XamplGenerator
       accessed
 
       attribute = @attribute_child[index]
-		  return attribute if attribute 
+      return attribute if attribute
 
       attribute = Attribute.new(index) unless attribute
 
       yield(attribute) if block_given?
       return add_attribute(attribute)
-		end
+    end
 
     def remove_attribute(index)
       accessed
-			changed
-	    unless String === index or Symbol === index then
+      changed
+      unless String === index or Symbol === index then
         index = index.get_the_index
-			end
+      end
       attribute = @attribute_child.delete(index) if index
       @children.delete(attribute)
     end
@@ -312,7 +312,7 @@ module XamplGenerator
 
     alias options options_child
     alias options= options_child=
-  
+
     def init_options_as_child
       @options_child = []
     end
@@ -325,7 +325,7 @@ module XamplGenerator
       changed
       return options
     end
-  
+
     def new_options
       accessed
       options = Options.new
@@ -344,7 +344,7 @@ module XamplGenerator
 
   module IndexAttributeAsChild
     require "indexed-array"
-  
+
     def index_attribute_child
       accessed
       @index_attribute_child
@@ -357,21 +357,21 @@ module XamplGenerator
 
     alias index_attribute index_attribute_child
     alias index_attribute= index_attribute_child=
-  
+
     def init_index_attribute_as_child
       @index_attribute_child = IndexedArray.new
     end
-  
+
     def add_index_attribute(index_attribute)
       accessed
       index = index_attribute.get_the_index
-      if(nil == index) then
+      if (nil == index) then
         throw "no value for the index 'name' of index_attribute defined in : " << index_attribute.pp_xml
       end
 
       existing = @index_attribute_child[index]
 
-			self.remove_index_attribute(index) if existing and (existing != index_attribute)
+      self.remove_index_attribute(index) if existing and (existing != index_attribute)
 
       @children << index_attribute
       @index_attribute_child[index] = index_attribute
@@ -381,7 +381,7 @@ module XamplGenerator
       changed
       return index_attribute
     end
-  
+
     def new_index_attribute(index)
       accessed
 
@@ -396,20 +396,20 @@ module XamplGenerator
       accessed
 
       index_attribute = @index_attribute_child[index]
-		  return index_attribute if index_attribute 
+      return index_attribute if index_attribute
 
       index_attribute = IndexAttribute.new(index) unless index_attribute
 
       yield(index_attribute) if block_given?
       return add_index_attribute(index_attribute)
-		end
+    end
 
     def remove_index_attribute(index)
       accessed
-			changed
-	    unless String === index or Symbol === index then
+      changed
+      unless String === index or Symbol === index then
         index = index.get_the_index
-			end
+      end
       index_attribute = @index_attribute_child.delete(index) if index
       @children.delete(index_attribute)
     end
@@ -428,7 +428,7 @@ module XamplGenerator
 
     alias resolve resolve_child
     alias resolve= resolve_child=
-  
+
     def init_resolve_as_child
       @resolve_child = []
     end
@@ -441,7 +441,7 @@ module XamplGenerator
       changed
       return resolve
     end
-  
+
     def new_resolve
       accessed
       resolve = Resolve.new
@@ -465,25 +465,26 @@ module XamplGenerator
     def Elements.persisted?
       false
     end
+
     def persisted?
       false
     end
-  
+
     @@tag = "elements"
     @@ns = "http://xampl.com/generator"
     @@ns_tag = "{http://xampl.com/generator}elements"
     @@module_name = "XamplGenerator"
     @@attributes = [
-                     [ :@pid, "pid" ],
-                   ]
+            [ :@pid, "pid" ],
+    ]
     include ElementAsChild
 
     @@to_yaml_properties = [ "@pid" ]
     @@to_yaml_properties_all = [
-                                 "@pid",
-                                 "@children",
-                                 "@_content"
-                               ] 
+            "@pid",
+                    "@children",
+                    "@_content"
+    ]
 
     def to_yaml_properties
       if is_yaml_root(self) then
@@ -507,7 +508,7 @@ module XamplGenerator
 
     def pid=(v)
       accessed
-			# This is kind of optimistic, I think you are in trouble if you do this
+      # This is kind of optimistic, I think you are in trouble if you do this
       Xampl.auto_uncache(self) if @pid
       @pid = v
       changed
@@ -523,26 +524,26 @@ module XamplGenerator
       init_xampl_object
       init_data_content
       init_element_as_child
-  
+
       yield(self) if block_given?
       changed
     end
 
     def clear_non_persistent_index_attributes
     end
-  
+
     def append_to(other)
       other.add_elements(self)
     end
-  
+
     def Elements.tag
       @@tag
     end
-  
+
     def Elements.ns
       @@ns
     end
-  
+
     def Elements.ns_tag
       @@ns_tag
     end
@@ -550,15 +551,15 @@ module XamplGenerator
     def Elements.module_name
       @@module_name
     end
-  
+
     def tag
       @@tag
     end
-  
+
     def ns
       @@ns
     end
-  
+
     def ns_tag
       @@ns_tag
     end
@@ -566,35 +567,35 @@ module XamplGenerator
     def module_name
       @@module_name
     end
-  
+
     def attributes
       @@attributes
     end
-  
+
     def indexed_by
       :pid
     end
-  
+
     def get_the_index
       @pid
     end
-  
+
     def set_the_index(index)
       @pid = index
     end
-   
+
     def substitute_in_visit(visitor)
       return visitor.substitute_in_visit_elements(self) || self
     end
-   
+
     def before_visit(visitor)
       visitor.before_visit_elements(self)
     end
-   
+
     def visit(visitor)
       visitor.visit_elements(self)
     end
-   
+
     def after_visit(visitor)
       visitor.after_visit_elements(self)
     end
@@ -609,45 +610,46 @@ module XamplGenerator
     def Element.persisted?
       false
     end
+
     def persisted?
       false
     end
-  
+
     @@tag = "element"
     @@ns = "http://xampl.com/generator"
     @@ns_tag = "{http://xampl.com/generator}element"
     @@module_name = "XamplGenerator"
     @@attributes = [
-                     [ :@has_content, "hasContent" ],
-                     [ :@class_name, "className" ],
-                     [ :@attribute_name, "attributeName" ],
-                     [ :@nstag, "nstag" ],
-                     [ :@empty, "empty" ],
-                     [ :@indexed_by_attr, "indexedByAttr" ],
-                     [ :@persisted, "persisted" ],
-                     [ :@name, "name" ],
-                     [ :@kind, "kind" ],
-                     [ :@namespace, "namespace" ],
-                     [ :@package, "package" ],
-                   ]
+            [ :@has_content, "hasContent" ],
+                    [ :@class_name, "className" ],
+                    [ :@attribute_name, "attributeName" ],
+                    [ :@nstag, "nstag" ],
+                    [ :@empty, "empty" ],
+                    [ :@indexed_by_attr, "indexedByAttr" ],
+                    [ :@persisted, "persisted" ],
+                    [ :@name, "name" ],
+                    [ :@kind, "kind" ],
+                    [ :@namespace, "namespace" ],
+                    [ :@package, "package" ],
+    ]
     include ChildElementAsChild
     include AttributeAsChild
 
     @@to_yaml_properties     = [
-                                 "@has_content",
-                                 "@class_name",
-                                 "@attribute_name",
-                                 "@nstag",
-                                 "@empty",
-                                 "@indexed_by_attr",
-                                 "@persisted",
-                                 "@name",
-                                 "@kind",
-                                 "@namespace",
-                                 "@package",
-                                 "@children",
-                                 "@_content"
-                               ] 
+            "@has_content",
+                    "@class_name",
+                    "@attribute_name",
+                    "@nstag",
+                    "@empty",
+                    "@indexed_by_attr",
+                    "@persisted",
+                    "@name",
+                    "@kind",
+                    "@namespace",
+                    "@package",
+                    "@children",
+                    "@_content"
+    ]
 
     def to_yaml_properties
       @@to_yaml_properties
@@ -659,9 +661,9 @@ module XamplGenerator
     end
 
     def has_content=(v)
-     accessed
-     changed
-     @has_content = v
+      accessed
+      changed
+      @has_content = v
     end
 
     def class_name
@@ -670,9 +672,9 @@ module XamplGenerator
     end
 
     def class_name=(v)
-     accessed
-     changed
-     @class_name = v
+      accessed
+      changed
+      @class_name = v
     end
 
     def attribute_name
@@ -681,9 +683,9 @@ module XamplGenerator
     end
 
     def attribute_name=(v)
-     accessed
-     changed
-     @attribute_name = v
+      accessed
+      changed
+      @attribute_name = v
     end
 
     def nstag
@@ -692,9 +694,9 @@ module XamplGenerator
     end
 
     def nstag=(v)
-     accessed
-     changed
-     @nstag = v
+      accessed
+      changed
+      @nstag = v
     end
 
     def empty
@@ -703,9 +705,9 @@ module XamplGenerator
     end
 
     def empty=(v)
-     accessed
-     changed
-     @empty = v
+      accessed
+      changed
+      @empty = v
     end
 
     def indexed_by_attr
@@ -714,9 +716,9 @@ module XamplGenerator
     end
 
     def indexed_by_attr=(v)
-     accessed
-     changed
-     @indexed_by_attr = v
+      accessed
+      changed
+      @indexed_by_attr = v
     end
 
     def persisted
@@ -725,9 +727,9 @@ module XamplGenerator
     end
 
     def persisted=(v)
-     accessed
-     changed
-     @persisted = v
+      accessed
+      changed
+      @persisted = v
     end
 
     def name
@@ -736,9 +738,9 @@ module XamplGenerator
     end
 
     def name=(v)
-     accessed
-     changed
-     @name = v
+      accessed
+      changed
+      @name = v
     end
 
     def kind
@@ -747,9 +749,9 @@ module XamplGenerator
     end
 
     def kind=(v)
-     accessed
-     changed
-     @kind = v
+      accessed
+      changed
+      @kind = v
     end
 
     def namespace
@@ -758,9 +760,9 @@ module XamplGenerator
     end
 
     def namespace=(v)
-     accessed
-     changed
-     @namespace = v
+      accessed
+      changed
+      @namespace = v
     end
 
     def package
@@ -769,9 +771,9 @@ module XamplGenerator
     end
 
     def package=(v)
-     accessed
-     changed
-     @package = v
+      accessed
+      changed
+      @package = v
     end
 
     def initialize(index=nil)
@@ -794,7 +796,7 @@ module XamplGenerator
       init_data_content
       init_child_element_as_child
       init_attribute_as_child
-  
+
       yield(self) if block_given?
       changed
     end
@@ -812,19 +814,19 @@ module XamplGenerator
       @namespace = nil
       @package = nil
     end
-  
+
     def append_to(other)
       other.add_element(self)
     end
-  
+
     def Element.tag
       @@tag
     end
-  
+
     def Element.ns
       @@ns
     end
-  
+
     def Element.ns_tag
       @@ns_tag
     end
@@ -832,15 +834,15 @@ module XamplGenerator
     def Element.module_name
       @@module_name
     end
-  
+
     def tag
       @@tag
     end
-  
+
     def ns
       @@ns
     end
-  
+
     def ns_tag
       @@ns_tag
     end
@@ -848,35 +850,35 @@ module XamplGenerator
     def module_name
       @@module_name
     end
-  
+
     def attributes
       @@attributes
     end
-  
+
     def indexed_by
       :name
     end
-  
+
     def get_the_index
       @name
     end
-  
+
     def set_the_index(index)
       @name = index
     end
-   
+
     def substitute_in_visit(visitor)
       return visitor.substitute_in_visit_element(self) || self
     end
-   
+
     def before_visit(visitor)
       visitor.before_visit_element(self)
     end
-   
+
     def visit(visitor)
       visitor.visit_element(self)
     end
-   
+
     def after_visit(visitor)
       visitor.after_visit_element(self)
     end
@@ -891,32 +893,33 @@ module XamplGenerator
     def ChildElement.persisted?
       false
     end
+
     def persisted?
       false
     end
-  
+
     @@tag = "childElement"
     @@ns = "http://xampl.com/generator"
     @@ns_tag = "{http://xampl.com/generator}childElement"
     @@module_name = "XamplGenerator"
     @@attributes = [
-                     [ :@element_name, "element_name" ],
-                     [ :@name, "name" ],
-                     [ :@namespace, "namespace" ],
-                     [ :@index_class, "index_class" ],
-                     [ :@index, "index" ],
-                     [ :@package, "package" ],
-                   ]
+            [ :@element_name, "element_name" ],
+                    [ :@name, "name" ],
+                    [ :@namespace, "namespace" ],
+                    [ :@index_class, "index_class" ],
+                    [ :@index, "index" ],
+                    [ :@package, "package" ],
+    ]
 
     @@to_yaml_properties =     [
-                                 "@element_name",
-                                 "@name",
-                                 "@namespace",
-                                 "@index_class",
-                                 "@index",
-                                 "@package",
-                               ] 
-  
+            "@element_name",
+                    "@name",
+                    "@namespace",
+                    "@index_class",
+                    "@index",
+                    "@package",
+    ]
+
     def to_yaml_properties
       @@to_yaml_properties
     end
@@ -1003,7 +1006,7 @@ module XamplGenerator
       yield(self) if block_given?
       changed
     end
-  
+
     def clear_non_persistent_index_attributes
       @element_name = nil
       @name = nil
@@ -1012,19 +1015,19 @@ module XamplGenerator
       @index = nil
       @package = nil
     end
-  
+
     def append_to(other)
       other.add_child_element(self)
     end
-  
+
     def ChildElement.tag
       @@tag
     end
-  
+
     def ChildElement.ns
       @@ns
     end
-  
+
     def ChildElement.ns_tag
       @@ns_tag
     end
@@ -1032,15 +1035,15 @@ module XamplGenerator
     def ChildElement.module_name
       @@module_name
     end
-  
+
     def tag
       @@tag
     end
-  
+
     def ns
       @@ns
     end
-  
+
     def ns_tag
       @@ns_tag
     end
@@ -1048,7 +1051,7 @@ module XamplGenerator
     def module_name
       @@module_name
     end
-  
+
     def attributes
       @@attributes
     end
@@ -1056,27 +1059,27 @@ module XamplGenerator
     def indexed_by
       :name
     end
-  
+
     def get_the_index
       @name
     end
-  
+
     def set_the_index(index)
       @name = index
     end
-   
+
     def substitute_in_visit(visitor)
       return visitor.substitute_in_visit_child_element(self) || self
     end
-   
+
     def before_visit(visitor)
       visitor.before_visit_child_element(self)
     end
-   
+
     def visit(visitor)
       visitor.visit_child_element(self)
     end
-   
+
     def after_visit(visitor)
       visitor.after_visit_child_element(self)
     end
@@ -1091,24 +1094,25 @@ module XamplGenerator
     def Attribute.persisted?
       false
     end
+
     def persisted?
       false
     end
-  
+
     @@tag = "attribute"
     @@ns = "http://xampl.com/generator"
     @@ns_tag = "{http://xampl.com/generator}attribute"
     @@module_name = "XamplGenerator"
     @@attributes = [
-                     [ :@namespace, "namespace" ],
-                     [ :@name, "name" ],
-                   ]
+            [ :@namespace, "namespace" ],
+                    [ :@name, "name" ],
+    ]
 
     @@to_yaml_properties =     [
-                                 "@namespace",
-                                 "@name",
-                               ] 
-  
+            "@namespace",
+                    "@name",
+    ]
+
     def to_yaml_properties
       @@to_yaml_properties
     end
@@ -1147,24 +1151,24 @@ module XamplGenerator
       yield(self) if block_given?
       changed
     end
-  
+
     def clear_non_persistent_index_attributes
       @namespace = nil
       @name = nil
     end
-  
+
     def append_to(other)
       other.add_attribute(self)
     end
-  
+
     def Attribute.tag
       @@tag
     end
-  
+
     def Attribute.ns
       @@ns
     end
-  
+
     def Attribute.ns_tag
       @@ns_tag
     end
@@ -1172,15 +1176,15 @@ module XamplGenerator
     def Attribute.module_name
       @@module_name
     end
-  
+
     def tag
       @@tag
     end
-  
+
     def ns
       @@ns
     end
-  
+
     def ns_tag
       @@ns_tag
     end
@@ -1188,7 +1192,7 @@ module XamplGenerator
     def module_name
       @@module_name
     end
-  
+
     def attributes
       @@attributes
     end
@@ -1196,27 +1200,27 @@ module XamplGenerator
     def indexed_by
       :name
     end
-  
+
     def get_the_index
       @name
     end
-  
+
     def set_the_index(index)
       @name = index
     end
-   
+
     def substitute_in_visit(visitor)
       return visitor.substitute_in_visit_attribute(self) || self
     end
-   
+
     def before_visit(visitor)
       visitor.before_visit_attribute(self)
     end
-   
+
     def visit(visitor)
       visitor.visit_attribute(self)
     end
-   
+
     def after_visit(visitor)
       visitor.after_visit_attribute(self)
     end
@@ -1231,28 +1235,29 @@ module XamplGenerator
     def Options.persisted?
       false
     end
+
     def persisted?
       false
     end
-  
+
     @@tag = "options"
     @@ns = "http://xampl.com/generator"
     @@ns_tag = "{http://xampl.com/generator}options"
     @@module_name = "XamplGenerator"
     @@attributes = [
-                   ]
+            ]
     include IndexAttributeAsChild
     include ResolveAsChild
 
     @@to_yaml_properties     = [
-                                 "@children",
-                                 "@_content"
-                               ] 
+            "@children",
+                    "@_content"
+    ]
 
     def to_yaml_properties
       @@to_yaml_properties
     end
-  
+
     def initialize
       super
 
@@ -1260,26 +1265,26 @@ module XamplGenerator
       init_data_content
       init_index_attribute_as_child
       init_resolve_as_child
-  
+
       yield(self) if block_given?
       changed
     end
 
     def clear_non_persistent_index_attributes
     end
-  
+
     def append_to(other)
       other.add_options(self)
     end
-  
+
     def Options.tag
       @@tag
     end
-  
+
     def Options.ns
       @@ns
     end
-  
+
     def Options.ns_tag
       @@ns_tag
     end
@@ -1287,15 +1292,15 @@ module XamplGenerator
     def Options.module_name
       @@module_name
     end
-  
+
     def tag
       @@tag
     end
-  
+
     def ns
       @@ns
     end
-  
+
     def ns_tag
       @@ns_tag
     end
@@ -1303,23 +1308,23 @@ module XamplGenerator
     def module_name
       @@module_name
     end
-  
+
     def attributes
       @@attributes
     end
-   
+
     def substitute_in_visit(visitor)
       return visitor.substitute_in_visit_options(self) || self
     end
-   
+
     def before_visit(visitor)
       visitor.before_visit_options(self)
     end
-   
+
     def visit(visitor)
       visitor.visit_options(self)
     end
-   
+
     def after_visit(visitor)
       visitor.after_visit_options(self)
     end
@@ -1334,24 +1339,25 @@ module XamplGenerator
     def IndexAttribute.persisted?
       false
     end
+
     def persisted?
       false
     end
-  
+
     @@tag = "index-attribute"
     @@ns = "http://xampl.com/generator"
     @@ns_tag = "{http://xampl.com/generator}index-attribute"
     @@module_name = "XamplGenerator"
     @@attributes = [
-                     [ :@name, "name" ],
-                     [ :@persisted, "persisted" ],
-                   ]
+            [ :@name, "name" ],
+                    [ :@persisted, "persisted" ],
+    ]
 
     @@to_yaml_properties =     [
-                                 "@name",
-                                 "@persisted",
-                               ] 
-  
+            "@name",
+                    "@persisted",
+    ]
+
     def to_yaml_properties
       @@to_yaml_properties
     end
@@ -1390,24 +1396,24 @@ module XamplGenerator
       yield(self) if block_given?
       changed
     end
-  
+
     def clear_non_persistent_index_attributes
       @name = nil
       @persisted = nil
     end
-  
+
     def append_to(other)
       other.add_index_attribute(self)
     end
-  
+
     def IndexAttribute.tag
       @@tag
     end
-  
+
     def IndexAttribute.ns
       @@ns
     end
-  
+
     def IndexAttribute.ns_tag
       @@ns_tag
     end
@@ -1415,15 +1421,15 @@ module XamplGenerator
     def IndexAttribute.module_name
       @@module_name
     end
-  
+
     def tag
       @@tag
     end
-  
+
     def ns
       @@ns
     end
-  
+
     def ns_tag
       @@ns_tag
     end
@@ -1431,7 +1437,7 @@ module XamplGenerator
     def module_name
       @@module_name
     end
-  
+
     def attributes
       @@attributes
     end
@@ -1439,27 +1445,27 @@ module XamplGenerator
     def indexed_by
       :name
     end
-  
+
     def get_the_index
       @name
     end
-  
+
     def set_the_index(index)
       @name = index
     end
-   
+
     def substitute_in_visit(visitor)
       return visitor.substitute_in_visit_index_attribute(self) || self
     end
-   
+
     def before_visit(visitor)
       visitor.before_visit_index_attribute(self)
     end
-   
+
     def visit(visitor)
       visitor.visit_index_attribute(self)
     end
-   
+
     def after_visit(visitor)
       visitor.after_visit_index_attribute(self)
     end
@@ -1474,26 +1480,27 @@ module XamplGenerator
     def Resolve.persisted?
       false
     end
+
     def persisted?
       false
     end
-  
+
     @@tag = "resolve"
     @@ns = "http://xampl.com/generator"
     @@ns_tag = "{http://xampl.com/generator}resolve"
     @@module_name = "XamplGenerator"
     @@attributes = [
-                     [ :@namespace, "namespace" ],
-                     [ :@pkg, "pkg" ],
-                     [ :@preferred_prefix, "preferred_prefix" ],
-                   ]
+            [ :@namespace, "namespace" ],
+                    [ :@pkg, "pkg" ],
+                    [ :@preferred_prefix, "preferred_prefix" ],
+    ]
 
     @@to_yaml_properties =     [
-                                 "@namespace",
-                                 "@pkg",
-                                 "@preferred_prefix",
-                               ] 
-  
+            "@namespace",
+                    "@pkg",
+                    "@preferred_prefix",
+    ]
+
     def to_yaml_properties
       @@to_yaml_properties
     end
@@ -1530,7 +1537,7 @@ module XamplGenerator
       changed
       @preferred_prefix = v
     end
-  
+
     def initialize
       super
 
@@ -1543,25 +1550,25 @@ module XamplGenerator
       yield(self) if block_given?
       changed
     end
-  
+
     def clear_non_persistent_index_attributes
       @namespace = nil
       @pkg = nil
       @preferred_prefix = nil
     end
-  
+
     def append_to(other)
       other.add_resolve(self)
     end
-  
+
     def Resolve.tag
       @@tag
     end
-  
+
     def Resolve.ns
       @@ns
     end
-  
+
     def Resolve.ns_tag
       @@ns_tag
     end
@@ -1569,15 +1576,15 @@ module XamplGenerator
     def Resolve.module_name
       @@module_name
     end
-  
+
     def tag
       @@tag
     end
-  
+
     def ns
       @@ns
     end
-  
+
     def ns_tag
       @@ns_tag
     end
@@ -1585,23 +1592,23 @@ module XamplGenerator
     def module_name
       @@module_name
     end
-  
+
     def attributes
       @@attributes
     end
-   
+
     def substitute_in_visit(visitor)
       return visitor.substitute_in_visit_resolve(self) || self
     end
-   
+
     def before_visit(visitor)
       visitor.before_visit_resolve(self)
     end
-   
+
     def visit(visitor)
       visitor.visit_resolve(self)
     end
-   
+
     def after_visit(visitor)
       visitor.after_visit_resolve(self)
     end

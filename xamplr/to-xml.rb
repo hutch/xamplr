@@ -1,9 +1,8 @@
-
 module Xampl
 
   class XMLPrinter
     attr_accessor :ns_to_prefix, :start_body, :body, :out, :mixed, :persisting
-  
+
     def initialize(out, persisting=false)
       @out = out
       @persisting = persisting
@@ -14,32 +13,32 @@ module Xampl
       @attr_list = nil
       @mixed = 0
     end
-  
+
     def now_as_mixed
       @mixed = @mixed + 1
     end
-  
+
     def now_as_before
-      @mixed = @mixed - 1 if(0 < @mixed)
+      @mixed = @mixed - 1 if (0 < @mixed)
     end
-  
+
     def register_ns(ns)
-      if(0 == ns.length) then
+      if (0 == ns.length) then
         return ""
       end
-  
+
       prefix = ns_to_prefix[ns]
-      if(nil == prefix) then
-		    preferred = XamplObject.lookup_preferred_ns_prefix(ns)
+      if (nil == prefix) then
+        preferred = XamplObject.lookup_preferred_ns_prefix(ns)
         prefix = "" << preferred << ":" if preferred
         prefix = "ns" << ns_to_prefix.size.to_s << ":" unless prefix
         ns_to_prefix[ns] = prefix
       end
       return prefix
     end
-  
+
     def attr_esc(s)
-      if(s.kind_of? XamplObject)
+      if (s.kind_of? XamplObject)
         return attr_esc(s.to_xml)
       end
 
@@ -54,19 +53,19 @@ module Xampl
 
       return result
     end
-  
+
     def content_esc(s)
       result = s.to_s.dup
       #result = s.to_xml
 
-      return result if(s.kind_of? XamplObject)
+      return result if (s.kind_of? XamplObject)
 
       result.gsub!("&", "&amp;")
       result.gsub!("<", "&lt;")
 
       return result
     end
-  
+
     def attribute(xampl)
       @attr_list = []
       if (nil != xampl.attributes) then
@@ -78,31 +77,31 @@ module Xampl
         }
       end
     end
-  
+
     def persist_attribute(xampl)
       @attr_list = []
       index = xampl.indexed_by[1..-1]
       if (nil != index) then
-          value = xampl.get_the_index
-          @attr_list << " " << index << "='" << attr_esc(value) << "'" if value 
+        value = xampl.get_the_index
+        @attr_list << " " << index << "='" << attr_esc(value) << "'" if value
       end
     end
-  
+
     def show_attributes
-      if(nil == @attr_list) then
+      if (nil == @attr_list) then
         return ""
       else
         result = @attr_list.join
-        if(0 == result.length) then
+        if (0 == result.length) then
           return ""
         else
           return result
         end
       end
     end
-  
+
     def start_root_element(tag, ns, empty=false)
-      if(empty) then
+      if (empty) then
         @start_body << "<" << register_ns(ns) << tag << show_attributes
         @body = "/>"
       else
@@ -110,9 +109,9 @@ module Xampl
         @body = ">"
       end
     end
-  
+
     def start_element(tag, ns, empty=false)
-      if(empty) then
+      if (empty) then
         @body << "<" << register_ns(ns) << tag << show_attributes << "/>"
       else
         @body << "<" << register_ns(ns) << tag << show_attributes << ">"
@@ -122,7 +121,7 @@ module Xampl
     def persisted_element(tag, ns)
       @body << "<" << register_ns(ns) << tag << show_attributes << "/>"
     end
-  
+
     def _content(text)
       if nil != text then
         if text.kind_of? XMLText then
@@ -132,16 +131,17 @@ module Xampl
         end
       end
     end
+
     alias content _content
-  
+
     def end_root_element(tag, ns, empty)
-      @body << "</" << register_ns(ns) << tag << ">" if(!empty)
+      @body << "</" << register_ns(ns) << tag << ">" if (!empty)
     end
-  
+
     def end_element(tag, ns, empty)
-      @body << "</" << register_ns(ns) << tag << ">" if(!empty)
+      @body << "</" << register_ns(ns) << tag << ">" if (!empty)
     end
-  
+
     def define_ns
       result = ""
       ns_to_prefix.each{ | ns, prefix |
@@ -149,9 +149,9 @@ module Xampl
       }
       return result
     end
-  
+
     def done
       out << start_body << define_ns << body
     end
   end
-end  
+end

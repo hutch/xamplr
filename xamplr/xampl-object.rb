@@ -3,14 +3,14 @@
 module Xampl
 
   module InvalidXampl
-	end
+  end
 
   module XamplObject
     attr_accessor :is_changed, :parents
 
     @@yaml_root = nil
-		@@preferred_ns_prefix = { "http://xampl.com/" => "xampl",
-		                          "http://xampl.com/generator" => "xampl-gen",
+    @@preferred_ns_prefix = { "http://xampl.com/" => "xampl",
+                              "http://xampl.com/generator" => "xampl-gen",
                               "http://www.w3.org/XML/1998/namespace" => "xml" }
 
     def init_xampl_object
@@ -21,14 +21,14 @@ module Xampl
     def init_hook
     end
 
-		def XamplObject.ns_preferred_prefix(ns, prefix)
-		  @@preferred_ns_prefix[ns] = prefix unless @@preferred_ns_prefix.has_key?(ns)
-		end
+    def XamplObject.ns_preferred_prefix(ns, prefix)
+      @@preferred_ns_prefix[ns] = prefix unless @@preferred_ns_prefix.has_key?(ns)
+    end
 
-		def XamplObject.lookup_preferred_ns_prefix(ns)
-		  @@preferred_ns_prefix[ns]
-		end
-  
+    def XamplObject.lookup_preferred_ns_prefix(ns)
+      @@preferred_ns_prefix[ns]
+    end
+
     def persist_required
       return false
     end
@@ -37,15 +37,15 @@ module Xampl
       return false
     end
 
-		def invalidate
+    def invalidate
       self.note_invalidate
       self.persister.uncache(self) if self.persister
-		  self.extend InvalidXampl
-		end
+      self.extend InvalidXampl
+    end
 
-		def invalid
-		  return kind_of?(InvalidXampl)
-		end
+    def invalid
+      return kind_of?(InvalidXampl)
+    end
 
     def changes_accepted
       ResetIsChanged.new.start(self)
@@ -64,7 +64,7 @@ module Xampl
     def accessed
       raise XamplIsInvalid.new(self) if invalid
     end
-  
+
     def add_parent(xampl)
       @parents = [] if (not defined? @parents) or (nil == @parents)
       @parents << xampl
@@ -72,18 +72,18 @@ module Xampl
         Xampl.introduce_to_persister(self)
       end
     end
-  
+
     def init_attributes(attr_name, attr_namespace, attr_value)
       return unless attr_name
-  
+
       attr_name.each_index{ | i |
         self.attributes.each{ | attr_spec |
-          if(2 == attr_spec.size) then
-            if(attr_spec[1] == attr_name[i]) then
+          if (2 == attr_spec.size) then
+            if (attr_spec[1] == attr_name[i]) then
               self.instance_variable_set(attr_spec[0], attr_value[i])
             end
           else
-            if((attr_spec[1] == attr_name[i]) and (attr_spec[2] == attr_namespace[i])) then
+            if ((attr_spec[1] == attr_name[i]) and (attr_spec[2] == attr_namespace[i])) then
               self.instance_variable_set(attr_spec[0], attr_value[i])
             end
           end
@@ -139,64 +139,64 @@ module Xampl
     end
 
     module XamplRubyDefinition
-	   @@proc = nil
+      @@proc = nil
 #      def initialize
-#	      @@proc = nil
-#	    end
+      #	      @@proc = nil
+      #	    end
 
-	    def XamplRubyDefinition.build(target = nil)
+      def XamplRubyDefinition.build(target = nil)
         xampl = nil
-	      if @@proc then
-	        local_proc = @@proc
-	        @@proc = nil
-	        xampl = local_proc.call(target)
-					@@proc = nil
+        if @@proc then
+          local_proc = @@proc
+          @@proc = nil
+          xampl = local_proc.call(target)
+          @@proc = nil
         else
           xampl = XamplRubyDefinition.build_it(target)
-				end
+        end
 
         return xampl
-	    end
+      end
 
       def build_it
         nil
       end
     end
-    
+
     def XamplObject.from_string(string, target=nil)
       return FromXML.new.parse_string(string, true, false, target)
-      
-#       if '<' == string[0] then
-#         puts "XO.from_string XML ------------------------------------------------------"
-#         return FromXML.new.parse_string(string, true, false, target)
-#       else
-#         puts "XO.from_string RUBY ------------------------------------------------------"
-#         return XamplObject.from_ruby(string, target)
-#       end
+
+      #       if '<' == string[0] then
+      #         puts "XO.from_string XML ------------------------------------------------------"
+      #         return FromXML.new.parse_string(string, true, false, target)
+      #       else
+      #         puts "XO.from_string RUBY ------------------------------------------------------"
+      #         return XamplObject.from_ruby(string, target)
+      #       end
     end
 
     def XamplObject.recover_from_string(string)
-#       return FromXML.new.realise_string(string)
+      #       return FromXML.new.realise_string(string)
       return FromXML.new(true).parse_string(string, true, false, nil)
     end
 
     def XamplObject.from_ruby(ruby_string, target=nil)
       eval(ruby_string, nil, "ruby_definition", 0)
-			target.load_needed = false if target
+      target.load_needed = false if target
       xampl = XamplRubyDefinition.build(target)
     end
-  
+
     def XamplObject.from_yaml(yaml_string, target=nil)
       unstitched = YAML::load(yaml_string)
       unstitched.stitch_yaml
-			if target then
-			  vars = unstitched.instance_variables
-				vars.each { | ivar |
-				  v = unstitched.instance_variable_get(ivar)
-					target.instance_variable_set(ivar, v)
-				}
-				unstitched = target
-			end
+      if target then
+        vars = unstitched.instance_variables
+        vars.each { | ivar |
+          v = unstitched.instance_variable_get(ivar)
+          target.instance_variable_set(ivar, v)
+        }
+        unstitched = target
+      end
       return unstitched
     end
 
@@ -214,9 +214,9 @@ module Xampl
     def persist(out="", rules=nil)
       #rules = XMLPrinter.new(out, true) if nil == rules
       #return to_xml(out, rules)
-			return PersistXML.new("").start(self).done
+      return PersistXML.new("").start(self).done
     end
-  
+
     def XamplObject.realise_from_xml_string(xml_string, target=nil, tokenise=true)
       return FromXML.new.realise_string(xml_string, tokenise, target)
     end
@@ -396,7 +396,7 @@ module Xampl
       depth += 1
 
       if @first_text then
-        @text << "<" << pp.qname 
+        @text << "<" << pp.qname
 
         pp.attributeCount.times{ | i |
           @text << " " << pp.attributeQName(i) << "='" << pp.attributeValue(i) << "'"
@@ -407,7 +407,7 @@ module Xampl
           end
         }
       else
-        @first_text = "<" << pp.qname 
+        @first_text = "<" << pp.qname
 
         pp.attributeCount.times{ | i |
           @first_text << " " << pp.attributeQName(i) << "='" << pp.attributeValue(i) << "'"
@@ -462,25 +462,25 @@ module Xampl
 
       depth = start_element(pp, 0)
 
-      while true 
+      while true
         raise XamplException.new("unexpected end of document") if pp.endDocument?
 
         case pp.nextEvent
-          when Xampl_PP::START_DOCUMENT
-            raise XamplException.new("unexpected start of document")
-          when Xampl_PP::END_DOCUMENT
-            raise XamplException.new("unexpected end of document")
-          when Xampl_PP::START_ELEMENT
-            depth = start_element(pp, depth)
-          when Xampl_PP::END_ELEMENT
-            depth = end_element(pp, depth)
-            break if depth <= 0
-          when Xampl_PP::TEXT, Xampl_PP::CDATA_SECTION, Xampl_PP::ENTITY_REF
-            @text << pp.text
-           #when Xampl_PP::IGNORABLE_WHITESPACE
-           #when Xampl_PP::PROCESSING_INSTRUCTION
-           #when Xampl_PP::COMMENT
-           #when Xampl_PP::DOCTYPE
+        when Xampl_PP::START_DOCUMENT
+          raise XamplException.new("unexpected start of document")
+        when Xampl_PP::END_DOCUMENT
+          raise XamplException.new("unexpected end of document")
+        when Xampl_PP::START_ELEMENT
+          depth = start_element(pp, depth)
+        when Xampl_PP::END_ELEMENT
+          depth = end_element(pp, depth)
+          break if depth <= 0
+        when Xampl_PP::TEXT, Xampl_PP::CDATA_SECTION, Xampl_PP::ENTITY_REF
+          @text << pp.text
+          #when Xampl_PP::IGNORABLE_WHITESPACE
+          #when Xampl_PP::PROCESSING_INSTRUCTION
+          #when Xampl_PP::COMMENT
+          #when Xampl_PP::DOCTYPE
         end
       end
 

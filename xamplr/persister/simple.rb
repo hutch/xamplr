@@ -13,9 +13,9 @@ module Xampl
       :simple
     end
 
-		def kind
-		  SimplePersister.kind
-		end
+    def kind
+      SimplePersister.kind
+    end
 
     def sync_done
     end
@@ -32,7 +32,7 @@ module Xampl
     end
 
     def clear_cache
-		  throw :really_bad_idea, "clearing the cache in a simple persister looses information"
+      throw :really_bad_idea, "clearing the cache in a simple persister looses information"
     end
 
     def write(xampl)
@@ -44,16 +44,16 @@ module Xampl
 
       if (nil != xampl) then
         if target and target != xampl then
-				  target.invalidate
+          target.invalidate
           throw(:cache_conflict)
-				end
-				throw(:load_unsupported) if xampl.load_needed
+        end
+        throw(:load_unsupported) if xampl.load_needed
       end
 
-			return xampl
+      return xampl
     end
   end
 
-	Xampl.register_persister_kind(SimplePersister)
+  Xampl.register_persister_kind(SimplePersister)
 end
 

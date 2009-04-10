@@ -1,11 +1,11 @@
 module Xampl
 
   require 'version'
-  
+
   require "fileutils"
   require "persister/caching"
 
-  class SubversionPersister < AbstractCachingPersister 
+  class SubversionPersister < AbstractCachingPersister
 
     def initialize(name=nil, format=nil, root=File.join(".", "repo"))
       super(root, name, format)
@@ -18,13 +18,13 @@ module Xampl
     def kind
       SubversionPersister.kind
     end
-    
+
     def version(stream)
       catch(:refuse_to_version) do
         Version.new(@repo_name, @repo_root).make(stream)
       end
     end
-    
+
 
     def write(xampl)
       #raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index or xampl.ignore_when_no_index
@@ -35,7 +35,7 @@ module Xampl
 
       FileUtils.mkdir_p(place) unless File.exist?(place)
 
-			place = File.join(place, xampl.get_the_index)
+      place = File.join(place, xampl.get_the_index)
 
       representation = represent(xampl)
       if representation then
@@ -56,6 +56,6 @@ module Xampl
     end
   end
 
-	Xampl.register_persister_kind(SubversionPersister)
+  Xampl.register_persister_kind(SubversionPersister)
 end
 

@@ -1,34 +1,38 @@
 <labels>
-  <label id="tse" added="2003-06-20">
-    <name>Thomas Eliot</name>
-    <address>
-      <street>3 Prufrock Lane</street>
-      <city>Stamford</city>
-      <state>CT</state>
-    </address>
-    <quote>
-      <emph>Midwinter Spring</emph> is its own season&#8230;
-    </quote>
-  </label>
-  <label id="ep" added="2003-06-10">
-    <name>Ezra Pound</name>
-    <address>
-      <street>45 Usura Place</street>
-      <city>Hailey</city>
-      <state>ID</state>
-    </address>
-    <quote>
-      What thou lovest well remains, the rest is dross&#8230;
-    </quote>
-  </label>
-  <!-- Throw in 10,000 more records just like this -->
-  <label id="lh" added="2004-11-01">
-    <name>Langston Hughes</name>
-    <address>
-      <street>10 Bridge Tunnel</street>
-      <city>Harlem</city>
-      <state>NY</state>
-    </address>
-  </label>
+    <label id="tse"
+           added="2003-06-20">
+        <name>Thomas Eliot</name>
+        <address>
+            <street>3 Prufrock Lane</street>
+            <city>Stamford</city>
+            <state>CT</state>
+        </address>
+        <quote>
+            <emph>Midwinter Spring</emph>
+            is its own season&#8230;
+        </quote>
+    </label>
+    <label id="ep"
+           added="2003-06-10">
+        <name>Ezra Pound</name>
+        <address>
+            <street>45 Usura Place</street>
+            <city>Hailey</city>
+            <state>ID</state>
+        </address>
+        <quote>
+            What thou lovest well remains, the rest is dross&#8230;
+        </quote>
+    </label>
+    <!-- Throw in 10,000 more records just like this -->
+    <label id="lh"
+           added="2004-11-01">
+        <name>Langston Hughes</name>
+        <address>
+            <street>10 Bridge Tunnel</street>
+            <city>Harlem</city>
+            <state>NY</state>
+        </address>
+    </label>
 </labels>
 

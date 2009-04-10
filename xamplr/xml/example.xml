@@ -1,16 +1,23 @@
 <things xmlns='http://xampl.com/example'
         xmlns:xampl='http://xampl.com/example/special'>
-  <thing pid='' info=''>
-    <description kind=''>blah <emph>blah</emph> blah</description>
-    <keyValue id='' value=''/>
-    <stuff kind='' xampl:special=''/>
-    <thing pid=''/>
-    <things/>
-  </thing>
-  <thing pid='' info=''>
-	  <branch info=''>
-	    <branch info=''/>
-		  <leaf info=''/>
-	  </branch>
-	</thing>
+    <thing pid=''
+           info=''>
+        <description kind=''>blah
+            <emph>blah</emph>
+            blah
+        </description>
+        <keyValue id=''
+                  value=''/>
+        <stuff kind=''
+               xampl:special=''/>
+        <thing pid=''/>
+        <things/>
+    </thing>
+    <thing pid=''
+           info=''>
+        <branch info=''>
+            <branch info=''/>
+            <leaf info=''/>
+        </branch>
+    </thing>
 </things>

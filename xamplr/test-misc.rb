@@ -11,7 +11,7 @@ class TestXampl < Test::Unit::TestCase
 
   def setup
     Xampl.disable_all_persisters
-		FromXML.reset_registry
+    FromXML.reset_registry
   end
 
   def test_tokenise
@@ -55,7 +55,7 @@ class TestXampl < Test::Unit::TestCase
                 xmlns:ns3='also-used-only-by-attr.ns'>there</strong>
 </unknown>
 }
-   xml_expected=%Q{<unknown a='1' b='2' xmlns:ns='another-dummy.ns' xmlns:ns2='used-only-by-attr.ns' xmlns:ns3='also-used-only-by-attr.ns' xmlns='dummy.ns'>
+    xml_expected=%Q{<unknown a='1' b='2' xmlns:ns='another-dummy.ns' xmlns:ns2='used-only-by-attr.ns' xmlns:ns3='also-used-only-by-attr.ns' xmlns='dummy.ns'>
   hello <ns:strong ns2:c='3' ns3:d='4' xmlns='another-dummy.ns'>there</ns:strong>
   hello <strong ns2:c='3' ns3:d='4' xmlns='another-dummy.ns'>there</strong>
 </unknown>}

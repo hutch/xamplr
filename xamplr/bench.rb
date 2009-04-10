@@ -68,10 +68,10 @@ module Bench
     #puts yaml_s
     puts xml_s
     puts ruby_s
-		puts "++++++++++++++++++++++++++++++++++++"
-		puts "big_thing #{big_thing.object_id}, thing #{thing.object_id}"
-		puts big_thing.to_ruby
-		puts "++++++++++++++++++++++++++++++++++++"
+    puts "++++++++++++++++++++++++++++++++++++"
+    puts "big_thing #{big_thing.object_id}, thing #{thing.object_id}"
+    puts big_thing.to_ruby
+    puts "++++++++++++++++++++++++++++++++++++"
 
     puts "Rebuilding From String (YAML & XML) count: #{count} (est. ~ 11s)"
     bm(10) do | x |

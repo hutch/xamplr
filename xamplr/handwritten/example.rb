@@ -1,15 +1,15 @@
 module XamplExample
 
-require "xampl"
+  require "xampl"
 
   module ThingsAsChild
-  
+
     attr_accessor :things_child
-  
+
     def init_things_as_child
       @things_child = []
     end
-  
+
     def add_things(things)
       @children << things
       @things_child << things
@@ -17,7 +17,7 @@ require "xampl"
       changed
       return things
     end
-  
+
     def new_things
       things = Things.new
       yield(things) if block_given?
@@ -31,17 +31,17 @@ require "xampl"
   end
 
   module ThingAsChild
-  
+
     attr_accessor :thing_child, :thing_map
-  
+
     def init_thing_as_child
       @thing_child = []
       @thing_map = {}
     end
-  
+
     def add_thing(thing)
       index = thing.get_the_index
-      if(nil == index) then
+      if (nil == index) then
         throw "no index thing defined in : " << thing.to_xml
       end
 
@@ -55,7 +55,7 @@ require "xampl"
       changed
       return thing
     end
-  
+
     def new_thing(index)
       thing = Thing.new
       thing.set_the_index(index)
@@ -65,7 +65,7 @@ require "xampl"
 
     def remove_thing(thing)
       index = thing.get_the_index
-      if(nil == index) then
+      if (nil == index) then
         throw "no index thing defined in : " << thing.to_xml
       end
 
@@ -81,13 +81,13 @@ require "xampl"
   end
 
   module DescriptionAsChild
-  
+
     attr_accessor :description_child
-  
+
     def init_description_as_child
       @description_child = []
     end
-  
+
     def add_description(description)
       @children << description
       @description_child << description
@@ -95,7 +95,7 @@ require "xampl"
       changed
       return description
     end
-  
+
     def new_description
       description = Description.new
       yield(description) if block_given?
@@ -109,13 +109,13 @@ require "xampl"
   end
 
   module EmphAsChild
-  
+
     attr_accessor :emph_child
-  
+
     def init_emph_as_child
       @emph_child = []
     end
-  
+
     def add_emph(emph)
       @children << emph
       @emph_child << emph
@@ -123,7 +123,7 @@ require "xampl"
       changed
       return emph
     end
-  
+
     def new_emph
       emph = Emph.new
       yield(emph) if block_given?
@@ -137,17 +137,17 @@ require "xampl"
   end
 
   module KeyValueAsChild
-  
+
     attr_accessor :key_value_child, :key_value_map
-  
+
     def init_key_value_as_child
       @key_value_child = []
       @key_value_map = {}
     end
-  
+
     def add_key_value(key_value)
       index = key_value.get_the_index
-      if(nil == index) then
+      if (nil == index) then
         throw "no index key_value defined in : " << key_value.to_xml
       end
 
@@ -161,7 +161,7 @@ require "xampl"
       changed
       return key_value
     end
-  
+
     def new_key_value(index)
       key_value = KeyValue.new
       key_value.set_the_index(index)
@@ -171,7 +171,7 @@ require "xampl"
 
     def remove_key_value(key_value)
       index = key_value.get_the_index
-      if(nil == index) then
+      if (nil == index) then
         throw "no index key_value defined in : " << key_value.to_xml
       end
 
@@ -187,13 +187,13 @@ require "xampl"
   end
 
   module StuffAsChild
-  
+
     attr_accessor :stuff_child
-  
+
     def init_stuff_as_child
       @stuff_child = []
     end
-  
+
     def add_stuff(stuff)
       @children << stuff
       @stuff_child << stuff
@@ -201,7 +201,7 @@ require "xampl"
       changed
       return stuff
     end
-  
+
     def new_stuff
       stuff = Stuff.new
       yield(stuff) if block_given?
@@ -218,34 +218,34 @@ require "xampl"
   class Things
     include Xampl::XamplPersistedObject
     include Xampl::XamplWithDataContent
-  
+
     @@tag = "things"
     @@ns = "http://xampl.com/example"
     @@ns_tag = "{http://xampl.com/example}things"
     @@module_name = "XamplExample"
     @@attributes = [
-                   ]
-  
+            ]
+
     include ThingAsChild
 
     @@to_yaml_properties = [
-                             "@children",
-                             "@content"
-                           ] 
-  
-  
+            "@children",
+                    "@content"
+    ]
+
+
     def to_yaml_properties
       @@to_yaml_properties
     end
-  
+
     def Things.tag
       @@tag
     end
-  
+
     def Things.ns
       @@ns
     end
-  
+
     def Things.ns_tag
       @@ns_tag
     end
@@ -253,35 +253,35 @@ require "xampl"
     def Things.module_name
       @@module_name
     end
-  
+
     Xampl::FromXML::register(Things::tag, Things::ns_tag, Things)
-  
-  
+
+
     def initialize
       super
       init_xampl_object
 
 
       init_data_content
-  
+
       init_thing_as_child
-  
-			yield(self) if block_given?
+
+      yield(self) if block_given?
       changed
     end
-  
+
     def append_to(other)
       other.add_things(self)
     end
-  
+
     def tag
       @@tag
     end
-  
+
     def ns
       @@ns
     end
-  
+
     def ns_tag
       @@ns_tag
     end
@@ -289,7 +289,7 @@ require "xampl"
     def module_name
       @@module_name
     end
-  
+
     def attributes
       @@attributes
     end
@@ -298,15 +298,15 @@ require "xampl"
   class Thing
     include Xampl::XamplPersistedObject
     include Xampl::XamplWithDataContent
-  
+
     @@tag = "thing"
     @@ns = "http://xampl.com/example"
     @@ns_tag = "{http://xampl.com/example}thing"
     @@module_name = "XamplExample"
     @@attributes = [
-                     [ :@pid, "pid" ],
-                   ]
-  
+            [ :@pid, "pid" ],
+    ]
+
     include DescriptionAsChild
     include KeyValueAsChild
     include StuffAsChild
@@ -314,25 +314,25 @@ require "xampl"
     include ThingsAsChild
 
     @@to_yaml_properties = [
-                             "@pid",
-                             "@children",
-                             "@content"
-                           ] 
-  
+            "@pid",
+                    "@children",
+                    "@content"
+    ]
+
     attr_reader :pid
-  
+
     def to_yaml_properties
       @@to_yaml_properties
     end
-  
+
     def Thing.tag
       @@tag
     end
-  
+
     def Thing.ns
       @@ns
     end
-  
+
     def Thing.ns_tag
       @@ns_tag
     end
@@ -340,14 +340,14 @@ require "xampl"
     def Thing.module_name
       @@module_name
     end
-  
+
     Xampl::FromXML::register(Thing::tag, Thing::ns_tag, Thing)
-  
+
     def pid=(v)
-     changed
-     @pid = v
+      changed
+      @pid = v
     end
-  
+
     def initialize
       super
       init_xampl_object
@@ -355,29 +355,29 @@ require "xampl"
       @pid = nil if not defined? @pid
 
       init_data_content
-  
+
       init_description_as_child
       init_key_value_as_child
       init_stuff_as_child
       init_thing_as_child
       init_things_as_child
-  
-			yield(self) if block_given?
+
+      yield(self) if block_given?
       changed
     end
-  
+
     def append_to(other)
       other.add_thing(self)
     end
-  
+
     def tag
       @@tag
     end
-  
+
     def ns
       @@ns
     end
-  
+
     def ns_tag
       @@ns_tag
     end
@@ -385,15 +385,15 @@ require "xampl"
     def module_name
       @@module_name
     end
-  
+
     def attributes
       @@attributes
     end
-  
+
     def get_the_index
       @pid
     end
-  
+
     def set_the_index(index)
       @pid = index
     end
@@ -402,36 +402,36 @@ require "xampl"
   class Description
     include Xampl::XamplObject
     include Xampl::XamplWithMixedContent
-    
+
     @@tag = "description"
     @@ns = "http://xampl.com/example"
     @@ns_tag = "{http://xampl.com/example}description"
     @@module_name = "XamplExample"
     @@attributes = [
-                     [ :@kind, "kind" ],
-                   ]
-  
+            [ :@kind, "kind" ],
+    ]
+
     include EmphAsChild
 
     @@to_yaml_properties = [
-                             "@kind",
-                             "@children"
-                           ] 
-  
+            "@kind",
+                    "@children"
+    ]
+
     attr_reader :kind
 
     def to_yaml_properties
       @@to_yaml_properties
     end
-  
+
     def Description.tag
       @@tag
     end
-  
+
     def Description.ns
       @@ns
     end
-  
+
     def Description.ns_tag
       @@ns_tag
     end
@@ -439,14 +439,14 @@ require "xampl"
     def Description.module_name
       @@module_name
     end
-  
+
     Xampl::FromXML::register(Description::tag, Description::ns_tag, Description)
-  
+
     def kind=(v)
-     changed
-     @kind = v
+      changed
+      @kind = v
     end
-  
+
     def initialize
       super
       init_xampl_object
@@ -454,25 +454,25 @@ require "xampl"
       @kind = nil if not defined? @kind
 
       init_mixed_content
-  
+
       init_emph_as_child
 
-			yield(self) if block_given?
+      yield(self) if block_given?
       changed
     end
-  
+
     def append_to(other)
       other.add_description(self)
     end
-  
+
     def tag
       @@tag
     end
-  
+
     def ns
       @@ns
     end
-  
+
     def ns_tag
       @@ns_tag
     end
@@ -480,7 +480,7 @@ require "xampl"
     def module_name
       @@module_name
     end
-  
+
     def attributes
       @@attributes
     end
@@ -489,30 +489,30 @@ require "xampl"
   class Emph
     include Xampl::XamplObject
     include Xampl::XamplWithSimpleContent
-  
+
     @@tag = "emph"
     @@ns = "http://xampl.com/example"
     @@ns_tag = "{http://xampl.com/example}emph"
     @@module_name = "XamplExample"
     @@attributes = [
-                   ]
-  
+            ]
+
 
     @@to_yaml_properties = [
-                             "@content"
-                           ] 
-  
+            "@content"
+    ]
+
 
     @@to_yaml_properties = [ "@content" ]
-  
+
     def Emph.tag
       @@tag
     end
-  
+
     def Emph.ns
       @@ns
     end
-  
+
     def Emph.ns_tag
       @@ns_tag
     end
@@ -520,36 +520,36 @@ require "xampl"
     def Emph.module_name
       @@module_name
     end
-  
+
     Xampl::FromXML::register(Emph::tag, Emph::ns_tag, Emph)
-  
-  
+
+
     def initialize
       super
       init_xampl_object
 
 
 
-			yield(self) if block_given?
+      yield(self) if block_given?
       changed
     end
-  
+
     def to_yaml_properties
       @@to_yaml_properties
     end
-  
+
     def append_to(other)
       other.add_emph(self)
     end
-  
+
     def tag
       @@tag
     end
-  
+
     def ns
       @@ns
     end
-  
+
     def ns_tag
       @@ns_tag
     end
@@ -557,7 +557,7 @@ require "xampl"
     def module_name
       @@module_name
     end
-  
+
     def attributes
       @@attributes
     end
@@ -566,37 +566,37 @@ require "xampl"
   class KeyValue
     include Xampl::XamplObject
     include Xampl::XamplWithoutContent
-  
+
     @@tag = "keyValue"
     @@ns = "http://xampl.com/example"
     @@ns_tag = "{http://xampl.com/example}keyValue"
     @@module_name = "XamplExample"
     @@attributes = [
-                     [ :@id, "id" ],
-                     [ :@value, "value" ],
-                   ]
-  
+            [ :@id, "id" ],
+                    [ :@value, "value" ],
+    ]
+
 
     @@to_yaml_properties = [
-                             "@id",
-                             "@value",
-                           ] 
-  
+            "@id",
+                    "@value",
+    ]
+
     attr_reader :id
     attr_reader :value
 
     def to_yaml_properties
       @@to_yaml_properties
     end
-  
+
     def KeyValue.tag
       @@tag
     end
-  
+
     def KeyValue.ns
       @@ns
     end
-  
+
     def KeyValue.ns_tag
       @@ns_tag
     end
@@ -604,18 +604,19 @@ require "xampl"
     def KeyValue.module_name
       @@module_name
     end
-  
+
     Xampl::FromXML::register(KeyValue::tag, KeyValue::ns_tag, KeyValue)
-  
+
     def id=(v)
-     changed
-     @id = v
+      changed
+      @id = v
     end
+
     def value=(v)
-     changed
-     @value = v
+      changed
+      @value = v
     end
-  
+
     def initialize
       super
       init_xampl_object
@@ -624,22 +625,22 @@ require "xampl"
       @value = nil if not defined? @value
 
 
-			yield(self) if block_given?
+      yield(self) if block_given?
       changed
     end
-  
+
     def append_to(other)
       other.add_key_value(self)
     end
-  
+
     def tag
       @@tag
     end
-  
+
     def ns
       @@ns
     end
-  
+
     def ns_tag
       @@ns_tag
     end
@@ -647,7 +648,7 @@ require "xampl"
     def module_name
       @@module_name
     end
-  
+
     def attributes
       @@attributes
     end
@@ -655,7 +656,7 @@ require "xampl"
     def get_the_index
       @id
     end
-  
+
     def set_the_index(index)
       @id = index
     end
@@ -664,37 +665,37 @@ require "xampl"
   class Stuff
     include Xampl::XamplObject
     include Xampl::XamplWithoutContent
-  
+
     @@tag = "stuff"
     @@ns = "http://xampl.com/example"
     @@ns_tag = "{http://xampl.com/example}stuff"
     @@module_name = "XamplExample"
     @@attributes = [
-                     [ :@kind, "kind" ],
-                     [ :@special, "special", "http://xampl.com/example/special" ],
-                   ]
-  
+            [ :@kind, "kind" ],
+                    [ :@special, "special", "http://xampl.com/example/special" ],
+    ]
+
 
     @@to_yaml_properties = [
-                             "@kind",
-                             "@special",
-                           ] 
-  
+            "@kind",
+                    "@special",
+    ]
+
     attr_reader :kind
     attr_reader :special
 
     def to_yaml_properties
       @@to_yaml_properties
     end
-  
+
     def Stuff.tag
       @@tag
     end
-  
+
     def Stuff.ns
       @@ns
     end
-  
+
     def Stuff.ns_tag
       @@ns_tag
     end
@@ -702,18 +703,19 @@ require "xampl"
     def Stuff.module_name
       @@module_name
     end
-  
+
     Xampl::FromXML::register(Stuff::tag, Stuff::ns_tag, Stuff)
-  
+
     def kind=(v)
-     changed
-     @kind = v
+      changed
+      @kind = v
     end
+
     def special=(v)
-     changed
-     @special = v
+      changed
+      @special = v
     end
-  
+
     def initialize
       super
       init_xampl_object
@@ -722,22 +724,22 @@ require "xampl"
       @special = nil if not defined? @special
 
 
-			yield(self) if block_given?
+      yield(self) if block_given?
       changed
     end
-  
+
     def append_to(other)
       other.add_stuff(self)
     end
-  
+
     def tag
       @@tag
     end
-  
+
     def ns
       @@ns
     end
-  
+
     def ns_tag
       @@ns_tag
     end
@@ -745,7 +747,7 @@ require "xampl"
     def module_name
       @@module_name
     end
-  
+
     def attributes
       @@attributes
     end

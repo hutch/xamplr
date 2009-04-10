@@ -1,3 +1,7 @@
 <document>
-	<p>This <emph>is</emph> <strong>very</strong> important</p>
+    <p>This
+        <emph>is</emph>
+        <strong>very</strong>
+        important
+    </p>
 </document>

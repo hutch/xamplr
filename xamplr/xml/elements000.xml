@@ -4,69 +4,70 @@
      actually used by xampl, it is *just* an instance for the generator -->
 
 <elements xmlns='http://xampl.com/generator'>
-	<element name="elements"
-					 kind="semistructured"
-					 indexedByAttr=""
-					 persisted=""
-	         namespace="com.xampl"
-	         package="com.xampl">
-	  <childElement name="element"
-									namespace="com.xampl"
-									index="id"
-									indexClass="java.util.TreeMap"
-	                package="com.xampl" />
-	</element>
+    <element name="elements"
+             kind="semistructured"
+             indexedByAttr=""
+             persisted=""
+             namespace="com.xampl"
+             package="com.xampl">
+        <childElement name="element"
+                      namespace="com.xampl"
+                      index="id"
+                      indexClass="java.util.TreeMap"
+                      package="com.xampl"/>
+    </element>
 
-	<element name="element"
-					 kind="semistructured"
-	         namespace="com.xampl"
-	         package="com.xampl">
-	  <attribute name="kind" />
-	  <attribute name="inherit" />
-	  <attribute name="abstract" />
-	  <attribute name="rhino" />
-	  <attribute name="debris" />
-	  <attribute name="classname" />
-	  <attribute name="contentEncoding" />
-	  <attribute name="id" />
-	  <attribute name="name" />
-	  <attribute name="namespace" />
-	  <attribute name="package" />
-		<attribute name="className" />
-	  <attribute name="attributeName" />
-	  <attribute name="empty" />
-	  <attribute name="hasContent" /> <!-- characters encountered -->
-	  <childElement name="attribute"
-									namespace="com.xampl"
-									indexClass="java.util.TreeMap"
-									index="name"
-	                package="com.xampl" />
-	  <childElement name="childElement"
-									namespace="com.xampl"
-									indexClass="java.util.TreeMap"
-									index="name"
-	                package="com.xampl" />
-	</element>
+    <element name="element"
+             kind="semistructured"
+             namespace="com.xampl"
+             package="com.xampl">
+        <attribute name="kind"/>
+        <attribute name="inherit"/>
+        <attribute name="abstract"/>
+        <attribute name="rhino"/>
+        <attribute name="debris"/>
+        <attribute name="classname"/>
+        <attribute name="contentEncoding"/>
+        <attribute name="id"/>
+        <attribute name="name"/>
+        <attribute name="namespace"/>
+        <attribute name="package"/>
+        <attribute name="className"/>
+        <attribute name="attributeName"/>
+        <attribute name="empty"/>
+        <attribute name="hasContent"/>
+        <!-- characters encountered -->
+        <childElement name="attribute"
+                      namespace="com.xampl"
+                      indexClass="java.util.TreeMap"
+                      index="name"
+                      package="com.xampl"/>
+        <childElement name="childElement"
+                      namespace="com.xampl"
+                      indexClass="java.util.TreeMap"
+                      index="name"
+                      package="com.xampl"/>
+    </element>
 
-	<element name="attribute"
-					 kind="empty"
-	         namespace="com.xampl"
-	         package="com.xampl">
-	  <attribute name="name" />
-	  <attribute name="namespace" />
-	</element>
+    <element name="attribute"
+             kind="empty"
+             namespace="com.xampl"
+             package="com.xampl">
+        <attribute name="name"/>
+        <attribute name="namespace"/>
+    </element>
 
-	<element name="childElement"
-					 kind="empty"
-	         namespace="com.xampl"
-	         package="com.xampl">
-	  <attribute name="namespace" />
-	  <attribute name="name" />
-	  <attribute name="package" />
-	  <attribute name="index" />
-	  <attribute name="indexClass" />
-	  <attribute name="listClass" />
-	  <attribute name="min" />
-	  <attribute name="max" />
-	</element>
+    <element name="childElement"
+             kind="empty"
+             namespace="com.xampl"
+             package="com.xampl">
+        <attribute name="namespace"/>
+        <attribute name="name"/>
+        <attribute name="package"/>
+        <attribute name="index"/>
+        <attribute name="indexClass"/>
+        <attribute name="listClass"/>
+        <attribute name="min"/>
+        <attribute name="max"/>
+    </element>
 </elements>

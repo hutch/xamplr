@@ -8,7 +8,7 @@ include Xampl
 
 class TestRollback < Test::Unit::TestCase
 
-    xml = %Q{
+  xml = %Q{
 <sack pid='white'>
   <bag mark='one'>
     <thing info='something'>hello</thing>
@@ -19,11 +19,11 @@ class TestRollback < Test::Unit::TestCase
 </sack>
     }
 
-    Generator.new.go(:strings => [ xml ],
-                     :directory => "step7")
+  Generator.new.go(:strings => [ xml ],
+                   :directory => "step7")
 
-    require "step7/XamplAdHoc"
-    include XamplAdHoc
+  require "step7/XamplAdHoc"
+  include XamplAdHoc
 
   def test_rollback
     #sack1 = sack2 = nil
@@ -52,7 +52,7 @@ class TestRollback < Test::Unit::TestCase
 
         assert_equal(1, Xampl.count_changed)
 
-        raise 
+        raise
       }
     rescue Exception
     end
@@ -90,7 +90,7 @@ class TestRollback < Test::Unit::TestCase
 
         sack2.bag[0].thing[0].info = "this is a mistake"
 
-        raise 
+        raise
       }
     rescue Exception
     end

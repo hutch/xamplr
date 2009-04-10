@@ -1,6 +1,6 @@
-
-<people pid='' xmlns="http://xampl.com/tcx">
-  <person pid=''
-          name=''
-          age=''/>
+<people pid=''
+        xmlns="http://xampl.com/tcx">
+    <person pid=''
+            name=''
+            age=''/>
 </people>

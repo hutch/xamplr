@@ -1,9 +1,14 @@
 <things xmlns:xampl='http://xampl.com/example/play'>
-  <thing pid=''>
-    <description kind=''>blah <emph>blah</emph> blah</description>
-    <keyValue id='' value=''/>
-    <stuff kind='' xampl:special=''/>
-    <thing pid=''/>
-    <things/>
-  </thing>
+    <thing pid=''>
+        <description kind=''>blah
+            <emph>blah</emph>
+            blah
+        </description>
+        <keyValue id=''
+                  value=''/>
+        <stuff kind=''
+               xampl:special=''/>
+        <thing pid=''/>
+        <things/>
+    </thing>
 </things>

@@ -33,15 +33,15 @@ module XamplGenerator
     attr_accessor :elements_map, :options, :templates
 
     @@standard_templates = [ "templates/child_modules.template",
-                             "templates/child.template",
-                             "templates/child_indexed.template",
-                             "templates/element_classes.template",
-                             "templates/element_data.template",
-                             "templates/element_empty.template",
-                             "templates/element_mixed.template",
-                             "templates/element_simple.template",
-                             "templates/package.template",
-                            ]
+            "templates/child.template",
+            "templates/child_indexed.template",
+            "templates/element_classes.template",
+            "templates/element_data.template",
+            "templates/element_empty.template",
+            "templates/element_mixed.template",
+            "templates/element_simple.template",
+            "templates/package.template",
+    ]
 
     def initialize(options = nil, *predefined_elements)
       @elements_map = {}
@@ -52,21 +52,21 @@ module XamplGenerator
       if options then
         @options = options
       else
-        @options = Xampl.make(Options) { | options |
+        @options = Xampl.make(Options) do |options|
           options.new_index_attribute("id")
           options.new_index_attribute("pid").persisted = true;
-  
-          options.new_resolve{ | resolver |
+
+          options.new_resolve do |resolver|
             resolver.pkg = "XamplAdHoc"
             resolver.namespace=""
-          }
-        }
+          end
+        end
       end
 
-      predefined_elements.each{ | elements |
+      predefined_elements.each do |elements|
         throw :elements_need_a_pid unless elements.pid
         @elements_map[elements.pid] = elements
-      }
+      end
     end
 
     def start_element(parent)
@@ -75,7 +75,7 @@ module XamplGenerator
       namespace = "" unless namespace
       is_empty = @xpp.emptyElement
 
-      nstag = "{#{namespace}}#{name}"
+      nstag = "{{namespace}}#{name}"
 
       elements = @elements_map[namespace]
       if nil == elements then
@@ -92,18 +92,18 @@ module XamplGenerator
       element.nstag = nstag
       element.empty = is_empty
 
-      @xpp.attributeName.each_index { | i |
+      @xpp.attributeName.each_index do |i|
         attribute = Attribute.new
         attribute.name = @xpp.attributeName[i]
         attribute.namespace = @xpp.attributeNamespace[i]
         element.add_attribute(attribute)
-      }
+      end
 
       if parent then
-        parent.new_child_element(nstag){ | ce |
+        parent.new_child_element(nstag) do |ce|
           ce.element_name = name
           ce.namespace = namespace
-        }
+        end
       end
       return element
     end
@@ -126,56 +126,56 @@ module XamplGenerator
 
       while not @xpp.endDocument? do
         case @xpp.nextEvent
-          when Xampl_PP::START_ELEMENT
-            element_stack.push current_element unless nil == current_element
-            current_element = start_element(current_element)
-          when Xampl_PP::END_ELEMENT
-            current_element = element_stack.pop
-          when Xampl_PP::TEXT,
-               Xampl_PP::CDATA_SECTION,
-               Xampl_PP::ENTITY_REF
-            if current_element then
-              text = @xpp.text
-              if (nil != @xpp.text) then
-                text = text.strip
-                current_element.found_text_content if 0 < text.size
-              end
+        when Xampl_PP::START_ELEMENT
+          element_stack.push current_element unless nil == current_element
+          current_element = start_element(current_element)
+        when Xampl_PP::END_ELEMENT
+          current_element = element_stack.pop
+        when Xampl_PP::TEXT,
+                Xampl_PP::CDATA_SECTION,
+                Xampl_PP::ENTITY_REF
+          if current_element then
+            text = @xpp.text
+            if (nil != @xpp.text) then
+              text = text.strip
+              current_element.found_text_content if 0 < text.size
             end
+          end
         end
       end
     end
 
     def comprehend_from_files(filenames)
-      filenames.each{ | filename |
+      filenames.each do |filename|
         puts "comprehend file #{filename}"
         parse_filename(filename)
-      }
+      end
     end
 
     def comprehend_from_strings(strings)
-      strings.each{ | string |
+      strings.each do |string|
         parse_string(string)
-      }
+      end
     end
 
     def analyse
       namespace_package_map = {}
       namespace_prefix_map = {}
-      options.resolve_child.each{ | resolve |
+      options.resolve_child.each do |resolve|
         namespace_package_map[resolve.namespace] = resolve.pkg
-      }
+      end
 
-      @elements_map.each{ | ns, elements |
+      @elements_map.each do |ns, elements|
         package = namespace_package_map[ns]
 
-        elements.element_child.each{ | element |
+        elements.element_child.each do |element|
           element.package = package
           element.analyse(options)
-        }
-      }
+        end
+      end
 
       @required_packages = {}
-      @elements_map.each{ | ns, elements |
+      @elements_map.each do |ns, elements|
         package = namespace_package_map[ns]
 
         required = @required_packages[package]
@@ -184,16 +184,16 @@ module XamplGenerator
           @required_packages[package] = required
         end
 
-        elements.element_child.each{ | element |
-          element.child_element_child.each{ | child_element |
+        elements.element_child.each do |element|
+          element.child_element_child.each do |child_element|
             celement = child_element.find_element(@elements_map)
             #required[celement.package] = celement.package
             unless package == celement.package then
               required[celement.package] = celement.package
             end
-          }
-        }
-      }
+          end
+        end
+      end
     end
 
     def ensure_templates
@@ -224,45 +224,44 @@ module XamplGenerator
       ensure_templates
 
       lookup_element = {}
-      @elements_map.each{ | ns, elements |
-        elements.element_child.each{ | element |
-          #puts "ELEMENT : " << element.nstag
+      @elements_map.each do |ns, elements|
+        elements.element_child.each do |element|
           lookup_element[element.nstag] = element
-        }
-      }
+        end
+      end
 
       @templates.lookup_element = lookup_element
 
-      @elements_map.each{ | ns, elements |
-        elements.element_child.each{ | element |
+      @elements_map.each do |ns, elements|
+        elements.element_child.each do |element|
           place = find_place(directory_name, element.package)
 
           @templates.element = element
           @templates.package_name = element.package
 
           @templates.child_modules(place)
-        }
-      }
+        end
+      end
 
-      @elements_map.each{ | ns, elements |
-        elements.element_child.each{ | element |
+      @elements_map.each do |ns, elements|
+        elements.element_child.each do |element|
           place = find_place(directory_name, element.package)
 
           @templates.element = element
           @templates.package_name = element.package
 
           @templates.element_classes(place)
-        }
-      }
+        end
+      end
 
-      @generated_package_map.each{ | package_name, definition |
+      @generated_package_map.each do |package_name, definition|
         package_name = "XamplAdHoc" unless package_name
 
         @templates.element = nil
         @templates.package_name = package_name
         @templates.options = @options
 
-        @templates.required_packages = @required_packages[package_name]
+        @templates.required_packages = @required_packages[package_name] || {}
 
         @templates.place = definition
 
@@ -272,37 +271,37 @@ module XamplGenerator
           output_filename = File.join(directory_name, "#{package_name}.rb")
           puts "WRITE TO FILE: #{output_filename}"
           #puts package_definition
-          File.open(output_filename, "w"){ | file |
+          File.open(output_filename, "w") do |file|
             file.puts package_definition
-          }
+          end
         end
         if block_given? then
           package_name = "XamplAdHoc" unless package_name
           puts "EVALUATE: #{package_name}"
           eval_context.call(package_definition, package_name)
         end
-      }
+      end
 
       report_elements if params[:verbose]
     end
 
     def report_elements
-      @elements_map.each_value{ | elements |
+      @elements_map.each_value do |elements|
         puts elements.pp_xml
-      }
+      end
     end
 
     def print_elements(filename)
       root = Elements.new
-      @elements_map.each_value{ | elements |
-        elements.element_child.each { | element |
+      @elements_map.each_value do |elements|
+        elements.element_child.each do |element|
           root.children << element
-        }
-      }
+        end
+      end
 
-      File.open(filename, "w"){ | out |
+      File.open(filename, "w") do |out|
         root.pp_xml(out)
-      }
+      end
     end
 
     def go(args, &eval_context)
@@ -325,10 +324,9 @@ module XamplGenerator
       if directory then
         generate_to_directory(directory, args)
       else
-        generate_and_eval(args){ | module_definition, name |
-          # there must be a block, don't bother checking let it fail
-          yield(module_definition, name) 
-        }
+        generate_and_eval(args) do |module_definition, name|
+          yield(module_definition, name)
+        end
       end
     end
 
@@ -354,9 +352,9 @@ module XamplGenerator
       name.gsub!(/[A-Z]/, "_\\&")
       name.gsub!(/__+/, "_")
       class_name = ""
-      name.each("_"){ | chunk |
+      name.each("_") do |chunk|
         class_name << chunk.capitalize
-      }
+      end
       class_name.gsub!("_", "")
 
       return class_name, attr_name
@@ -364,33 +362,33 @@ module XamplGenerator
 
     def print_stats
       count = 0
-      @elements_map.each{ | ns, elements |
+      @elements_map.each do |ns, elements|
         count += elements.element_child.size
         printf("namespace: %s, element: %d\n", ns, elements.element_child.size)
-      }
+      end
       printf("counts of:: namespace: %d, element: %d\n", @elements_map.size, count)
-      @elements_map.each{ | ns, elements |
+      @elements_map.each do |ns, elements|
         puts elements.pp_xml
-      }
+      end
     end
   end
 
   class Options
     def resolve(namespace, pkg="XamplAdHoc", preferred_prefix=nil)
-      if(namespace.kind_of?(Array)) then
-        namespace.each { | ns , prefix |
-          self.new_resolve{ | resolver |
+      if (namespace.kind_of?(Array)) then
+        namespace.each do |ns, prefix|
+          self.new_resolve do |resolver|
             resolver.pkg = pkg
             resolver.namespace = ns
             resolver.preferred_prefix = prefix
-          }
-        }
+          end
+        end
       else
-        self.new_resolve{ | resolver |
+        self.new_resolve do |resolver|
           resolver.pkg = pkg
           resolver.namespace = namespace
-            resolver.preferred_prefix = preferred_prefix
-        }
+          resolver.preferred_prefix = preferred_prefix
+        end
       end
     end
   end
@@ -404,7 +402,7 @@ module XamplGenerator
 
   class Element
     def found_text_content
-       self.has_content = true
+      self.has_content = true
     end
 
     def analyse(options)
@@ -424,81 +422,85 @@ module XamplGenerator
           is_mixed = @has_content
           is_data = !@has_content
         end
-  
+
         # this isn't a very strong piece of information, can't do much about it.
         #attribute_like = ((0 == @attribute_child.size) and is_simple)
-  
-        if    is_empty  then @kind = "empty"
-        elsif is_simple then @kind = "simple"
-        elsif is_data   then @kind = "data"
-        elsif is_mixed  then @kind = "mixed"
+
+        if    is_empty  then
+          @kind = "empty"
+        elsif is_simple then
+          @kind = "simple"
+        elsif is_data   then
+          @kind = "data"
+        elsif is_mixed  then
+          @kind = "mixed"
         else
           throw "no kind determined" # this should be impossible
         end
       end
 
       unless self.indexed_by_attr then
-        attribute_child.each{ | attribute |
+        attribute_child.each do |attribute|
           aname_orig = attribute.name
           class_name, aname = Generator.choose_names(aname_orig)
           attribute.name = aname
           attribute.tag_name = aname_orig
 
-          options.index_attribute_child.each{ | iattr |
+          options.index_attribute_child.each do |iattr|
             if aname == iattr.name then
               self.indexed_by_attr = aname
               self.persisted = iattr.persisted
               break
             end
-          }
-        }
+          end
+        end
       end
     end
   end
 
   def XamplGenerator.from_command_line(options=nil)
     opts = GetoptLong.new(
-      ["--options", "-o", GetoptLong::REQUIRED_ARGUMENT],
-      ["--elements", "-e", GetoptLong::REQUIRED_ARGUMENT],
-      ["--gen:options", "-O", GetoptLong::OPTIONAL_ARGUMENT],
-      ["--gen:elements", "-E", GetoptLong::OPTIONAL_ARGUMENT],
-      ["--directory", "-d", GetoptLong::REQUIRED_ARGUMENT],
-      ["--help", "-h", GetoptLong::NO_ARGUMENT],
-      ["--version", "-v", GetoptLong::NO_ARGUMENT]
+            ["--options", "-o", GetoptLong::REQUIRED_ARGUMENT],
+            ["--elements", "-e", GetoptLong::REQUIRED_ARGUMENT],
+            ["--gen:options", "-O", GetoptLong::OPTIONAL_ARGUMENT],
+            ["--gen:elements", "-E", GetoptLong::OPTIONAL_ARGUMENT],
+            ["--directory", "-d", GetoptLong::REQUIRED_ARGUMENT],
+            ["--help", "-h", GetoptLong::NO_ARGUMENT],
+            ["--version", "-v", GetoptLong::NO_ARGUMENT]
     )
 
     write_options = nil
     write_elements = nil
     directory = File.join(".", "tmp")
 
-    opts.each{ | opt, arg |
+    opts.each do |opt, arg|
       case opt
-        when "--help" then
-          puts "--help, -h          :: this help message"
-          puts "--options, -o       :: xml file seting the generation options"
-          puts "--elements, -e      :: xml file providing a hint 'schema' (very optional)"
-          puts "--gen:options, -O   :: write an xml file describing the options used (default gen-options.xml)"
-          puts "--gen:elements, -E  :: write an xml file describing the 'schema' (default gen-elements.xml)"
-          puts "--directory, -o     :: where to write the generated files (default #{directory})"
-          puts "--version, -o       :: what version of xampl is this?"
-          exit
-        when "--version" then
-          puts "version 0.0.0"
-          exit
-        when "--directory"
-          directory = arg
-        when "--options"
-          puts "sorry, cannot read options yet"
-        when "--elements"
-          puts "sorry, cannot read elements yet"
-        when "--gen:options"
-          write_options = (arg and (0 < arg.length)) ? arg : "gen-options.xml"
-        when "--gen:elements"
-          write_elements = (arg and (0 < arg.length)) ? arg : "gen-elements.xml"
-        else
-          puts "  #{opt} #{arg}"
-        end
-    }
+      when "--help" then
+        puts "--help, -h          :: this help message"
+        puts "--options, -o       :: xml file seting the generation options"
+        puts "--elements, -e      :: xml file providing a hint 'schema' (very optional)"
+        puts "--gen:options, -O   :: write an xml file describing the options used (default gen-options.xml)"
+        puts "--gen:elements, -E  :: write an xml file describing the 'schema' (default gen-elements.xml)"
+        puts "--directory, -o     :: where to write the generated files (default #{directory})"
+        puts "--version, -o       :: what version of xampl is this?"
+        exit
+      when "--version" then
+        puts "version 0.0.0"
+        exit
+      when "--directory"
+        directory = arg
+      when "--options"
+        puts "sorry, cannot read options yet"
+      when "--elements"
+        puts "sorry, cannot read elements yet"
+      when "--gen:options"
+        write_options = (arg and (0 < arg.length)) ? arg : "gen-options.xml"
+      when "--gen:elements"
+        write_elements = (arg and (0 < arg.length)) ? arg : "gen-elements.xml"
+      else
+        puts "  #{opt} #{arg}"
+      end
+    end
 
     puts "write options to: #{write_options}" if write_options
     puts "write elements to: #{write_elements}" if write_elements
@@ -507,14 +509,14 @@ module XamplGenerator
     generator = Generator.new(options)
 
     filenames = []
-    ARGV.each{ | name |
+    ARGV.each do |name|
       filenames << name
-    }
+    end
 
     if 0 < filenames.length then
       generator.comprehend_from_files(filenames)
       generator.generate_to_directory(directory)
-      
+
       generator.print_elements(write_elements) if write_elements
     end
   end
