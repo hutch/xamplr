@@ -25,15 +25,19 @@ module RandomPeople
   #</people>
 
   5.times do
-    start_query_at = Time.now
-    found1 = Xampl.transaction("random-people") do
-      Xampl.query do | q |
-        q.add_condition('city', :equals, 'TORONTO')
-        q.add_condition('email', :ends_with, 'dodgit.com')
+    found1 = []
+    found2 = []
+    found3 = []
 
-        q.order_by('surname', :strasc)
-      end
-    end
+    start_query_at = Time.now
+#    found1 = Xampl.transaction("random-people") do
+#      Xampl.query do | q |
+#        q.add_condition('city', :equals, 'TORONTO')
+#        q.add_condition('email', :ends_with, 'dodgit.com')
+#
+#        q.order_by('surname', :strasc)
+#      end
+#    end
 
     start_find_at = Time.now
     found2 = Xampl.transaction("random-people") do

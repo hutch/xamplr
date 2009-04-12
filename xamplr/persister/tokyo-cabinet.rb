@@ -401,7 +401,7 @@ module Xampl
     #   :numoreq # number which is equal to at least one token
     #
 
-    def add (colname, operator, val, affirmative=true, no_index=true)
+    def add (colname, operator, val, affirmative=true, no_index=false)
       op = operator.is_a?(Fixnum) ? operator : OPERATORS[operator]
       op = op | TDBQRY::QCNEGATE unless affirmative
       op = op | TDBQRY::QCNOIDX if no_index
