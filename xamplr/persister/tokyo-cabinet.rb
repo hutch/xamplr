@@ -15,6 +15,7 @@ module Xampl
       unless result then
         rmsg = sprintf(msg, @tc_db.errmsg(@tc_db.ecode))
         STDERR.printf(rmsg)
+        STDERR.printf("CODE: " + @tc_db.ecode)
         caller(0).each do |trace|
           STDERR.puts(trace)
         end
@@ -39,6 +40,18 @@ module Xampl
       FileUtils.mkdir_p(@root_dir) unless File.exist?(@root_dir)
       @filename = "#{@root_dir}/repo.tct"
 
+      open_tc_db()
+
+      #      note_errors("TC:: optimisation error: %s\n") do
+      #        @tc_db.optimize(-1, -1, -1, TDB::TDEFLATE)
+      #      end
+#      note_errors("TC:: close error: %s\n") do
+#        @tc_db.close
+#      end
+    end
+
+    def open_tc_db
+      return if @tc_db
       @tc_db = TDB.new
       note_errors("TC:: tuning error: %s\n") do
         @tc_db.tune(-1, -1, -1, TDB::TDEFLATE)
@@ -55,13 +68,16 @@ module Xampl
       $numeric_indexes.each do | index_name |
         @tc_db.setindex(index_name, TDB::ITDECIMAL | TDB::ITKEEP)
       end
+    end
 
-      #      note_errors("TC:: optimisation error: %s\n") do
-      #        @tc_db.optimize(-1, -1, -1, TDB::TDEFLATE)
-      #      end
-#      note_errors("TC:: close error: %s\n") do
-#        @tc_db.close
-#      end
+    def close
+      if @tc_db then
+        self.sync
+        note_errors("TC:: close error: %s\n") do
+          @tc_db.close
+        end
+        @tc_db = nil
+      end
     end
 
     def TokyoCabinetPersister.kind
@@ -73,6 +89,7 @@ module Xampl
     end
 
     def query
+      open_tc_db
       query = TableQuery.new(@tc_db)
 
       yield query
@@ -105,6 +122,7 @@ module Xampl
     end
 
     def find_xampl
+      open_tc_db
       query = TableQuery.new(@tc_db)
 
       yield query
@@ -138,6 +156,7 @@ module Xampl
     end
 
     def find_pids
+      open_tc_db
       query = TableQuery.new(@tc_db)
 
       yield query
@@ -148,6 +167,7 @@ module Xampl
     end
 
     def find_meta
+      open_tc_db
       query = TableQuery.new(@tc_db)
 
       yield query
@@ -159,6 +179,7 @@ module Xampl
     end
 
     def do_sync_write
+      open_tc_db
       @time_stamp = Time.now.to_f.to_s
 
 #      puts "DO SYNC WRITE: #{ @changed.size } to be written (#{ @filename })"
@@ -220,6 +241,7 @@ module Xampl
     end
 
     def read_representation(klass, pid)
+      open_tc_db
       place = File.join(klass.name.split("::"), pid)
       representation = nil
 

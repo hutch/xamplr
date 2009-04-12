@@ -30,6 +30,7 @@ module Xampl
 
   def Xampl.disable_all_persisters
     @@persister = nil
+    @@known_persisters.each { | persister | persister.close}
     @@known_persisters = {}
   end
 
@@ -62,6 +63,7 @@ module Xampl
     @@persister = @@known_persisters[name]
 
     if @@persister then
+#      @@persister.open # this won't work
       # TODO -- if we know the persister, why are we being so anal about kind and format???
 
       kind = @@persister.kind || kind
@@ -97,6 +99,7 @@ module Xampl
 
   def Xampl.flush_persister_caches
     Xampl.print_known_persisters
+    @persister.close
     @@known_persisters.delete(@@persister.name)
     Xampl.print_known_persisters
   end
@@ -107,6 +110,7 @@ module Xampl
       puts "    #{n} #{k}"
     }
     puts "---------------------------------------------"
+    @@known_persisters.each { | persister | persister.close}
     @@known_persisters = {}
     GC.start
     GC.start
@@ -115,6 +119,8 @@ module Xampl
 
   def Xampl.drop_persister(name)
     Xampl.print_known_persisters
+    p = @@known_persisters[name]
+    p.close if p
     @@known_persisters.delete(name)
     Xampl.print_known_persisters
   end
@@ -336,6 +342,12 @@ module Xampl
     }
   end
 
+  def Xampl.close_all_persisters
+    @@known_persisters.each do | name, persister |
+      persister.close
+    end
+  end
+
   def Xampl.rollback(persister=@@persister)
     raise NoActivePersister unless persister
     persister.rollback_cleanup
@@ -532,6 +544,10 @@ module Xampl
       @syncing = false
 
       @busy_count = 0
+    end
+
+    def close
+      self.sync
     end
 
     def busy(yes)
