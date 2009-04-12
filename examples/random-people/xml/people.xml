@@ -1,0 +1,11 @@
+<people pid='' xmlns="http://xampl.com/people">
+    <person pid=''
+            given-name=''
+            surname=''
+            street-address=''
+            city=''
+            state=''
+            postal-code=''
+            email=''
+            phone=''/>
+</people>

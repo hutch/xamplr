@@ -3,6 +3,7 @@ module Xampl
   require 'fileutils'
   require 'tokyocabinet'
   require 'persister/caching'
+  require 'set'
 
   class TokyoCabinetPersister < AbstractCachingPersister
     include TokyoCabinet
@@ -21,11 +22,22 @@ module Xampl
       return rmsg
     end
 
+    $lexical_indexes = Set.new(%w{ class pid time-stamp }) unless $lexical_indexes
+    $numeric_indexes = Set.new unless $numeric_indexes
+
+    def TokyoCabinetPersister.add_lexical_indexs(indexes)
+      $lexical_indexes.merge(indexes)
+    end
+
+    def TokyoCabinetPersister.add_numeric_indexs(indexes)
+      $numeric_indexes.merge(indexes)
+    end
+
     def initialize(name=nil, format=nil, root=File.join(".", "repo"))
       super(root, name, format)
 
       FileUtils.mkdir_p(@root_dir) unless File.exist?(@root_dir)
-      filename = "#{@root_dir}/repo.tct"
+      @filename = "#{@root_dir}/repo.tct"
 
       @tc_db = TDB.new
       note_errors("TC:: tuning error: %s\n") do
@@ -33,12 +45,23 @@ module Xampl
       end
 
       note_errors("TC:: open error: %s\n") do
-        @tc_db.open(filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB ) #TDB::OTSYNC slows it down by almost 50 times
+        @tc_db.open(@filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB ) #TDB::OTSYNC slows it down by almost 50 times
+      end
+
+      # Don't care if there are errors (in fact, if the index exists a failure is the expected thing)
+      $lexical_indexes.each do | index_name |
+        @tc_db.setindex(index_name, TDB::ITLEXICAL | TDB::ITKEEP)
+      end
+      $numeric_indexes.each do | index_name |
+        @tc_db.setindex(index_name, TDB::ITDECIMAL | TDB::ITKEEP)
       end
 
       #      note_errors("TC:: optimisation error: %s\n") do
       #        @tc_db.optimize(-1, -1, -1, TDB::TDEFLATE)
       #      end
+#      note_errors("TC:: close error: %s\n") do
+#        @tc_db.close
+#      end
     end
 
     def TokyoCabinetPersister.kind
@@ -47,29 +70,6 @@ module Xampl
 
     def kind
       TokyoCabinetPersister.kind
-    end
-
-    def do_sync_write
-      @time_stamp = Time.now.to_f.to_s
-
-      begin
-        note_errors("TC:: tranbegin error: %s\n") do
-          @tc_db.tranbegin
-        end
-
-        @changed.each do |xampl, ignore|
-          write(xampl)
-        end
-      rescue => e
-        msg = note_errors("TC:: trancommit error: %s\n") do
-          @tc_db.tranabort
-        end
-        raise "TokyoCabinetPersister Error:: #{ msg }/#{ e }"
-      else
-        note_errors("TC:: trancommit error: %s\n") do
-          @tc_db.trancommit
-        end
-      end
     end
 
     def query
@@ -104,6 +104,94 @@ module Xampl
       results
     end
 
+    def find_xampl
+      query = TableQuery.new(@tc_db)
+
+      yield query
+
+      class_cache = {}
+
+      result_keys = query.search
+
+      results = result_keys.collect do | key |
+        result = @tc_db[ key ]
+        next unless result
+
+        class_name = result['class']
+        result_class = class_cache[class_name]
+        unless result_class then
+          class_name.split("::").each do | chunk |
+            if result_class then
+              result_class = result_class.const_get( chunk )
+            else
+              result_class = Kernel.const_get( chunk )
+            end
+          end
+
+          class_cache[class_name] = result_class
+        end
+
+        self.lookup(result_class, result['pid'])
+      end
+
+      results
+    end
+
+    def find_pids
+      query = TableQuery.new(@tc_db)
+
+      yield query
+
+      result_keys = query.search
+
+      result_keys
+    end
+
+    def find_meta
+      query = TableQuery.new(@tc_db)
+
+      yield query
+
+      result_keys = query.search
+      results = result_keys.collect { | key | @tc_db[ key ] }
+
+      results
+    end
+
+    def do_sync_write
+      @time_stamp = Time.now.to_f.to_s
+
+#      puts "DO SYNC WRITE: #{ @changed.size } to be written (#{ @filename })"
+#      note_errors("TC:: open error: %s\n") do
+#        @tc_db.open(@filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB ) #TDB::OTSYNC slows it down by almost 50 times
+#      end
+
+      begin
+        note_errors("TC:: tranbegin error: %s\n") do
+          @tc_db.tranbegin
+        end
+
+        @changed.each do |xampl, ignore|
+          write(xampl)
+        end
+      rescue => e
+        msg = "no TC.abort attempted"
+        msg = note_errors("TC:: trancommit error: %s\n") do
+          @tc_db.tranabort
+        end
+        raise "TokyoCabinetPersister Error:: #{ msg }/#{ e }"
+      else
+        note_errors("TC:: trancommit error: %s\n") do
+          @tc_db.trancommit
+        end
+      ensure
+#        note_errors("TC:: close error: %s\n") do
+#          @tc_db.close()
+#        end
+      end
+#      puts "               num records: #{ @tc_db.rnum() }"
+    end
+
     def write(xampl)
       raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index
 
@@ -124,7 +212,6 @@ module Xampl
 
       note_errors("TC:: write error: %s\n") do
         @tc_db.put(place, xampl_hash)
-#        @tc_db.putcat(place, xampl_hash) #dubious use in xampl
       end
 
       @write_count = @write_count + 1
@@ -247,6 +334,12 @@ module Xampl
 
     def search
       @query.search
+    end
+
+    # limits the search
+
+    def setlimit(max=nil, skip=nil)
+      @query.setlimit(max, skip)
     end
 
     #

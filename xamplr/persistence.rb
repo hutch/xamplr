@@ -486,6 +486,22 @@ module Xampl
     return pid_map.delete(pid)
   end
 
+  def Xampl.query
+    @@persister.query { | q | yield q } if @@persister
+  end
+
+  def Xampl.find_xampl
+    @@persister.find_xampl { | q | yield q } if @@persister
+  end
+
+  def Xampl.find_meta
+    @@persister.find_meta { | q | yield q } if @@persister
+  end
+
+  def Xampl.find_pids
+    @@persister.find_pids { | q | yield q } if @@persister
+  end
+
   class Persister
     attr_accessor :name,
                   :automatic,
