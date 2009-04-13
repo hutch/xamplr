@@ -498,20 +498,24 @@ module Xampl
     return pid_map.delete(pid)
   end
 
-  def Xampl.query
-    @@persister.query { | q | yield q } if @@persister
+  def Xampl.optimise(opts)
+    @@persister.optimise(opts) if @@persister
   end
 
-  def Xampl.find_xampl
-    @@persister.find_xampl { | q | yield q } if @@persister
+  def Xampl.query(hint=false)
+    @@persister.query(hint) { | q | yield q } if @@persister
   end
 
-  def Xampl.find_meta
-    @@persister.find_meta { | q | yield q } if @@persister
+  def Xampl.find_xampl(hint=false)
+    @@persister.find_xampl(hint) { | q | yield q } if @@persister
   end
 
-  def Xampl.find_pids
-    @@persister.find_pids { | q | yield q } if @@persister
+  def Xampl.find_meta(hint=false)
+    @@persister.find_meta(hint) { | q | yield q } if @@persister
+  end
+
+  def Xampl.find_pids(hint=false)
+    @@persister.find_pids(hint) { | q | yield q } if @@persister
   end
 
   class Persister
@@ -544,6 +548,9 @@ module Xampl
       @syncing = false
 
       @busy_count = 0
+    end
+
+    def optimise(opts)
     end
 
     def close

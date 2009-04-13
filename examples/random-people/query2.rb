@@ -24,11 +24,11 @@ module RandomPeople
   #            phone=''/>
   #</people>
 
-  3.times do
+  1.times do
     found1 = []
     found2 = []
     found3 = []
-  
+
     start = Time.now
 
     Xampl.transaction("random-people") do

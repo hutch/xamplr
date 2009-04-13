@@ -15,10 +15,12 @@ module Xampl
       unless result then
         rmsg = sprintf(msg, @tc_db.errmsg(@tc_db.ecode))
         STDERR.printf(rmsg)
-        STDERR.printf("CODE: " + @tc_db.ecode)
+#        STDERR.printf("CODE: " + @tc_db.ecode)
+        puts "---------"
         caller(0).each do |trace|
           STDERR.puts(trace)
         end
+        puts "---------"
       end
       return rmsg
     end
@@ -45,9 +47,9 @@ module Xampl
       #      note_errors("TC:: optimisation error: %s\n") do
       #        @tc_db.optimize(-1, -1, -1, TDB::TDEFLATE)
       #      end
-#      note_errors("TC:: close error: %s\n") do
-#        @tc_db.close
-#      end
+      #      note_errors("TC:: close error: %s\n") do
+      #        @tc_db.close
+      #      end
     end
 
     def open_tc_db
@@ -70,6 +72,24 @@ module Xampl
       end
     end
 
+    def optimise(opts)
+      return unless @tc_db
+
+      if opts[:indexes_only] then
+        # Don't care if there are errors (in fact, if the index exists a failure is the expected thing)
+        $lexical_indexes.each do | index_name |
+          @tc_db.setindex(index_name, 9998)
+        end
+        $numeric_indexes.each do | index_name |
+          @tc_db.setindex(index_name, 9998)
+        end
+      else
+        note_errors("TC:: optimisation error: %s\n") do
+          @tc_db.optimize(-1, -1, -1, 0xff)
+        end
+      end
+    end
+
     def close
       if @tc_db then
         self.sync
@@ -88,13 +108,19 @@ module Xampl
       TokyoCabinetPersister.kind
     end
 
-    def query
+    def query(hint=false)
       open_tc_db
       query = TableQuery.new(@tc_db)
 
       yield query
 
-      result_keys = query.search
+      result_keys = nil
+      the_hint = nil
+      if hint then
+        result_keys, the_hint = query.search(true)
+      else
+        result_keys = query.search
+      end
       results = result_keys.collect { | key | @tc_db[ key ] }
 
       class_cache = {}
@@ -118,10 +144,14 @@ module Xampl
         result['xampl'] = self.lookup(result_class, result['pid'])
       end
 
-      results
+      if hint then
+        return results, the_hint
+      else
+        return results
+      end
     end
 
-    def find_xampl
+    def find_xampl(hint=false)
       open_tc_db
       query = TableQuery.new(@tc_db)
 
@@ -129,7 +159,13 @@ module Xampl
 
       class_cache = {}
 
-      result_keys = query.search
+      result_keys = nil
+      the_hint = nil
+      if hint then
+        result_keys, the_hint = query.search(true)
+      else
+        result_keys = query.search
+      end
 
       results = result_keys.collect do | key |
         result = @tc_db[ key ]
@@ -152,40 +188,68 @@ module Xampl
         self.lookup(result_class, result['pid'])
       end
 
-      results
+      if hint then
+        return results, the_hint
+      else
+        return results
+      end
+
     end
 
-    def find_pids
+    def find_pids(hint=false)
       open_tc_db
       query = TableQuery.new(@tc_db)
 
       yield query
 
-      result_keys = query.search
+      result_keys = nil
+      the_hint = nil
+      if hint then
+        result_keys, the_hint = query.search(true)
+      else
+        result_keys = query.search
+      end
 
-      result_keys
+      if hint then
+        return result_keys, the_hint
+      else
+        return result_keys
+      end
+
     end
 
-    def find_meta
+    def find_meta(hint=false)
       open_tc_db
       query = TableQuery.new(@tc_db)
 
       yield query
 
-      result_keys = query.search
+      result_keys = nil
+      the_hint = nil
+      if hint then
+        result_keys, the_hint = query.search(true)
+      else
+        result_keys = query.search
+      end
+
       results = result_keys.collect { | key | @tc_db[ key ] }
 
-      results
+      if hint then
+        return results, the_hint
+      else
+        return results
+      end
+
     end
 
     def do_sync_write
       open_tc_db
       @time_stamp = Time.now.to_f.to_s
 
-#      puts "DO SYNC WRITE: #{ @changed.size } to be written (#{ @filename })"
-#      note_errors("TC:: open error: %s\n") do
-#        @tc_db.open(@filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB ) #TDB::OTSYNC slows it down by almost 50 times
-#      end
+      #      puts "DO SYNC WRITE: #{ @changed.size } to be written (#{ @filename })"
+      #      note_errors("TC:: open error: %s\n") do
+      #        @tc_db.open(@filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB ) #TDB::OTSYNC slows it down by almost 50 times
+      #      end
 
       begin
         note_errors("TC:: tranbegin error: %s\n") do
@@ -206,9 +270,9 @@ module Xampl
           @tc_db.trancommit
         end
       ensure
-#        note_errors("TC:: close error: %s\n") do
-#          @tc_db.close()
-#        end
+        #        note_errors("TC:: close error: %s\n") do
+        #          @tc_db.close()
+        #        end
       end
 #      puts "               num records: #{ @tc_db.rnum() }"
     end
@@ -354,8 +418,13 @@ module Xampl
     # Performs the search
     #
 
-    def search
-      @query.search
+    def search(hint=false)
+      r = @query.search
+      if hint then
+        return r, @query.hint
+      else
+        return r
+      end
     end
 
     # limits the search
