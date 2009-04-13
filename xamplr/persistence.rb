@@ -498,7 +498,7 @@ module Xampl
     return pid_map.delete(pid)
   end
 
-  def Xampl.optimise(opts)
+  def Xampl.optimise(opts={})
     @@persister.optimise(opts) if @@persister
   end
 
