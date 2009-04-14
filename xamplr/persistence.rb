@@ -873,7 +873,7 @@ module Xampl
   require "persister/in-memory"
   require "persister/filesystem"
 
-  if require 'rufus/tokyo' then
+  if require 'tokyocabinet' then
     require "persister/tokyo-cabinet"
   end
 end
