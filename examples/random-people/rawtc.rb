@@ -1,4 +1,3 @@
-$LOAD_PATH.unshift("../../../xamplr-pp")
 $LOAD_PATH.unshift("../../xamplr")
 
 require 'fileutils'

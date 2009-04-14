@@ -1,4 +1,5 @@
-require "xampl-pp/xampl-pp"
+require "xamplr-pp"
+#require "xampl-pp/xampl-pp"
 
 module Xampl
 

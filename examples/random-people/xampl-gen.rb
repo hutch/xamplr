@@ -2,7 +2,6 @@
 
 if $0 == __FILE__ then
 
-  $LOAD_PATH.unshift("../../../xamplr-pp")
   $LOAD_PATH.unshift("../../xamplr")
 
   class File

@@ -1,6 +1,5 @@
 require 'rubygems'
 
-$LOAD_PATH.unshift("../../../xamplr-pp")
 $LOAD_PATH.unshift("../../xamplr")
 $LOAD_PATH.unshift("xampl_generated_code")
 
