@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{xamplr}
-  s.version = "1.0.0"
+  s.version = "1.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bob Hutchison"]
@@ -35,6 +35,8 @@ Gem::Specification.new do |s|
     "examples/tokyo-cabinet-experimental/expt.rb",
     "examples/tokyo-cabinet-experimental/xampl-gen.rb",
     "examples/tokyo-cabinet-experimental/xml/tcx.xml",
+    "lib/xampl-generator.rb",
+    "lib/xampl.rb",
     "lib/xamplr-generator.rb",
     "lib/xamplr.rb",
     "lib/xamplr/BUGS",
