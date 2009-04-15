@@ -1,7 +1,0 @@
-= xamplr
-
-Description goes here.
-
-== Copyright
-
-Copyright (c) 2009 Bob Hutchison. See LICENSE for details.

@@ -1,0 +1,26 @@
+module #{package_name}
+
+  require "xamplr"
+	include Xampl
+
+|
+| @required_packages.each_key{ | required_package_name |
+|
+  require "#{required_package_name}"
+|
+| }
+|
+
+|
+| if @options then
+|   @options.resolve_child.each{ | r |
+|     if r.namespace and (0 < r.namespace.length) and r.preferred_prefix and (0 < r.preferred_prefix.length) then
+|
+  XamplObject.ns_preferred_prefix("#{r.namespace}", "#{r.preferred_prefix}")
+|
+|     end
+|   }
+| end
+|
+#{place}
+end

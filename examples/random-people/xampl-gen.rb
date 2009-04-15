@@ -2,15 +2,13 @@
 
 if $0 == __FILE__ then
 
-  $LOAD_PATH.unshift("../../xamplr")
-
   class File
     def File.sjoin(*args)
       File.join(args.select{ | o | o })
     end
   end
 
-  require 'xampl-generator'
+  require 'xamplr-generator'
 
   include XamplGenerator
   include Xampl

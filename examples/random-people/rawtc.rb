@@ -1,4 +1,3 @@
-$LOAD_PATH.unshift("../../xamplr")
 
 require 'fileutils'
 require 'fastercsv'
