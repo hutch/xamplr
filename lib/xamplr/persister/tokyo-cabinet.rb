@@ -15,12 +15,11 @@ module Xampl
       unless result then
         rmsg = sprintf(msg, @tc_db.errmsg(@tc_db.ecode))
         STDERR.printf(rmsg)
-#        STDERR.printf("CODE: " + @tc_db.ecode)
-        puts "---------"
+        STDERR.puts "---------"
         caller(0).each do |trace|
           STDERR.puts(trace)
         end
-        puts "---------"
+        STDERR.puts "---------"
       end
       return rmsg
     end
