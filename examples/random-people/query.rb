@@ -28,14 +28,16 @@ module RandomPeople
     found3 = []
 
     start_query_at = Time.now
-#    found1 = Xampl.transaction("random-people") do
-#      Xampl.query do | q |
-#        q.add_condition('city', :equals, 'TORONTO')
-#        q.add_condition('email', :ends_with, 'dodgit.com')
-#
-#        q.order_by('surname', :strasc)
-#      end
-#    end
+    found1 = Xampl.transaction("random-people") do
+      Xampl.query do | q |
+        q.add_condition('city', :equals, 'TORONTO')
+        q.add_condition('email', :ends_with, 'dodgit.com')
+
+#        q.setlimit(10, 10)
+
+        q.order_by('surname', :strasc)
+      end
+    end
 
     start_find_at = Time.now
     found2 = Xampl.transaction("random-people") do
@@ -54,7 +56,7 @@ module RandomPeople
     found3 = Xampl.transaction("random-people") do
       Xampl.find_pids do | q |
         q.add_condition('city', :equals, 'TORONTO')
-#        q.add_condition('email', :ends_with, 'dodgit.com')
+        q.add_condition('email', :ends_with, 'dodgit.com')
 
 #        q.setlimit(10, 10)
 
@@ -66,7 +68,10 @@ module RandomPeople
     #  found1.each do | person_meta |
     #    puts "surname: #{ person_meta['surname']}, given: #{ person_meta['xampl'].given_name }"
     #  end
-    puts "found:: query #{ found1.size }, find_xampl: #{ found2.size }, find_pids: #{ found3.size }"
-    puts "query in: #{ start_find_at - start_query_at }, find_xampl in: #{ start_find_pids_at - start_find_at }, pids in: #{ done - start_find_pids_at}\n"
+
+    puts
+    puts "query    :: found: #{ found1.size }, in: #{ start_find_at - start_query_at }"
+    puts "find     :: found: #{ found2.size }, in: #{ start_find_pids_at - start_find_at }"
+    puts "find pids:: found: #{ found3.size }, in: #{ done - start_find_pids_at}"
   end
 end
