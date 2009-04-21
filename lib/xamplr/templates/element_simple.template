@@ -4,7 +4,7 @@
 |if @element.persisted then
 |
     include Xampl::XamplPersistedObject
-  
+
     @@default_persister_format = nil
 
     def default_persister_format
@@ -17,6 +17,13 @@
       @@default_persister_format = format
     end
 
+    def #{@element.class_name}.find_by_query
+      things = Xampl.find_xampl do | q |
+         q.add_condition('class', :equals, self.name)
+         yield(q)
+       end
+    end
+
 |
 |else
 |
@@ -25,7 +32,7 @@
 |end
 |
     include Xampl::XamplWithSimpleContent
-  
+
     @@tag = "#{@element.name}"
     @@ns = "#{@element.namespace}"
     @@ns_tag = "{#{@element.namespace}}#{@element.name}"
@@ -59,7 +66,7 @@
 |
 
     @@to_yaml_properties = [ "@#{@element.indexed_by_attr}" ]
-    @@to_yaml_properties_all = [ 
+    @@to_yaml_properties_all = [
 |
 |else
 |
@@ -75,7 +82,7 @@
 |}
 |
                                  "@_content"
-                               ] 
+                               ]
 
     def to_yaml_properties
 |
@@ -151,7 +158,7 @@
 |
 | else
 |
-  
+
     def initialize
       super
 |
@@ -185,7 +192,7 @@
 
       changed
     end
-  
+
     def clear_non_persistent_index_attributes
 |
 |@element.attribute_child.each{ | attribute |
@@ -197,11 +204,11 @@
 |}
 |
     end
-  
+
     def append_to(other)
       other.add_#{@element.attribute_name}(self)
     end
-  
+
 |
 |if @element.persisted then
 |
@@ -230,11 +237,11 @@
     def #{@element.class_name}.tag
       @@tag
     end
-  
+
     def #{@element.class_name}.ns
       @@ns
     end
-  
+
     def #{@element.class_name}.ns_tag
       @@ns_tag
     end
@@ -242,19 +249,19 @@
     def #{@element.class_name}.safe_name
       @@safe_name
     end
-  
+
     def #{@element.class_name}.module_name
       @@module_name
     end
-  
+
     def tag
       @@tag
     end
-  
+
     def ns
       @@ns
     end
-  
+
     def ns_tag
       @@ns_tag
     end
@@ -262,11 +269,11 @@
     def safe_name
       @@safe_name
     end
-  
+
     def module_name
       @@module_name
     end
-  
+
     def attributes
       @@attributes
     end
@@ -277,30 +284,30 @@
     def indexed_by
       :#{@element.indexed_by_attr}
     end
-  
+
     def get_the_index
       @#{@element.indexed_by_attr}
     end
-  
+
     def set_the_index(index)
       @#{@element.indexed_by_attr} = index
     end
 |
 |end
 |
-   
+
     def substitute_in_visit(visitor)
       return visitor.substitute_in_visit_#{@element.attribute_name}(self) || self
     end
-   
+
     def before_visit(visitor)
       visitor.before_visit_#{@element.attribute_name}(self)
     end
-   
+
     def visit(visitor)
       visitor.visit_#{@element.attribute_name}(self)
     end
-   
+
     def after_visit(visitor)
       visitor.after_visit_#{@element.attribute_name}(self)
     end

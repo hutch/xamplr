@@ -1,3 +1,1 @@
--- add a way of ignoring namespaces (e.g. xhtml) during load and comprehension
-     (have this for pp_xml)
--- escaped content is being repeatedly escaped
+-- escaped content is being repeatedly escaped (confirm, just a suspiscion from a long time ago)

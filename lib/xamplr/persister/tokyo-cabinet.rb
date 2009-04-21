@@ -25,7 +25,7 @@ module Xampl
       return rmsg
     end
 
-    $lexical_indexes = Set.new(%w{ class pid time-stamp }) unless defined?($lexical_indexes)
+    $lexical_indexes = Set.new(%w{ class pid time-stamp xampl_from xampl_to }) unless defined?($lexical_indexes)
     $numeric_indexes = Set.new unless defined?($numeric_indexes)
 
     def TokyoCabinetPersister.add_lexical_indexs(indexes)
@@ -64,6 +64,7 @@ module Xampl
       end
 
       # Don't care if there are errors (in fact, if the index exists a failure is the expected thing)
+
       $lexical_indexes.each do | index_name |
         @tc_db.setindex(index_name, TDB::ITLEXICAL | TDB::ITKEEP)
       end
@@ -193,7 +194,6 @@ module Xampl
       else
         return results
       end
-
     end
 
     def find_pids(hint=false)
@@ -215,7 +215,6 @@ module Xampl
       else
         return result_keys
       end
-
     end
 
     def find_meta(hint=false)
@@ -239,7 +238,40 @@ module Xampl
       else
         return results
       end
+    end
 
+    def find_mentions_of(xampl)
+      open_tc_db
+
+      place = File.join(xampl.class.name.split("::"), xampl.get_the_index)
+
+      query = TableQuery.new(@tc_db)
+      query.add_condition('xampl_to', :equals, place)
+      result_keys = query.search
+
+      class_cache = {}
+      results = result_keys.collect do | key |
+        result = @tc_db[ key ]
+        next unless result
+
+        mentioner = result['xampl_from']
+        class_name = result['class']
+        result_class = class_cache[class_name]
+        unless result_class then
+          class_name.split("::").each do | chunk |
+            if result_class then
+              result_class = result_class.const_get( chunk )
+            else
+              result_class = Kernel.const_get( chunk )
+            end
+          end
+
+          class_cache[class_name] = result_class
+        end
+
+        self.lookup(result_class, result['pid'])
+      end
+      return results
     end
 
     def do_sync_write
@@ -281,7 +313,31 @@ module Xampl
       raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index
 
       place = File.join(xampl.class.name.split("::"), xampl.get_the_index)
-      data = represent(xampl)
+      mentions = Set.new
+      data = represent(xampl, mentions)
+
+      query = TableQuery.new(@tc_db)
+      query.add_condition('xampl_from', :equals, place)
+      note_errors("TC:: failed to remove from mentions, error: %s\n") do
+        query.searchout
+      end
+
+      mentions.each do | mention |
+        mention_place = File.join(mention.class.name.split("::"), mention.get_the_index)
+        #TODO -- will repeadedly changing a persisted xampl object fragment the TC db?
+
+        pk = @tc_db.genuid
+        mention_hash = {
+                'xampl_from' => place,
+                'class' => xampl.class.name,
+                'pid' => xampl.get_the_index,
+                'xampl_to' => mention_place
+        }
+
+        note_errors("TC:: write error: %s\n") do
+          @tc_db.put(pk, mention_hash)
+        end
+      end
 
       xampl_hash = {
               'class' => xampl.class.name,
@@ -425,6 +481,14 @@ module Xampl
       else
         return r
       end
+    end
+
+    #
+    #  Performs the search and removes whatever's found
+    #
+
+    def searchout
+      r = @query.searchout
     end
 
     # limits the search
