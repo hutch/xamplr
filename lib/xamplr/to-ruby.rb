@@ -1,13 +1,15 @@
+
 module Xampl
 
   class RubyPrinter
 
     $USE_A_PROC = false
 
-    def initialize
+    def initialize(mentions=nil)
       @obj_count = 0
       @map = {}
       @lookup_map={}
+      @mentions = mentions
     end
 
     def show_attributes(thing, name, depth)
@@ -23,7 +25,7 @@ module Xampl
           out << indent << "#{name}.#{accessor} = #{value.inspect}\n"
         end
       else
-        thing.attributes.each{ | attribute |
+        thing.attributes.each do |attribute|
           value = thing.instance_variable_get(attribute[0])
 
           if value then
@@ -35,7 +37,7 @@ module Xampl
               out << indent << "#{name}.instance_variable_set(:#{attribute[0]}, #{value.inspect})\n"
             end
           end
-        }
+        end
       end
       return out
     end
@@ -44,15 +46,16 @@ module Xampl
       out = ""
       indent = "    " + ("  " * depth)
 
-      #TODO -- is this getting the changed flag right?
-      return out << indent << "#{name}.load_needed = true\n" if thing.persist_required and (1 < depth)
+      if thing.persist_required and (1 < depth) then
+        return out << indent << "#{name}.load_needed = true\n"
+      end
 
       if (!thing.kind_of? XamplWithMixedContent) and
               (!thing.kind_of? XamplWithoutContent) and
               thing._content then
         out << indent << "#{name} << #{thing._content.inspect}\n"
       end
-      thing.children.each{ | child |
+      thing.children.each do |child|
         if child.kind_of? XamplObject then
           cname = "v_#{child.safe_name}_#{@obj_count += 1}"
 
@@ -70,7 +73,7 @@ module Xampl
         else
           out << indent << "#{name} << #{child.inspect}\n"
         end
-      }
+      end
       return out
     end
 
@@ -87,13 +90,13 @@ module Xampl
           out << "      " << "xampl.#{accessor} = #{value.inspect}\n"
         end
       else
-        thing.attributes.each{ | attribute |
+        thing.attributes.each do |attribute|
           value = thing.instance_variable_get(attribute[0])
 
           if value then
             out << "      " << "xampl.instance_variable_set(:#{attribute[0]}, #{value.inspect})\n"
           end
-        }
+        end
       end
       return out
     end
@@ -101,7 +104,7 @@ module Xampl
     def show_children_flat(thing, name, depth)
       out = ""
 
-      thing.children.each{ | child |
+      thing.children.each do |child|
         if child.kind_of? XamplObject and (nil == @map[child]) then
           cname = "v_#{child.safe_name}_#{@obj_count += 1}"
 
@@ -113,6 +116,7 @@ module Xampl
           if 0 < cout.size then
             if child.persist_required then
               out << "    " << "#{cname} = #{child.class.to_s}['#{child.get_the_index}']\n"
+              @mentions << child if @mentions
             else
               out << "    " << "#{cname} = #{child.class.to_s}.new { | xampl |\n"
               out << cout
@@ -123,7 +127,7 @@ module Xampl
           end
           out << show_children_flat(child, cname, 1 + depth) unless child.persist_required
         end
-      }
+      end
       return out
     end
 
@@ -149,18 +153,18 @@ module Xampl
               thing._content then
         out << "    " << "#{name} << #{thing._content.inspect}\n"
       end
-      thing.children.each{ | child |
+      thing.children.each do |child|
         if child.kind_of? XamplObject then
           out << "    " << "#{name} << #{@lookup_map[child]}\n"
         else
           out << "    " << "#{name} << #{child.inspect}\n"
         end
-      }
-      thing.children.each{ | child |
+      end
+      thing.children.each do |child|
         if child.kind_of? XamplObject then
           out << show_children_stitch(child, 1 + depth)
         end
-      }
+      end
       return out
     end
 

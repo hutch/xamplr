@@ -133,9 +133,9 @@ module Xampl
       return true
     end
 
-    def to_ruby
+    def to_ruby(mentions=nil)
       accessed
-      return RubyPrinter.new.to_ruby(self)
+      return RubyPrinter.new(mentions).to_ruby(self)
     end
 
     module XamplRubyDefinition
@@ -211,10 +211,8 @@ module Xampl
       return result
     end
 
-    def persist(out="", rules=nil)
-      #rules = XMLPrinter.new(out, true) if nil == rules
-      #return to_xml(out, rules)
-      return PersistXML.new("").start(self).done
+    def persist(out="", mentions=nil, rules=nil)
+      return PersistXML.new(out, mentions).start(self).done
     end
 
     def XamplObject.realise_from_xml_string(xml_string, target=nil, tokenise=true)
@@ -449,9 +447,6 @@ module Xampl
     end
 
     def to_xml(xml_printer=nil)
-      # xml_printer should be an XMLPrinter (and it knows about
-      # namespace prefixes)
-
       @text
     end
 

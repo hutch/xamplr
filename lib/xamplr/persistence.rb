@@ -518,6 +518,10 @@ module Xampl
     @@persister.find_pids(hint) { | q | yield q } if @@persister
   end
 
+  def Xampl.find_mentions_of(xampl)
+    @@persister.find_mentions_of(xampl) if @@persister
+  end
+
   class Persister
     attr_accessor :name,
                   :automatic,
@@ -636,14 +640,14 @@ module Xampl
       @@persister.introduce(new_xampl)
     end
 
-    def represent(xampl)
+    def represent(xampl, mentions)
       #puts "REPRESENT #{xampl} load needed: #{xampl.load_needed}"
       #      return nil if xampl.load_needed
       case xampl.default_persister_format || @format
       when nil, :xml_format then
-        return xampl.persist
+        return xampl.persist("", mentions)
       when :ruby_format then
-        return xampl.to_ruby
+        return xampl.to_ruby(mentions)
       when :yaml_format then
         return xampl.as_yaml
       end

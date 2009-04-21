@@ -9,7 +9,7 @@ include XamplExample
 require "benchmark"
 include Benchmark
 
-require 'persister/fsdb'
+#require 'persister/fsdb'
 require 'wee-cache/cache'
 
 class LRUCache < Cache::StorageCache

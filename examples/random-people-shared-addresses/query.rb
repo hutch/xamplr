@@ -1,6 +1,5 @@
-$LOAD_PATH.unshift("xampl_generated_code")
 
-require 'RandomPeople'
+require 'xampl_generated_code/RandomPeople'
 require 'people'
 
 Xampl.set_default_persister_kind(:tokyo_cabinet)
@@ -9,17 +8,19 @@ Xampl.set_default_persister_format(:ruby_format)
 
 module RandomPeople
 
-  #GivenName,Surname,StreetAddress,City,State,ZipCode,EmailAddress,TelephoneNumber
-  #<people pid='' xmlns="http://xampl.com/people">
+  #<people pid=''
+  #        xmlns="http://xampl.com/people">
   #    <person pid=''
   #            given-name=''
   #            surname=''
-  #            street-address=''
-  #            city=''
-  #            state=''
-  #            postal-code=''
   #            email=''
-  #            phone=''/>
+  #            phone=''>
+  #        <address pid=''
+  #                 street-address=''
+  #                 city=''
+  #                 state=''
+  #                 postal-code=''/>
+  #    </person>
   #</people>
 
   5.times do
@@ -41,7 +42,7 @@ module RandomPeople
 
     start_find_at = Time.now
     found2 = Xampl.transaction("random-people") do
-      Xampl.find_xampl do | q |
+      Person.find_by_query do | q |
         q.add_condition('city', :equals, 'TORONTO')
         q.add_condition('email', :ends_with, 'dodgit.com')
 

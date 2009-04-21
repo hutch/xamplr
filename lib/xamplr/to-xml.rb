@@ -1,3 +1,4 @@
+
 module Xampl
 
   class XMLPrinter
@@ -69,12 +70,12 @@ module Xampl
     def attribute(xampl)
       @attr_list = []
       if (nil != xampl.attributes) then
-        xampl.attributes.each{ | attr_spec |
+        xampl.attributes.each do |attr_spec|
           prefix = (2 < attr_spec.length) ? register_ns(attr_spec[2]) : ""
           value = xampl.instance_variable_get(attr_spec[0])
           @attr_list << " " << prefix << attr_spec[1] << "='" << attr_esc(value) << "'" \
                 unless nil == value
-        }
+        end
       end
     end
 
@@ -144,9 +145,9 @@ module Xampl
 
     def define_ns
       result = ""
-      ns_to_prefix.each{ | ns, prefix |
+      ns_to_prefix.each do |ns, prefix|
         result = sprintf("%s xmlns:%s='%s'", result, prefix[0..-2], ns)
-      }
+      end
       return result
     end
 

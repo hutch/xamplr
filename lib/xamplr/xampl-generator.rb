@@ -343,7 +343,12 @@ module XamplGenerator
 
     def Generator.choose_names(original_name, attr_prefix="_", attr_suffix="_")
 
-      name = original_name.gsub(/[^a-zA-Z_]+/, "_")
+#      name = original_name.gsub(/[^a-zA-Z_]+/, "_")
+
+      # NOTE (2009-04-16) -- if tag starts with a number, prefix it with an 'x'
+      name = original_name.sub(/^([0-9])/) { | m | "x" + m }
+      name = name.gsub(/[^a-zA-Z0-9_]+/, "_")
+
 
       attr_name = name.gsub(/[A-Z]+/, "_\\&")
       attr_name.gsub!(/__+/, "_")

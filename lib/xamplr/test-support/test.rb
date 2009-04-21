@@ -1455,80 +1455,80 @@ class TestXampl < Test::Unit::TestCase
     pp_xml = root.pp_xml
   end
 
-  def test_fsdb_extension_persistence_basics
-    require 'persister/fsdb'
-    stuff = Stuff.new
-    thing = Thing.new
-    thing << stuff
-
-    thing.pid = "thing"
-
-    assert_xampl_exception(:name_required){
-      Xampl.enable_persister(nil, :fsdb)
-    }
-
-    pname = "test_fsdb_extension_persistence_basics" << Time.now.strftime("%Y%m%d-%H%M-%S") << rand.to_s
-    Xampl.enable_persister(pname, :fsdb)
-
-    stuff = Stuff.new
-    thing = Thing.new
-    thing.pid = "thing"
-    thing << stuff
-
-    assert_nil(Xampl.lookup(Thing, "thing"))
-
-    assert(nil == thing.persister)
-    assert(thing.is_changed)
-    assert_equal(0, Xampl.count_changed)
-
-    Xampl.introduce_to_persister(thing)
-
-    assert(thing.persister)
-    assert_equal(1, Xampl.count_changed)
-    assert_same(thing, Xampl.lookup(Thing, "thing"), "cannot lookup new stuff")
-
-    #Xampl.print_stats
-
-    assert_equal(1, Xampl.count_changed)
-    writes = Xampl.sync
-    assert_equal(1, writes)
-    assert_equal(0, Xampl.count_changed)
-    assert(Xampl.lookup(Thing, "thing"))
-
-    thing2 = Xampl.lookup(Thing, "thing")
-    assert_same(thing, thing2, "cannot lookup cached stuff")
-
-    Xampl.clear_cache
-
-    found = Xampl.lookup(Thing, "thing")
-    assert_not_same(thing, found)
-    assert(thing === found)
-
-    Xampl.clear_cache
-
-    # now, changing thing will affect the DB -- VERY SUBTLE POSSIBLIITY OF BUG!
-    thing.new_stuff
-    assert_equal(2, thing.stuff.size)
-    assert_equal(1, found.stuff.size)
-
-    writes = Xampl.sync
-
-    assert_equal(2, thing.stuff.size)
-    assert_equal(1, found.stuff.size)
-
-    found2 = Xampl.lookup(Thing, "thing")
-
-    assert_equal(2, thing.stuff.size)
-    assert_equal(1, found.stuff.size)
-    assert_equal(2, found2.stuff.size)
-
-    assert(!(found === found2))
-    assert(thing === found2)
-
-    assert_not_equal(found, found2)
-
-    #Xampl.print_stats
-  end
+#  def test_fsdb_extension_persistence_basics
+#    require 'persister/fsdb'
+#    stuff = Stuff.new
+#    thing = Thing.new
+#    thing << stuff
+#
+#    thing.pid = "thing"
+#
+#    assert_xampl_exception(:name_required){
+#      Xampl.enable_persister(nil, :fsdb)
+#    }
+#
+#    pname = "test_fsdb_extension_persistence_basics" << Time.now.strftime("%Y%m%d-%H%M-%S") << rand.to_s
+#    Xampl.enable_persister(pname, :fsdb)
+#
+#    stuff = Stuff.new
+#    thing = Thing.new
+#    thing.pid = "thing"
+#    thing << stuff
+#
+#    assert_nil(Xampl.lookup(Thing, "thing"))
+#
+#    assert(nil == thing.persister)
+#    assert(thing.is_changed)
+#    assert_equal(0, Xampl.count_changed)
+#
+#    Xampl.introduce_to_persister(thing)
+#
+#    assert(thing.persister)
+#    assert_equal(1, Xampl.count_changed)
+#    assert_same(thing, Xampl.lookup(Thing, "thing"), "cannot lookup new stuff")
+#
+#    #Xampl.print_stats
+#
+#    assert_equal(1, Xampl.count_changed)
+#    writes = Xampl.sync
+#    assert_equal(1, writes)
+#    assert_equal(0, Xampl.count_changed)
+#    assert(Xampl.lookup(Thing, "thing"))
+#
+#    thing2 = Xampl.lookup(Thing, "thing")
+#    assert_same(thing, thing2, "cannot lookup cached stuff")
+#
+#    Xampl.clear_cache
+#
+#    found = Xampl.lookup(Thing, "thing")
+#    assert_not_same(thing, found)
+#    assert(thing === found)
+#
+#    Xampl.clear_cache
+#
+#    # now, changing thing will affect the DB -- VERY SUBTLE POSSIBLIITY OF BUG!
+#    thing.new_stuff
+#    assert_equal(2, thing.stuff.size)
+#    assert_equal(1, found.stuff.size)
+#
+#    writes = Xampl.sync
+#
+#    assert_equal(2, thing.stuff.size)
+#    assert_equal(1, found.stuff.size)
+#
+#    found2 = Xampl.lookup(Thing, "thing")
+#
+#    assert_equal(2, thing.stuff.size)
+#    assert_equal(1, found.stuff.size)
+#    assert_equal(2, found2.stuff.size)
+#
+#    assert(!(found === found2))
+#    assert(thing === found2)
+#
+#    assert_not_equal(found, found2)
+#
+#    #Xampl.print_stats
+#  end
 
   def test_simple_extension_persistence_basics
     stuff = Stuff.new

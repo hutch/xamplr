@@ -1,0 +1,13 @@
+
+2009-04-16 (version 1.0.2)
+
+  -- if tag starts with a number, prefix it with an 'x' (e.g. 0abc --> x0abc).
+     The problem arose if a tag like <0abc> was used in an xml file
+     used to generate xampl code. In that case, the 'attribute
+     names' associated with the tag would be based on '_abc'. The
+     change makes the attribute names be based on x0abc. The choice
+     of 'x' is arbitrary, but we can't have a leading digit, and
+     the '_' could fail to distinguish certain elements (e.g. 0abc
+     and 1abc would both be based on '_abc').
+
+

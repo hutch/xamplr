@@ -9,7 +9,7 @@ include XamplExample
 require "benchmark"
 include Benchmark
 
-require 'persister/fsdb'
+#require 'persister/fsdb'
 
 module Bench
 
@@ -32,10 +32,10 @@ module Bench
         Xampl.enable_persister("bench2_no_rollback_filesystem", :filesystem)
         writes += Bench.no_rollbacks(count_things, count)
       }
-      x.report("fsdb") {
-        Xampl.enable_persister("bench2_no_rollback_fsdb", :fsdb)
-        Bench.no_rollbacks(count_things, count)
-      }
+#      x.report("fsdb") {
+#        Xampl.enable_persister("bench2_no_rollback_fsdb", :fsdb)
+#        Bench.no_rollbacks(count_things, count)
+#      }
     end
     puts "   writes: #{writes}"
 
@@ -54,10 +54,10 @@ module Bench
         Xampl.enable_persister("bench2_rollback_filesystem", :filesystem)
         writes += Bench.rollbacks(count_things, count)
       }
-      x.report("fsdb") {
-        Xampl.enable_persister("bench2_rollback_fsdb", :fsdb)
-        Bench.rollbacks(count_things, count)
-      }
+#      x.report("fsdb") {
+#        Xampl.enable_persister("bench2_rollback_fsdb", :fsdb)
+#        Bench.rollbacks(count_things, count)
+#      }
     end
     puts "   writes: #{writes}"
   end

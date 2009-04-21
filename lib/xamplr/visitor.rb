@@ -1,3 +1,4 @@
+
 module Xampl
 
   class Visitor
@@ -439,13 +440,15 @@ module Xampl
   end
 
   class PersistXML < Visitor
-    attr_accessor :ns_to_prefix, :start_body, :body, :out
+    attr_accessor :ns_to_prefix, :start_body, :body, :out, :mentions
 
-    def initialize(out="")
+    def initialize(out="", mentions=nil)
       super()
 
       @out = out
       @was_attr = false
+
+      @mentions = mentions
 
       @ns_to_prefix = {}
       @start_body = nil
@@ -552,6 +555,7 @@ module Xampl
         @was_attr = true if 0 < attr_defn.size
       else
         if xampl.persist_required then
+          @mentions << xampl if @mentions
           @no_children = true
           persist_attribute(xampl)
         else
