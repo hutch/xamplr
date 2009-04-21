@@ -640,7 +640,7 @@ module Xampl
       @@persister.introduce(new_xampl)
     end
 
-    def represent(xampl, mentions)
+    def represent(xampl, mentions=[])
       #puts "REPRESENT #{xampl} load needed: #{xampl.load_needed}"
       #      return nil if xampl.load_needed
       case xampl.default_persister_format || @format
