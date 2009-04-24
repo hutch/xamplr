@@ -92,10 +92,7 @@ module RandomPeople
         people = Xampl.find_mentions_of(address)
 
         people_inspected += people.size
-
-        people.each do | person |
-          all_people << person if person.address.first == address
-        end
+        all_people.merge(people)
       end
     end
 
