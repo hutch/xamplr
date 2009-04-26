@@ -37,7 +37,7 @@ module Xampl
       actual_victim = nil
       min = 1 + @now
       @size = 0
-      @cache.each{ | key, pair |
+      @cache.each do |key, pair|
         possibility = pair[0]
         if (not possibility.load_needed) and pair[1] < min then
           @size += 1
@@ -45,7 +45,7 @@ module Xampl
           actual_victim = possibility
           min = pair[1]
         end
-      }
+      end
 #puts
       #puts
       #puts "REMOVE FROM CACHE(XamplCache): victim: #{victim}, actual: #{actual_victim}"
@@ -84,11 +84,11 @@ module Xampl
     end
 
     def print(out = "")
-      out << "Cache with capacity: #{@capacity}, current size: #{@size}\n"
-      @cache.each{ | key, pair |
+      out << "Cache (standard) with capacity: #{@capacity}, current size: #{@size}\n"
+      @cache.each do |key, pair|
         out << sprintf("  key: '%s', value: '%s', accessed: %s\n",
                        key, pair[0], pair[1])
-      }
+      end
       out
     end
 
@@ -122,7 +122,7 @@ module Xampl
       actual_victim = nil
       min = 1 + @accesses
       live = 0
-      @cache.each{ | key, pair |
+      @cache.each do |key, pair|
         pair[1] -= 1
         possibility = pair[0]
         if (not possibility.load_needed) and pair[1] < min then
@@ -131,7 +131,7 @@ module Xampl
           actual_victim = possibility
           min = pair[1]
         end
-      }
+      end
 #puts
       #puts
       #puts "REMOVE FROM CACHE(XamplCacheLFU): victim: #{victim}, actual: #{actual_victim} -- live: #{live}, size: #{@size}"
@@ -172,11 +172,11 @@ module Xampl
     end
 
     def print(out = "")
-      out << "Cache with capacity: #{@capacity}, current size: #{@size}\n"
-      @cache.each{ | key, pair |
+      out << "Cache (LFU) with capacity: #{@capacity}, current size: #{@size}\n"
+      @cache.each do |key, pair|
         out << sprintf("  key: '%s', value: '%s', count: %s\n",
                        key, pair[0], pair[1])
-      }
+      end
       out
     end
 

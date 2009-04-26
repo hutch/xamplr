@@ -15,7 +15,9 @@ module TestingStuff
 
 
       parent = Parent.new('parent1')
+      parent.info = "one"
       child = Child.new('child1')
+      child.info = "two"
 
       parent << child
       child << parent

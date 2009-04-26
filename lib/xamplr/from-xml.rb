@@ -137,9 +137,9 @@ module Xampl
         end
 
         unless @is_realising then
-          @attributeValue.size.times{ | i |
+          @attributeValue.size.times do |i|
             FromXML.tokenise_string @attributeValue[i]
-          }
+          end
         end
 
         if target then
@@ -150,7 +150,7 @@ module Xampl
           element.note_attributes_initialised(@is_realising)
         else
           if klasses[0].persisted? then
-            @attributeName.each_index{ | i |
+            @attributeName.each_index do |i|
               if @attributeName[i] == klasses[0].persisted?.to_s then
                 existing_element = Xampl.find_known(klasses[0], @attributeValue[i])
                 if existing_element then
@@ -178,10 +178,16 @@ module Xampl
                   #                   existing_element.reset_contents
                   #                   element = existing_element
                   #                   existing_element = nil
+#                  puts "#{File.basename(__FILE__)} #{__LINE__} EXISTING ELEMENT: #{ existing_element }"
+#                  puts "#{File.basename(__FILE__)} #{__LINE__} WOW, must handle the existing element correctly"
+                  element = existing_element #TODO -- IS THIS RIGHT????????????????????????
                 end
                 unless element then
                   element = klasses[0].new
                   requires_caching = @recovering
+#                  puts "#{File.basename(__FILE__)} #{__LINE__} WOW, what about recovering????"
+                  #TODO -- IS THIS RIGHT????????????????????????
+                  requires_caching = true #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                   unless @recovering then
                     element.force_load if parent
                   end
@@ -190,7 +196,7 @@ module Xampl
 
                 break
               end
-            }
+            end
           end
 
           unless element then

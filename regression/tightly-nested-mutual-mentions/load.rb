@@ -12,11 +12,10 @@ module TestingStuff
 # </stuff>
 
     Xampl.transaction("stuff") do
-      thing = Parent['parent1']
-      #puts thing.pp_xml
-
-      #thing = Child['child1']
-      #puts thing.pp_xml
+      parent = Parent['parent1']
+      puts "parent has info: #{ parent.info }"
+      child = parent.child.first
+      puts "child has info: #{ child.info }"
     end
 
 end

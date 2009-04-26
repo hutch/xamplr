@@ -1,6 +1,6 @@
 <stuff pid='' xmlns="http://xampl.com/stuff">
-        <parent pid=''>
-          <child pid=''>
+        <parent pid='' info=''>
+          <child pid='' info=''>
             <parent pid=''/>
           </child>
         </parent>

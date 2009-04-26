@@ -63,7 +63,7 @@ module Xampl
     @@persister = @@known_persisters[name]
 
     if @@persister then
-#      @@persister.open # this won't work
+      #      @@persister.open # this won't work
       # TODO -- if we know the persister, why are we being so anal about kind and format???
 
       kind = @@persister.kind || kind
@@ -691,8 +691,7 @@ module Xampl
 
     def lookup(klass, pid)
       #raise XamplException.new(:live_across_rollback) if @rolled_back
-
-      # puts "LOOKUP:: klass: #{klass} pid: #{pid}"
+#puts "#{File.basename(__FILE__)} #{__LINE__} LOOKUP:: klass: #{klass} pid: #{pid}"
 
       begin
         busy(true)
@@ -700,6 +699,8 @@ module Xampl
       ensure
         busy(false)
       end
+
+#puts "#{File.basename(__FILE__)} #{__LINE__}       ---> #{ xampl }"
 
       return xampl
     end
@@ -713,7 +714,7 @@ module Xampl
     end
 
     def lazy_load(target, klass, pid)
-      # puts "LAZY_LOAD:: klass: #{klass} pid: #{pid} target: #{target}"
+#      puts "#{File.basename(__FILE__)} #{__LINE__} LAZY_LOAD:: klass: #{klass} pid: #{pid} target: #{target}"
 
       xampl = read(klass, pid, target)
 

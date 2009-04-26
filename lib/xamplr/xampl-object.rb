@@ -216,7 +216,8 @@ module Xampl
     end
 
     def XamplObject.realise_from_xml_string(xml_string, target=nil, tokenise=true)
-      return FromXML.new.realise_string(xml_string, tokenise, target)
+      xampl = FromXML.new.realise_string(xml_string, tokenise, target)
+      return xampl
     end
 
     def XamplObject.from_xml_string(xml_string, tokenise=true)

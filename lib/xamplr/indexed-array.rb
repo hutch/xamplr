@@ -79,35 +79,37 @@ class IndexedArray
   end
 
   def each
-    @store.each{ | obj | yield(obj) }
+    @store.each do  |obj |
+      yield(obj)
+    end
   end
 
   def each_index
-    @store.each_index{ | i | yield(i) }
+    @store.each_index { | i | yield(i) }
   end
 
   def each_key_value
-    @map.each{ | k, v | yield(k, @store[v]) }
+    @map.each { | k, v | yield(k, @store[v]) }
   end
 
   def sort
-    @store.sort{ | a, b | yield(a, b) }
+    @store.sort { | a, b | yield(a, b) }
   end
 
   def sort!
     arr = []
-    @map.each{ | index, pos |
+    @map.each do |index, pos|
       arr << [index, @store[pos]]
-    }
-    arr.sort!{ | a, b |
+    end
+    arr.sort! do |a, b|
       yield(a[1], b[1])
-    }
+    end
     @map = {}
     @store = []
-    arr.each { | pair |
+    arr.each do |pair|
       @map[pair[0]] = @store.size
       @store << pair[1]
-    }
+    end
   end
 end
 
