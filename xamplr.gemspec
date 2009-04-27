@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{xamplr}
-  s.version = "1.0.4"
+  s.version = "1.0.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bob Hutchison"]
-  s.date = %q{2009-04-21}
+  s.date = %q{2009-04-27}
   s.email = %q{hutch@recursive.ca}
   s.extra_rdoc_files = [
     "LICENSE",
@@ -52,6 +52,7 @@ Gem::Specification.new do |s|
     "lib/xampl.rb",
     "lib/xamplr-generator.rb",
     "lib/xamplr.rb",
+    "lib/xamplr/README-POSSIBLE-PROBLEMS",
     "lib/xamplr/TODO",
     "lib/xamplr/from-xml.rb",
     "lib/xamplr/gen-elements.xml",
