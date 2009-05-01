@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 
 require 'sync'
 
@@ -91,9 +90,7 @@ module Xampl
 
   def Xampl.print_known_persisters
     puts "Known Persisters:: --------------------------"
-    @@known_persisters.each { | n, k |
-      puts "    #{n} #{k}"
-    }
+    @@known_persisters.each { | n, k | puts "    #{n} #{k}" }
     puts "---------------------------------------------"
   end
 
@@ -106,9 +103,7 @@ module Xampl
 
   def Xampl.drop_all_persisters
     puts "Drop All Persisters:: --------------------------"
-    @@known_persisters.each { | n, k |
-      puts "    #{n} #{k}"
-    }
+    @@known_persisters.each { | n, k | puts "    #{n} #{k}" }
     puts "---------------------------------------------"
     @@known_persisters.each { | persister | persister.close}
     @@known_persisters = {}
@@ -149,8 +144,10 @@ module Xampl
         rollback = true
         exception = nil
         original_automatic = @@persister.automatic
+
         begin
           #TODO -- impose some rules on nested transactions/enable_persisters??
+
           Xampl.auto_persistence(automatic)
           result = yield
           Xampl.block_future_changes(true)
@@ -297,7 +294,9 @@ module Xampl
   end
 
   def Xampl.introduce_to_persister(xampl)
-    @@persister.introduce(xampl) if @@persister
+    raise NoActivePersister unless @@persister
+
+    @@persister.introduce(xampl)
   end
 
   def Xampl.count_changed
@@ -324,12 +323,14 @@ module Xampl
   end
 
   def Xampl.clear_cache
-    @@persister.clear_cache if nil != @@persister
+    raise NoActivePersister unless @@persister
+    @@persister.clear_cache
   end
 
   def Xampl.sync
     #raise XamplException.new(:live_across_rollback) if @@persister.rolled_back
-    @@persister.sync if nil != @@persister
+    raise NoActivePersister unless @@persister
+    @@persister.sync
   end
 
   def Xampl.version(stream)
@@ -337,9 +338,7 @@ module Xampl
   end
 
   def Xampl.sync_all
-    @@known_persisters.each{ | name, persister |
-      persister.sync
-    }
+    @@known_persisters.each{ | name, persister | persister.sync }
   end
 
   def Xampl.close_all_persisters
@@ -349,52 +348,34 @@ module Xampl
   end
 
   def Xampl.rollback(persister=@@persister)
-    raise NoActivePersister unless persister
+    raise NoActivePersister unless @@persister
     persister.rollback_cleanup
   end
 
   def Xampl.rollback_all
-    @@known_persisters.values.each{ | persister |
-      persister.rollback
-    }
+    @@known_persisters.values.each { | persister | persister.rollback }
   end
 
   def Xampl.lazy_load(xampl)
+    raise NoActivePersister.new unless @@persister
+
     pid = xampl.get_the_index
-    if xampl and pid and @@persister then
-      @@persister.lazy_load(xampl, xampl.class, pid) if xampl and pid and @@persister
+    if xampl and pid then
+      @@persister.lazy_load(xampl, xampl.class, pid)
       xampl.load_needed = false
     else
-      puts "XAMPL.LAZY_LOAD -- REFUSED"
+      raise "XAMPL.LAZY_LOAD -- REFUSED"
     end
   end
 
   def Xampl.lookup(klass, pid)
-    @@persister.lookup(klass, pid) if nil != persister
-  end
-
-  def Xampl.lookup_lazy(klass, pid)
-    # TODO -- Make this work
-    puts "LOOKUP LAZY(#{klass.name}, #{pid})"
-
-    xampl = Xampl.find_known(klass, pid)
-
-    puts "LOOKUP LAZY(#{klass.name}, #{pid}) -- EXISTING: #{xampl}"
-    return xampl if xampl
-
-    #xampl = @@persister.lookup(klass, pid) if nil != persister
-    if nil != persister then
-      xampl = klass.new(pid) if nil != persister
-      xampl.load_needed = true
-    end
-
-    puts "LOOKUP LAZY(#{klass.name}, #{pid}) -- LAZY LOADER: #{xampl}"
-
-    return xampl
+    raise NoActivePersister unless @@persister
+    @@persister.lookup(klass, pid)
   end
 
   def Xampl.find_known(klass, pid)
-    xampl, ignore = @@persister.find_known(klass, pid) if nil != persister
+    raise NoActivePersister unless @@persister
+    xampl, ignore = @@persister.find_known(klass, pid)
     return xampl
   end
 
@@ -499,387 +480,35 @@ module Xampl
   end
 
   def Xampl.optimise(opts={})
-    @@persister.optimise(opts) if @@persister
+    raise NoActivePersister unless @@persister
+
+    @@persister.optimise(opts)
   end
 
   def Xampl.query(hint=false)
-    @@persister.query(hint) { | q | yield q } if @@persister
+    raise NoActivePersister unless @@persister
+    @@persister.query(hint) { | q | yield q }
   end
 
   def Xampl.find_xampl(hint=false)
-    @@persister.find_xampl(hint) { | q | yield q } if @@persister
+    raise NoActivePersister unless @@persister
+    @@persister.find_xampl(hint) { | q | yield q }
   end
 
   def Xampl.find_meta(hint=false)
-    @@persister.find_meta(hint) { | q | yield q } if @@persister
+    raise NoActivePersister unless @@persister
+    @@persister.find_meta(hint) { | q | yield q }
   end
 
   def Xampl.find_pids(hint=false)
-    @@persister.find_pids(hint) { | q | yield q } if @@persister
+    raise NoActivePersister unless @@persister
+    @@persister.find_pids(hint) { | q | yield q }
   end
 
   def Xampl.find_mentions_of(xampl)
-    @@persister.find_mentions_of(xampl) if @@persister
+    raise NoActivePersister unless @@persister
+    @@persister.find_mentions_of(xampl)
   end
 
-  class Persister
-    attr_accessor :name,
-                  :automatic,
-                  :block_changes,
-                  :read_count, :total_read_count,
-                  :write_count, :total_write_count,
-                  :total_sync_count, :total_rollback_count,
-                  :cache_hits, :total_cache_hits,
-                  :last_write_count,
-                  :rolled_back
-    attr_reader :syncing, :format
-
-    def initialize(name=nil, format=nil)
-      @name = name
-      @format = format
-      @automatic = false
-      @changed = {}
-      @cache_hits = 0
-      @total_cache_hits = 0
-      @read_count = 0
-      @total_read_count = 0
-      @write_count = 0
-      @total_write_count = 0
-      @last_write_count = 0
-      @total_sync_count = 0
-      @total_rollback_count = 0
-      @rolled_back = false
-      @syncing = false
-
-      @busy_count = 0
-    end
-
-    def optimise(opts)
-    end
-
-    def close
-      self.sync
-    end
-
-    def busy(yes)
-      if yes then
-        @busy_count += 1
-      elsif 0 < @busy_count then
-        @busy_count -= 1
-      end
-    end
-
-    def is_busy
-      return 0 < @busy_count
-    end
-
-    def introduce(xampl)
-      if xampl.introduce_persister(self) then
-        cache(xampl)
-      end
-      has_changed(xampl) if xampl.is_changed
-    end
-
-    def has_changed(xampl)
-      #raise XamplException.new(:live_across_rollback) if @rolled_back
-      # puts "!!!! has_changed #{xampl} #{xampl.get_the_index} -- persist required: #{xampl.persist_required}"
-      if xampl.persist_required && xampl.is_changed then
-        unless self == xampl.persister
-          raise MixedPersisters.new(xampl.persister, self)
-        end
-        @changed[xampl] = xampl
-#         puts "!!!! change recorded ==> #{@changed.size}/#{count_changed} #{@changed.object_id} !!!!"
-        #         @changed.each{ | thing, ignore |
-        #           puts "             changed: #{thing}, index: #{thing.get_the_index},  changed: #{thing.is_changed}"
-        #         }
-      end
-    end
-
-    def has_not_changed(xampl)
-      #       puts "!!!! has_not_changed #{xampl} #{xampl.get_the_index} -- in @changed: #{nil != @changed[xampl]}"
-      @changed.delete(xampl) if xampl
-    end
-
-    def count_changed
-#      @changed.each{ | thing, ignore |
-      #        puts "changed: #{thing}, index: #{thing.get_the_index}"
-      #      }
-      return @changed.size
-    end
-
-    def cache(xampl)
-      raise XamplException.new(:unimplemented)
-    end
-
-    def uncache(xampl)
-      raise XamplException.new(:unimplemented)
-    end
-
-    def clear_cache
-      raise XamplException.new(:unimplemented)
-    end
-
-    def Persister.replace(old_xampl, new_xampl)
-      pid = old_xampl.get_the_index
-      if old_xampl.persister != @@persister then
-        raise MixedPersisters.new(@@persister, old_xampl.persister)
-      end
-      if new_xampl.persister != @@persister then
-        raise MixedPersisters.new(@@persister, new_xampl.persister)
-      end
-
-      new_xampl.note_replacing(old_xampl)
-
-      unless old_xampl.load_needed then
-        Xampl.log.warn("Replacing live xampl: #{old_xampl} pid: #{pid}")
-        @@persister.uncache(old_xampl)
-        old_xampl.invalidate
-      end
-      new_xampl.pid = nil
-      new_xampl.pid = pid
-      @@persister.introduce(new_xampl)
-    end
-
-    def represent(xampl, mentions=[])
-      #puts "REPRESENT #{xampl} load needed: #{xampl.load_needed}"
-      #      return nil if xampl.load_needed
-      case xampl.default_persister_format || @format
-      when nil, :xml_format then
-        return xampl.persist("", mentions)
-      when :ruby_format then
-        return xampl.to_ruby(mentions)
-      when :yaml_format then
-        return xampl.as_yaml
-      end
-    end
-
-    def realise(representation, target=nil)
-      # Normally we'd expect to see the representation in the @format format, but
-      # that isn't necessarily the case. Try to work out what the format might be...
-
-      if representation =~ /^</ then
-        return XamplObject.realise_from_xml_string(representation, target)
-      elsif representation =~ /^-/ then
-        return XamplObject.from_yaml(representation, target)
-      else
-        XamplObject.from_ruby(representation, target)
-      end
-
-      # case @format
-      #   when nil, :xml_format then
-      #     return XamplObject.realise_from_xml_string(representation, target)
-      #   when :ruby_format then
-      #     XamplObject.from_ruby(representation, target)
-      #   when :yaml_format then
-      #     return XamplObject.from_yaml(representation, target)
-      # end
-    end
-
-    def version(stream)
-      raise XamplException.new(:unimplemented)
-      # catch(:refuse_to_version) do
-      # end
-    end
-
-    def write(xampl)
-      raise XamplException.new(:unimplemented)
-    end
-
-    def read(klass, pid, target=nil)
-      raise XamplException.new(:unimplemented)
-    end
-
-    def lookup(klass, pid)
-      #raise XamplException.new(:live_across_rollback) if @rolled_back
-#puts "#{File.basename(__FILE__)} #{__LINE__} LOOKUP:: klass: #{klass} pid: #{pid}"
-
-      begin
-        busy(true)
-        xampl = read(klass, pid)
-      ensure
-        busy(false)
-      end
-
-#puts "#{File.basename(__FILE__)} #{__LINE__}       ---> #{ xampl }"
-
-      return xampl
-    end
-
-    def find_known(klass, pid)
-      #raise XamplException.new(:live_across_rollback) if @rolled_back
-
-      xampl = read_from_cache(klass, pid, nil)
-
-      return xampl
-    end
-
-    def lazy_load(target, klass, pid)
-#      puts "#{File.basename(__FILE__)} #{__LINE__} LAZY_LOAD:: klass: #{klass} pid: #{pid} target: #{target}"
-
-      xampl = read(klass, pid, target)
-
-      # puts "   LAZY_LOAD --> #{xampl}"
-
-      return xampl
-    end
-
-    def put_changed(msg="")
-      puts "Changed::#{msg}:"
-      @changed.each { | xampl, ignore | puts "   #{xampl.tag} #{xampl.get_the_index}" }
-    end
-
-    def do_sync_write
-      unchanged_in_changed_list = 0
-      @changed.each { | xampl, ignore |
-        unchanged_in_changed_list += 1 unless xampl.is_changed
-        unless xampl.kind_of?(InvalidXampl) then
-          write(xampl)
-        end
-      }
-    end
-
-    def sync
-      #raise XamplException.new(:live_across_rollback) if @rolled_back
-      begin
-        #puts "SYNC"
-        #puts "SYNC"
-        #puts "SYNC changed: #{@changed.size}" if 0 < @changed.size
-        #@changed.each do | key, value |
-        ##puts "   #{key.class.name}"
-        ##puts "key: #{key.class.name}, value: #{value.class.name}"
-        #puts key.to_xml
-        #end
-        #puts "SYNC"
-        #puts "SYNC"
-
-        #if 0 < @changed.size then
-        #puts "SYNC changed: #{@changed.size}"
-        ##caller(0).each do | trace |
-        ##  next if /xamplr/ =~ trace
-        ##  puts "  #{trace}"
-        ##  break if /actionpack/ =~ trace
-        ##end
-        #end
-        busy(true)
-        @syncing = true
-
-        do_sync_write
-
-        @changed = {}
-
-        @total_read_count = @total_read_count + @read_count
-        @total_write_count = @total_write_count + @write_count
-        @total_cache_hits = @total_cache_hits + @cache_hits
-        @total_sync_count = @total_sync_count + 1
-
-        @read_count = 0
-        @last_write_count = @write_count
-        @write_count = 0
-
-        self.sync_done()
-
-        return @last_write_count
-      ensure
-        busy(false)
-        @syncing = false
-      end
-    end
-
-    def sync_done
-      raise XamplException.new(:unimplemented)
-    end
-
-    def rollback
-      begin
-        busy(true)
-
-        return Xampl.rollback(self)
-      ensure
-        busy(false)
-      end
-    end
-
-    def rollback_cleanup
-      @changed = {}
-    end
-
-    def print_stats
-      printf("SYNC:: TOTAL cache_hits: %d, reads: %d, writes: %d\n",
-             @total_cache_hits, @total_read_count, @total_write_count)
-      printf("             cache_hits: %d, reads: %d, last writes: %d\n",
-             @cache_hits, @read_count, @last_write_count)
-      printf("             syncs: %d\n", @total_sync_count)
-      printf("             changed count: %d (%d)\n", count_changed, @changed.size)
-      @changed.each{ | thing, ignore |
-        if thing.is_changed then
-          puts "             changed: #{thing}, index: #{thing.get_the_index}"
-        else
-          puts "             UNCHANGED: #{thing}, index: #{thing.get_the_index} <<<<<<<<<<<<<<<<<<< BAD!"
-        end
-      }
-    end
-  end
-
-  class NoActivePersister < Exception
-    def message
-      "No Persister is active"
-    end
-  end
-
-  class BlockedChange < Exception
-    attr_reader :xampl
-
-    def initialize(xampl=nil)
-      @xampl = xampl
-    end
-
-    def message
-      "attempt to change #{@xampl}, pid: #{@xampl.get_the_index}, oid: #{@xampl.object_id} when changes are blocked"
-    end
-  end
-
-  class UnmanagedChange < Exception
-    attr_reader :xampl
-
-    def initialize(xampl=nil)
-      @xampl = xampl
-    end
-
-    def message
-      "attempt to change #{@xampl}, pid: #{@xampl.get_the_index}, oid: #{@xampl.object_id} outside of its persister's management"
-    end
-  end
-
-  class IncompatiblePersisterRequest < Exception
-    attr_reader :msg
-
-    def initialize(persister, feature_name, requested_feature_value, actual_feature_value)
-      @msg = "persister #{persister.name}:: requested feature: #{feature_name} #{requested_feature_value}, actual: #{actual_feature_value}"
-    end
-
-    def message
-      @msg
-    end
-  end
-
-  class MixedPersisters < Exception
-    attr_reader :msg
-
-    def initialize(active, local)
-      @msg = "mixed persisters:: active #{active.name}, local: #{local.name}"
-    end
-
-    def message
-      @msg
-    end
-  end
-
-  require "xamplr/persister/simple"
-  require "xamplr/persister/in-memory"
-  require "xamplr/persister/filesystem"
-
-  if require 'tokyocabinet' then
-    require "xamplr/persister/tokyo-cabinet"
-  end
 end
 

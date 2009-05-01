@@ -1,6 +1,6 @@
 module Xampl
 
-  require "xamplr/persister/caches"
+  require "xamplr/persisters/caches"
 
   class InMemoryPersister < Persister
 

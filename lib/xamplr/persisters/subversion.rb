@@ -3,20 +3,20 @@ module Xampl
   require 'xamplr/version'
 
   require "fileutils"
-  require "xamplr/persister/caching"
+  require "xamplr/persisters/caching"
 
-  class FilesystemPersister < AbstractCachingPersister
+  class SubversionPersister < AbstractCachingPersister
 
     def initialize(name=nil, format=nil, root=File.join(".", "repo"))
       super(root, name, format)
     end
 
-    def FilesystemPersister.kind
-      :filesystem
+    def SubversionPersister.kind
+      :subversion
     end
 
     def kind
-      FilesystemPersister.kind
+      SubversionPersister.kind
     end
 
     def version(stream)
@@ -56,6 +56,6 @@ module Xampl
     end
   end
 
-  Xampl.register_persister_kind(FilesystemPersister)
+  Xampl.register_persister_kind(SubversionPersister)
 end
 

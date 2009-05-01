@@ -2,7 +2,7 @@ module Xampl
 
   require 'fileutils'
   require 'tokyocabinet'
-  require 'xamplr/persister/caching'
+  require 'xamplr/persisters/caching'
   require 'set'
 
   class TokyoCabinetPersister < AbstractCachingPersister

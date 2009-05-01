@@ -1,7 +1,7 @@
 module Xampl
 
   require "fileutils"
-  require "xamplr/persister/caches"
+  require "xamplr/persisters/caches"
 
   class AbstractCachingPersister < Persister
 

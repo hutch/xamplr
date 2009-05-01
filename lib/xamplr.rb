@@ -14,13 +14,19 @@ module Xampl
     return @@logger
   end
 
+  require "xamplr/xampl-module"
+  require "xamplr/xampl-object-internals"
   require "xamplr/xampl-object"
-  require "xamplr/persistence"
+  require "xamplr/xampl-persisted-object"
+
+  require "xamplr/xml-text"
   require "xamplr/notifications"
   require "xamplr/mixins"
+
   require "xamplr/from-xml"
   require "xamplr/to-xml"
   require "xamplr/to-ruby"
+  
   require "xamplr/visitor"
 
 end
