@@ -79,7 +79,8 @@ module Xampl
       @is_changed = false
       @persister.has_not_changed(self) if @persister
       self.clear_non_persistent_index_attributes
-      self.methods.grep(/init_.*_as_child/).each do |method_name|
+      methods = self.methods.grep(/init_.*_as_child/)
+      methods.each do |method_name|
         self.send(method_name)
       end
       @children = []

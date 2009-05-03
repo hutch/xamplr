@@ -192,43 +192,6 @@ class TestXampl < Test::Unit::TestCase
     check_parents(big_thing)
   end
 
-  def test_yaml_round_trip
-    emph_content_1 = "there"
-    emph1 = Emph.new
-    emph1 << emph_content_1
-
-    emph_content_2 = "are"
-    emph2 = Emph.new
-    emph2.content = emph_content_2
-
-    desc1 = Description.new
-    desc1.kind = "desc1"
-
-    desc1.is_changed = nil
-    desc1 << "hello " << emph1 << "! How " << emph2 << " you?"
-
-    thing = Thing.new
-    thing.pid = "thing"
-    thing.new_stuff.kind = "stuff1"
-    thing << desc1
-
-    big_thing = Thing.new
-    big_thing << "leading content" << thing << "trailing content"
-
-    check_parents(big_thing)
-
-    #puts YAML::dump(big_thing)
-    #puts big_thing.to_xml
-
-    something = XamplObject.from_yaml(YAML::dump(big_thing))
-    assert_equal(something.to_xml, big_thing.to_xml)
-    check_parents(something)
-
-    something = XamplObject.from_yaml(big_thing.to_yaml)
-    assert_equal(something.to_xml, big_thing.to_xml)
-    check_parents(something)
-  end
-
   def test_from_xml
     emph_content_1 = "there"
     emph1 = Emph.new

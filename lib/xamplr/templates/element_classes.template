@@ -7,5 +7,5 @@
 | elsif "mixed" == @element.kind then
 |   element_mixed(result)
 | else
-|   raise XamplException.new(:unkown_kind_of_element, "unknown element kind: '#{@element.kind}'")
+|   raise Xampl::XamplException.new(:unkown_kind_of_element, "unknown element kind: '#{@element.kind}'")
 | end

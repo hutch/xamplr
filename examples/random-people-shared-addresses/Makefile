@@ -2,7 +2,7 @@
 nope:
 
 raw:
-	rm -rf repo/raw
+	rm -rf repo
 	time ruby rawtc.rb
 	#time ruby rawtc.rb
 	#time ruby rawtc.rb
@@ -11,6 +11,6 @@ raw:
 	#time ruby rawtc.rb
 
 batch:
-	rm -rf repo/random-people
+	rm -rf repo
 	time ruby batch-load-users.rb
 

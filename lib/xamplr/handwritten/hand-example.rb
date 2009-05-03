@@ -150,7 +150,6 @@ module XamplExample
     @@ns_tag = "{http://xampl.com/example}emph"
     @@module_name = "XamplExample"
     @@attributes = [ ]
-    @@to_yaml_properties = [ "@content" ]
 
     def Emph.tag
       @@tag
@@ -175,10 +174,6 @@ module XamplExample
       init_xampl_object
 
       changed
-    end
-
-    def to_yaml_properties
-      @@to_yaml_properties
     end
 
     def append_to(other)
@@ -218,13 +213,8 @@ module XamplExample
             [:@kind, "kind"],
                     [:@special, "special", "http://xampl.com/example/special"]
     ]
-    @@to_yaml_properties = [ "@kind", "@special" ]
 
     attr_reader :kind, :special
-
-    def to_yaml_properties
-      @@to_yaml_properties
-    end
 
     def Stuff.tag
       @@tag
@@ -303,13 +293,7 @@ module XamplExample
 
     include EmphAsChild
 
-    @@to_yaml_properties = [ "@kind", "@children" ]
-
     attr_reader :kind
-
-    def to_yaml_properties
-      @@to_yaml_properties
-    end
 
     def Description.tag
       @@tag
@@ -386,13 +370,7 @@ module XamplExample
     include ThingAsChild
     include KeyValueAsChild
 
-    @@to_yaml_properties = [ "@pid", "@content", "@children" ]
-
     attr_reader :pid
-
-    def to_yaml_properties
-      @@to_yaml_properties
-    end
 
     def Thing.tag
       @@tag
@@ -478,13 +456,8 @@ module XamplExample
             [:@id, "id"],
                     [:@value, "value"]
     ]
-    @@to_yaml_properties = [ "@id", "@value" ]
 
     attr_reader :id, :value
-
-    def to_yaml_properties
-      @@to_yaml_properties
-    end
 
     def KeyValue.tag
       @@tag

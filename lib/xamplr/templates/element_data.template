@@ -65,46 +65,7 @@
 |}
 |
 |
-|if @element.persisted then
-|
 
-    @@to_yaml_properties = [ "@#{@element.indexed_by_attr}" ]
-    @@to_yaml_properties_all = [
-|
-|else
-|
-
-    @@to_yaml_properties     = [
-|
-|end
-|
-|@element.attribute_child.each{ | attribute |
-|
-                                 "@#{attribute.name}",
-|
-|}
-|
-                                 "@children",
-                                 "@_content"
-                               ]
-
-    def to_yaml_properties
-|
-|if @element.persisted then
-|
-      if is_yaml_root(self) then
-        return @@to_yaml_properties_all
-      else
-        return @@to_yaml_properties
-      end
-|
-|else
-|
-      @@to_yaml_properties
-|
-|end
-|
-    end
 |
 |if @element.persisted then
 |

@@ -4,7 +4,6 @@ module Xampl
   module XamplObject
     attr_accessor :is_changed, :parents
 
-    @@yaml_root = nil
     @@preferred_ns_prefix = { "http://xampl.com/" => "xampl",
                               "http://xampl.com/generator" => "xampl-gen",
                               "http://www.w3.org/XML/1998/namespace" => "xml" }
@@ -179,33 +178,9 @@ module Xampl
       xampl = XamplRubyDefinition.build(target)
     end
 
-    def XamplObject.from_yaml(yaml_string, target=nil)
-      unstitched = YAML::load(yaml_string)
-      unstitched.stitch_yaml
-      if target then
-        vars = unstitched.instance_variables
-        vars.each do |ivar|
-          v = unstitched.instance_variable_get(ivar)
-          target.instance_variable_set(ivar, v)
-        end
-        unstitched = target
-      end
-      return unstitched
-    end
-
-    def is_yaml_root(xampl)
-      xampl == @@yaml_root
-    end
-
-    def as_yaml
-      @@yaml_root = self unless @@yaml_root
-      result = YAML::dump(self)
-      @@yaml_root = nil if self == @@yaml_root
-      return result
-    end
-
     def persist(out="", mentions=nil, rules=nil)
-      return PersistXML.new(out, mentions).start(self).done
+      persist_xml_new = PersistXML.new(out, mentions)
+      return persist_xml_new.start(self).done
     end
 
     def XamplObject.realise_from_xml_string(xml_string, target=nil, tokenise=true)

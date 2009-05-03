@@ -39,9 +39,7 @@ module Xampl
 
       representation = represent(xampl)
       if representation then
-        File.open(place, "w"){ | out |
-          out.puts representation
-        }
+        File.open(place, "w"){ | out | out.puts representation }
         @write_count = @write_count + 1
       end
       xampl.changes_accepted
@@ -52,7 +50,8 @@ module Xampl
       place = File.join(@root_dir, klass.name.split("::"), pid)
 
       return nil unless File.exist?(place)
-      return File.read(place)
+      representation = File.read(place)
+      return representation
     end
   end
 

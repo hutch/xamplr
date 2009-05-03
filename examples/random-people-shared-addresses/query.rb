@@ -1,10 +1,7 @@
 
 require 'xampl_generated_code/RandomPeople'
 require 'people'
-
-Xampl.set_default_persister_kind(:tokyo_cabinet)
-#Xampl.set_default_persister_format(:xml_format)
-Xampl.set_default_persister_format(:ruby_format)
+require 'settings'
 
 module RandomPeople
 

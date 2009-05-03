@@ -3,21 +3,6 @@ require 'xampl_generated_code/RandomPeople'
 
 module RandomPeople
 
-  #<people pid=''
-  #        xmlns="http://xampl.com/people">
-  #    <person pid=''
-  #            given-name=''
-  #            surname=''
-  #            email=''
-  #            phone=''>
-  #        <address pid=''
-  #                 street-address=''
-  #                 city=''
-  #                 state=''
-  #                 postal-code=''/>
-  #    </person>
-  #</people>
-
   class Person
 
     Xampl::TokyoCabinetPersister.add_lexical_indexs(%w{ surname city state email })

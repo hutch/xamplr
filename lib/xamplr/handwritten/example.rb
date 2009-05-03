@@ -228,16 +228,6 @@ module XamplExample
 
     include ThingAsChild
 
-    @@to_yaml_properties = [
-            "@children",
-                    "@content"
-    ]
-
-
-    def to_yaml_properties
-      @@to_yaml_properties
-    end
-
     def Things.tag
       @@tag
     end
@@ -313,17 +303,7 @@ module XamplExample
     include ThingAsChild
     include ThingsAsChild
 
-    @@to_yaml_properties = [
-            "@pid",
-                    "@children",
-                    "@content"
-    ]
-
     attr_reader :pid
-
-    def to_yaml_properties
-      @@to_yaml_properties
-    end
 
     def Thing.tag
       @@tag
@@ -413,16 +393,7 @@ module XamplExample
 
     include EmphAsChild
 
-    @@to_yaml_properties = [
-            "@kind",
-                    "@children"
-    ]
-
     attr_reader :kind
-
-    def to_yaml_properties
-      @@to_yaml_properties
-    end
 
     def Description.tag
       @@tag
@@ -498,13 +469,6 @@ module XamplExample
             ]
 
 
-    @@to_yaml_properties = [
-            "@content"
-    ]
-
-
-    @@to_yaml_properties = [ "@content" ]
-
     def Emph.tag
       @@tag
     end
@@ -532,10 +496,6 @@ module XamplExample
 
       yield(self) if block_given?
       changed
-    end
-
-    def to_yaml_properties
-      @@to_yaml_properties
     end
 
     def append_to(other)
@@ -577,17 +537,8 @@ module XamplExample
     ]
 
 
-    @@to_yaml_properties = [
-            "@id",
-                    "@value",
-    ]
-
     attr_reader :id
     attr_reader :value
-
-    def to_yaml_properties
-      @@to_yaml_properties
-    end
 
     def KeyValue.tag
       @@tag
@@ -676,17 +627,8 @@ module XamplExample
     ]
 
 
-    @@to_yaml_properties = [
-            "@kind",
-                    "@special",
-    ]
-
     attr_reader :kind
     attr_reader :special
-
-    def to_yaml_properties
-      @@to_yaml_properties
-    end
 
     def Stuff.tag
       @@tag

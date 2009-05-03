@@ -101,12 +101,15 @@ module Xampl
     Xampl.print_known_persisters
   end
 
-  def Xampl.drop_all_persisters
-    puts "Drop All Persisters:: --------------------------"
-    @@known_persisters.each { | n, k | puts "    #{n} #{k}" }
-    puts "---------------------------------------------"
-    @@known_persisters.each { | persister | persister.close}
-    @@known_persisters = {}
+  def Xampl.drop_all_persisters(verbose=false)
+    puts "Drop All Persisters:: --------------------------" if verbose
+    @@known_persisters.each do |name, persister|
+      puts "    #{ name } #{ persister.class.name }" if verbose
+      next if persister == @@persister
+      persister.close
+      persister.clear_cache
+    end
+    puts "---------------------------------------------" if verbose
     GC.start
     GC.start
     GC.start

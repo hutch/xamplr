@@ -1,3 +1,4 @@
+
 module Xampl
 
   class XamplIsInvalid < Exception

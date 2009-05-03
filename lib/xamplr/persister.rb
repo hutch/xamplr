@@ -128,8 +128,6 @@ module Xampl
           return xampl.persist("", mentions)
         when :ruby_format then
           return xampl.to_ruby(mentions)
-        when :yaml_format then
-          return xampl.as_yaml
       end
     end
 
@@ -139,20 +137,9 @@ module Xampl
 
       if representation =~ /^</ then
         return XamplObject.realise_from_xml_string(representation, target)
-      elsif representation =~ /^-/ then
-        return XamplObject.from_yaml(representation, target)
       else
         XamplObject.from_ruby(representation, target)
       end
-
-      # case @format
-      #   when nil, :xml_format then
-      #     return XamplObject.realise_from_xml_string(representation, target)
-      #   when :ruby_format then
-      #     XamplObject.from_ruby(representation, target)
-      #   when :yaml_format then
-      #     return XamplObject.from_yaml(representation, target)
-      # end
     end
 
     def version(stream)

@@ -23,7 +23,7 @@
       accessed
       index = #{element.attribute_name}.get_the_index
       if(nil == index) then
-        raise XamplException.new("no value for the index '#{element.indexed_by_attr}' of #{element.attribute_name} defined in : " << #{element.attribute_name}.pp_xml)
+        raise Xampl::XamplException.new("no value for the index '#{element.indexed_by_attr}' of #{element.attribute_name} defined in : " << #{element.attribute_name}.pp_xml)
       end
 
       existing = @#{element.attribute_name}_child[index]

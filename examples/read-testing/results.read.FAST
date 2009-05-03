@@ -1,0 +1,5 @@
+time ruby read.rb
+read.rb:26 Root read in 3.317672
+read.rb:35 looped over 10000 text in 0.007039 NO LOADING
+loaded 10000, total lines: 3632427, in 2.897625 seconds, total time: 6.222336 seconds
+        6.73 real         6.37 user         0.26 sys

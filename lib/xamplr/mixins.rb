@@ -59,13 +59,6 @@ module Xampl
       end
       return self
     end
-
-    def stitch_yaml(depth=0)
-      initialize
-      if 0 < depth && self.persist_required then
-        self.force_load
-      end
-    end
   end
 
   module XamplWithSimpleContent
@@ -90,6 +83,11 @@ module Xampl
 
     def after_visit_by_element_kind(visitor)
       visitor.after_visit_simple_content(self)
+    end
+
+    def _content
+      accessed
+      @_content
     end
 
     def _content=(v)
@@ -168,13 +166,6 @@ module Xampl
       end
       return self
     end
-
-    def stitch_yaml(depth=0)
-      initialize
-      if 0 < depth && self.persist_required then
-        self.force_load
-      end
-    end
   end
 
   module XamplWithDataContent
@@ -209,6 +200,11 @@ module Xampl
     def children
       accessed
       return @children
+    end
+
+    def _content
+      accessed
+      @_content
     end
 
     def _content=(v)
@@ -287,24 +283,6 @@ module Xampl
         add_content(other)
       end
       return self
-    end
-
-    def stitch_yaml(depth=0)
-      children_array = @children if defined? @children
-      initialize
-
-      if 0 < depth && self.persist_required then
-        self.force_load
-        return
-      end
-
-      @children = []
-      if children_array then
-        children_array.each{ | child |
-          child.stitch_yaml(1 + depth) if (child.kind_of? XamplObject)
-          self << child
-        }
-      end
     end
   end
 
@@ -416,22 +394,6 @@ module Xampl
         add_content(other)
       end
       return self
-    end
-
-    def stitch_yaml(depth=0)
-      children_array = @children
-      initialize
-
-      if 0 < depth && self.persist_required then
-        self.force_load
-        return
-      end
-
-      @children = []
-      children_array.each{ | child |
-        child.stitch_yaml(1 + depth) if (child.kind_of? XamplObject)
-        self << child
-      }
     end
   end
 end

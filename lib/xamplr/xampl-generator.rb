@@ -76,7 +76,7 @@ module XamplGenerator
       namespace = "" unless namespace
       is_empty = @xpp.emptyElement
 
-      nstag = "{{namespace}}#{name}"
+      nstag = "{{#{namespace}}}#{name}"
 
       elements = @elements_map[namespace]
       if nil == elements then

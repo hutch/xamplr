@@ -2,10 +2,7 @@ $LOAD_PATH.unshift("xampl_generated_code")
 
 require 'RandomPeople'
 require 'people'
-
-Xampl.set_default_persister_kind(:tokyo_cabinet)
-Xampl.set_default_persister_format(:xml_format)
-#Xampl.set_default_persister_format(:ruby_format)
+require 'settings'
 
 module RandomPeople
 
@@ -50,7 +47,6 @@ module RandomPeople
         q.order_by('surname', :strasc)
       end
     end
-
     start_find_pids_at = Time.now
 
     found3 = Xampl.transaction("random-people") do

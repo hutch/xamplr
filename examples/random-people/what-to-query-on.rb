@@ -4,9 +4,7 @@ require 'set'
 require 'fastercsv'
 require 'RandomPeople'
 require 'people'
-
-Xampl.set_default_persister_kind(:tokyo_cabinet)
-Xampl.set_default_persister_format(:xml_format)
+require 'settings'
 
 module RandomPeople
   arr_of_arrs = FasterCSV.read("random-names.csv")

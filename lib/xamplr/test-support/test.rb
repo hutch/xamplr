@@ -257,50 +257,6 @@ class TestXampl < Test::Unit::TestCase
     check_parents(big_thing)
   end
 
-  def test_yaml_round_trip
-    emph_content_1 = "there"
-    emph1 = Emph.new
-    emph1 << emph_content_1
-
-    emph_content_2 = "are"
-    emph2 = Emph.new
-    emph2.content = emph_content_2
-
-    desc1 = Description.new
-    desc1.kind = "desc1"
-
-    desc1.is_changed = nil
-    desc1 << "hello " << emph1 << "! How " << emph2 << " you?"
-
-    thing = Thing.new
-    thing.pid = "thing"
-    thing.new_stuff.kind = "stuff1"
-    thing << desc1
-
-    big_thing = Thing.new("big_thing")
-    big_thing << "leading content" << thing << "trailing content"
-
-    check_parents(big_thing)
-
-    #puts YAML::dump(big_thing)
-    #puts big_thing.test_to_xml
-
-    #something = XamplObject.from_yaml(YAML::dump(big_thing))
-    pp_xml = big_thing.pp_xml
-    bt_as_yaml = big_thing.as_yaml
-
-    something = XamplObject.from_yaml(bt_as_yaml)
-
-    assert_not_same(something, big_thing)
-    assert_equal(something.test_to_xml, big_thing.persist)
-    check_parents(something)
-
-    something = XamplObject.from_yaml(big_thing.as_yaml)
-    assert_equal(something.test_to_xml, big_thing.persist)
-    assert_not_same(something, big_thing)
-    check_parents(something)
-  end
-
   def test_from_xml
     emph_content_1 = "there"
     emph1 = Emph.new
@@ -547,25 +503,6 @@ class TestXampl < Test::Unit::TestCase
   def test_in_memory_persistence_ruby
     pname = "test_in_memory_persistence_ruby" << Time.now.strftime("%Y%m%d-%H%M-%S") << rand.to_s
     Xampl.enable_persister(pname, :in_memory, :ruby_format)
-    persister2 = Xampl.persister
-
-    stuff = Stuff.new
-    thing = Thing.new
-    thing.pid = "thing"
-    thing << stuff
-
-    Xampl.introduce_to_persister(thing)
-    Xampl.sync
-    Xampl.clear_cache
-    found = Xampl.lookup(Thing, "thing")
-
-    assert_not_equal(thing, found)
-    assert(thing === found)
-  end
-
-  def test_in_memory_persistence_yaml
-    pname = "test_in_memory_persistence_yaml" << Time.now.strftime("%Y%m%d-%H%M-%S") << rand.to_s
-    Xampl.enable_persister(pname, :in_memory, :yaml_format)
     persister2 = Xampl.persister
 
     stuff = Stuff.new
@@ -854,30 +791,6 @@ class TestXampl < Test::Unit::TestCase
     assert_equal(thing.object_id, found.object_id)
   end
 
-  def test_filesystem_persistence_yaml
-    pname = "test_filesystem_persistence_yaml" << Time.now.strftime("%Y%m%d-%H%M-%S") << rand.to_s
-    Xampl.enable_persister(pname, :filesystem, :yaml_format)
-    persister2 = Xampl.persister
-
-    stuff = Stuff.new
-    thing = Thing.new
-    thing.pid = "thing"
-    thing << stuff
-
-    Xampl.introduce_to_persister(thing)
-    Xampl.sync
-
-    thing.info = "force emptying"
-
-    Xampl.rollback
-
-    assert(thing.load_needed)
-
-    found = Xampl.lookup(Thing, "thing")
-
-    assert_equal(thing.object_id, found.object_id)
-  end
-
   def test_filesystem_persistence_automatic
     stuff = Stuff.new
     thing = Thing.new
@@ -1045,12 +958,11 @@ class TestXampl < Test::Unit::TestCase
 
     keep_new_thing = new_thing
 
-    # these (to xml, ruby, yaml) will NOT suck the child thing into memory
+    # these (to xml, ruby) will NOT suck the child thing into memory
     xml = thing.test_to_xml
 
     ruby = thing.to_ruby
     ruby_thing = XamplObject.from_ruby(ruby)
-    yaml_thing = XamplObject.from_yaml(thing.as_yaml)
 
     assert_equal(0, Xampl.persister.read_count, "not in the cache")
 

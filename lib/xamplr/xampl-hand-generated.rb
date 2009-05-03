@@ -479,21 +479,6 @@ module XamplGenerator
     ]
     include ElementAsChild
 
-    @@to_yaml_properties = [ "@pid" ]
-    @@to_yaml_properties_all = [
-            "@pid",
-                    "@children",
-                    "@_content"
-    ]
-
-    def to_yaml_properties
-      if is_yaml_root(self) then
-        return @@to_yaml_properties_all
-      else
-        return @@to_yaml_properties
-      end
-    end
-
     def Elements.lookup(pid)
       Xampl.lookup(Elements, pid)
     end
@@ -634,26 +619,6 @@ module XamplGenerator
     ]
     include ChildElementAsChild
     include AttributeAsChild
-
-    @@to_yaml_properties     = [
-            "@has_content",
-                    "@class_name",
-                    "@attribute_name",
-                    "@nstag",
-                    "@empty",
-                    "@indexed_by_attr",
-                    "@persisted",
-                    "@name",
-                    "@kind",
-                    "@namespace",
-                    "@package",
-                    "@children",
-                    "@_content"
-    ]
-
-    def to_yaml_properties
-      @@to_yaml_properties
-    end
 
     def has_content
       accessed
@@ -911,19 +876,6 @@ module XamplGenerator
                     [ :@package, "package" ],
     ]
 
-    @@to_yaml_properties =     [
-            "@element_name",
-                    "@name",
-                    "@namespace",
-                    "@index_class",
-                    "@index",
-                    "@package",
-    ]
-
-    def to_yaml_properties
-      @@to_yaml_properties
-    end
-
     def element_name
       accessed
       @element_name
@@ -1108,15 +1060,6 @@ module XamplGenerator
                     [ :@name, "name" ],
     ]
 
-    @@to_yaml_properties =     [
-            "@namespace",
-                    "@name",
-    ]
-
-    def to_yaml_properties
-      @@to_yaml_properties
-    end
-
     def namespace
       accessed
       @namespace
@@ -1249,15 +1192,6 @@ module XamplGenerator
     include IndexAttributeAsChild
     include ResolveAsChild
 
-    @@to_yaml_properties     = [
-            "@children",
-                    "@_content"
-    ]
-
-    def to_yaml_properties
-      @@to_yaml_properties
-    end
-
     def initialize
       super
 
@@ -1352,15 +1286,6 @@ module XamplGenerator
             [ :@name, "name" ],
                     [ :@persisted, "persisted" ],
     ]
-
-    @@to_yaml_properties =     [
-            "@name",
-                    "@persisted",
-    ]
-
-    def to_yaml_properties
-      @@to_yaml_properties
-    end
 
     def name
       accessed
@@ -1494,16 +1419,6 @@ module XamplGenerator
                     [ :@pkg, "pkg" ],
                     [ :@preferred_prefix, "preferred_prefix" ],
     ]
-
-    @@to_yaml_properties =     [
-            "@namespace",
-                    "@pkg",
-                    "@preferred_prefix",
-    ]
-
-    def to_yaml_properties
-      @@to_yaml_properties
-    end
 
     def namespace
       accessed

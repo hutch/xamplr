@@ -5,6 +5,8 @@ module Xampl
   require 'xamplr/persisters/caching'
   require 'set'
 
+  require 'ruby-prof'
+
   class TokyoCabinetPersister < AbstractCachingPersister
     include TokyoCabinet
 
@@ -43,29 +45,32 @@ module Xampl
 
       open_tc_db()
 
-      #      note_errors("TC:: optimisation error: %s\n") do
+      #      note_errors("TC[[#{ @filename }]]:: optimisation error: %s\n") do
       #        @tc_db.optimize(-1, -1, -1, TDB::TDEFLATE)
       #      end
-      #      note_errors("TC:: close error: %s\n") do
+      #      note_errors("TC[[#{ @filename }]]:: close error: %s\n") do
       #        @tc_db.close
       #      end
     end
 
     def open_tc_db
       return if @tc_db
+#      puts "#{File.basename(__FILE__)}:#{__LINE__} open tc db: #{ @filename }"
+#puts "#{File.basename(__FILE__)}:#{__LINE__} callers..."
+      #caller(0).each { | trace | puts "   #{trace}"}
       @tc_db = TDB.new
-      note_errors("TC:: tuning error: %s\n") do
+      note_errors("TC[[#{ @filename }]]:: tuning error: %s\n") do
         @tc_db.tune(-1, -1, -1, TDB::TDEFLATE)
       end
 
-      note_errors("TC:: open error: %s\n") do
+      note_errors("TC[[#{ @filename }]]:: open [#{ @filename }] error: %s\n") do
         @tc_db.open(@filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB ) #TDB::OTSYNC slows it down by almost 50 times
       end
 
       # Don't care if there are errors (in fact, if the index exists a failure is the expected thing)
 
       $lexical_indexes.each do | index_name |
-        @tc_db.setindex(index_name, TDB::ITLEXICAL | TDB::ITKEEP)
+        r = @tc_db.setindex(index_name, TDB::ITLEXICAL | TDB::ITKEEP)
       end
       $numeric_indexes.each do | index_name |
         @tc_db.setindex(index_name, TDB::ITDECIMAL | TDB::ITKEEP)
@@ -84,7 +89,7 @@ module Xampl
           @tc_db.setindex(index_name, 9998)
         end
       else
-        note_errors("TC:: optimisation error: %s\n") do
+        note_errors("TC[[#{ @filename }]]:: optimisation error: %s\n") do
           @tc_db.optimize(-1, -1, -1, 0xff)
         end
       end
@@ -93,10 +98,11 @@ module Xampl
     def close
       if @tc_db then
         self.sync
-        note_errors("TC:: close error: %s\n") do
+        note_errors("TC[[#{ @filename }]]:: close error: %s\n") do
           @tc_db.close
         end
         @tc_db = nil
+#        puts "#{File.basename(__FILE__)}:#{__LINE__} close tc db: #{ @filename }"
       end
     end
 
@@ -274,6 +280,17 @@ module Xampl
     end
 
     def do_sync_write
+#      RubyProf.start
+      #
+      #      do_sync_write_work
+      #
+      #      result = RubyProf.stop
+      #      printer = RubyProf::FlatPrinter.new(result)
+      #      printer.print(STDOUT, 0)
+      #      puts "#{File.basename(__FILE__)}:#{__LINE__} stop this profiler"
+      #    end
+      #
+      #    def do_sync_write_work
       open_tc_db
       @time_stamp = Time.now.to_f.to_s
 
@@ -283,7 +300,7 @@ module Xampl
       #      end
 
       begin
-        note_errors("TC:: tranbegin error: %s\n") do
+        note_errors("TC[[#{ @filename }]]:: tranbegin error: %s\n") do
           @tc_db.tranbegin
         end
 
@@ -292,16 +309,16 @@ module Xampl
         end
       rescue => e
         msg = "no TC.abort attempted"
-        msg = note_errors("TC:: trancommit error: %s\n") do
+        msg = note_errors("TC[[#{ @filename }]]:: trancommit error: %s\n") do
           @tc_db.tranabort
         end
         raise "TokyoCabinetPersister Error:: #{ msg }/#{ e }"
       else
-        note_errors("TC:: trancommit error: %s\n") do
+        note_errors("TC[[#{ @filename }]]:: trancommit error: %s\n") do
           @tc_db.trancommit
         end
       ensure
-        #        note_errors("TC:: close error: %s\n") do
+        #        note_errors("TC[[#{ @filename }]]:: close error: %s\n") do
         #          @tc_db.close()
         #        end
       end
@@ -317,7 +334,7 @@ module Xampl
 
       query = TableQuery.new(@tc_db)
       query.add_condition('xampl_from', :equals, place)
-      note_errors("TC:: failed to remove from mentions, error: %s\n") do
+      note_errors("TC[[#{ @filename }]]:: failed to remove from mentions, error: %s\n") do
         query.searchout
       end
 
@@ -333,7 +350,7 @@ module Xampl
                 'xampl_to' => mention_place
         }
 
-        note_errors("TC:: write error: %s\n") do
+        note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
           @tc_db.put(pk, mention_hash)
         end
       end
@@ -350,7 +367,7 @@ module Xampl
         xampl_hash = hash.merge(xampl_hash)
       end
 
-      note_errors("TC:: write error: %s\n") do
+      note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
         @tc_db.put(place, xampl_hash)
       end
 
@@ -359,7 +376,15 @@ module Xampl
       return true
     end
 
+    $TC_COUNT = 0
+    $FS_COUNT = 0
+    $NF_COUNT = 0
+
     def read_representation(klass, pid)
+      #TODO -- is this being called too often, e.g. by new_xxx???
+      #      puts "#{File.basename(__FILE__)}:#{__LINE__} READ #{ klass }/#{ pid }"
+      #      caller(0).each { | trace | puts "  #{trace}"}
+
       open_tc_db
       place = File.join(klass.name.split("::"), pid)
       representation = nil
@@ -367,8 +392,21 @@ module Xampl
       meta = @tc_db[place]
       representation = meta['xampl'] if meta
 
+      #      puts "#{File.basename(__FILE__)}:#{__LINE__} TC: #{ klass }/#{ pid }" if representation
+      $TC_COUNT += 1 if representation
+
       # puts "read: #{ place }, size: #{ representation.size }"
       # puts representation[0..100]
+
+      unless representation then
+        # try the filesystem if it is not in the TC repository
+        place = File.join(@root_dir, klass.name.split("::"), pid)
+        representation = File.read(place) if File.exist?(place)
+        $FS_COUNT += 1 if representation
+#        puts "#{File.basename(__FILE__)}:#{__LINE__} FS: #{ klass }/#{ pid } (FS: #{ $FS_COUNT}, TC: #{ $TC_COUNT }, NF: #{ $NF_COUNT }" if representation
+      end
+#      puts "#{File.basename(__FILE__)}:#{__LINE__} ??: #{ klass }/#{ pid }" unless representation
+      $NF_COUNT += 1
 
       return representation
     end
