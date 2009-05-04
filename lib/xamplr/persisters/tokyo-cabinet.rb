@@ -5,7 +5,7 @@ module Xampl
   require 'xamplr/persisters/caching'
   require 'set'
 
-  require 'ruby-prof'
+#  require 'ruby-prof'
 
   class TokyoCabinetPersister < AbstractCachingPersister
     include TokyoCabinet
