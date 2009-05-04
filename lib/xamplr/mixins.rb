@@ -62,8 +62,6 @@ module Xampl
   end
 
   module XamplWithSimpleContent
-    attr_reader :_content
-
     def initialize
       super
       @_content = nil unless defined? @_content
@@ -169,7 +167,6 @@ module Xampl
   end
 
   module XamplWithDataContent
-    attr_reader :_content
 
     def initialize
       super
