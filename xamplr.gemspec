@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{xamplr}
-  s.version = "1.1.2"
+  s.version = "1.1.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bob Hutchison"]
-  s.date = %q{2009-05-04}
+  s.date = %q{2009-05-05}
   s.email = %q{hutch@recursive.ca}
   s.extra_rdoc_files = [
     "LICENSE",
@@ -22,13 +22,12 @@ Gem::Specification.new do |s|
     "examples/random-people-shared-addresses/batch-load-users.rb",
     "examples/random-people-shared-addresses/find-mentions.rb",
     "examples/random-people-shared-addresses/find-people-by-address.rb",
+    "examples/random-people-shared-addresses/generated-elements.xml",
     "examples/random-people-shared-addresses/optimise.rb",
     "examples/random-people-shared-addresses/people.rb",
     "examples/random-people-shared-addresses/query.rb",
     "examples/random-people-shared-addresses/query2.rb",
     "examples/random-people-shared-addresses/random-names.csv",
-    "examples/random-people-shared-addresses/results.write.BASELINE",
-    "examples/random-people-shared-addresses/results.write.NEW_ATTR_ENCODING",
     "examples/random-people-shared-addresses/settings.rb",
     "examples/random-people-shared-addresses/what-to-query-on.rb",
     "examples/random-people-shared-addresses/xampl-gen.rb",
@@ -48,8 +47,6 @@ Gem::Specification.new do |s|
     "examples/read-testing/Makefile",
     "examples/read-testing/load.rb",
     "examples/read-testing/read.rb",
-    "examples/read-testing/results.read.BASELINE",
-    "examples/read-testing/results.read.FAST",
     "examples/read-testing/rrr.rb",
     "examples/read-testing/settings.rb",
     "examples/read-testing/xampl-gen.rb",
@@ -74,6 +71,7 @@ Gem::Specification.new do |s|
     "lib/xamplr/gen.elements.xml",
     "lib/xamplr/generate-elements.rb",
     "lib/xamplr/generator.rb",
+    "lib/xamplr/graphml-out.rb",
     "lib/xamplr/handwritten/example.rb",
     "lib/xamplr/handwritten/hand-example.rb",
     "lib/xamplr/handwritten/test-handwritten.rb",
@@ -153,6 +151,7 @@ Gem::Specification.new do |s|
     "lib/xamplr/xml/example.xml",
     "lib/xamplr/xml/options.xml",
     "lib/xamplr/xml/uche.xml",
+    "lib/xamplr/yEd-sample.graphml",
     "test/test_helper.rb",
     "test/xamplr_test.rb"
   ]
