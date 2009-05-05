@@ -156,6 +156,18 @@ module Xampl
       raise XamplException.new(:unimplemented)
     end
 
+    def query_implemented
+      false
+    end
+
+    def find_xampl(hint=false)
+      if hint then
+        return [], "no query made"
+      else
+        return []
+      end
+    end
+
     def lookup(klass, pid)
       #raise XamplException.new(:live_across_rollback) if @rolled_back
       #puts "#{File.basename(__FILE__)} #{__LINE__} LOOKUP:: klass: #{klass} pid: #{pid}"
