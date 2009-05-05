@@ -30,7 +30,7 @@ if $0 == __FILE__ then
                  :filenames => filenames,
                  :directory => directory)
 
-    #puts generator.print_elements("./generated-elements.xml")
+    puts generator.print_elements("./generated-elements.xml")
     exit!
   end
 end

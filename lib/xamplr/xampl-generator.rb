@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 
 require 'fileutils'
 require 'getoptlong'
@@ -7,6 +6,7 @@ module XamplGenerator
   require "xamplr"
   require "xamplr/xampl-hand-generated"
   require "xamplr/simpleTemplate/simple-template"
+  require "xamplr/graphml-out.rb"
 
   class Attribute
     attr_accessor :tag_name
@@ -303,6 +303,10 @@ module XamplGenerator
       File.open(filename, "w") do |out|
         root.pp_xml(out)
       end
+
+      graphml_out = GraphMLOut.new(@elements_map)
+      graphml_out.write_graph_ml(filename)
+
     end
 
     def go(args, &eval_context)
