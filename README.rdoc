@@ -10,6 +10,7 @@ Features:
   - transaction support
   - querying 
   - fast development, fast execution
+  - has been in use in commercial software since 2004, a Java version has been in use since 1998.
 
 Anti-Features:
   - absymal lack of documentation. If you are brave and willing to wade through (old) blog entries, you might try looking at: 
