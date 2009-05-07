@@ -2,11 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{xamplr}
-<<<<<<< HEAD:xamplr.gemspec
   s.version = "1.2.0"
-=======
-  s.version = "1.1.4"
->>>>>>> 2bfab88b25cad3dd63f850759971fb49d3feb399:xamplr.gemspec
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bob Hutchison"]
