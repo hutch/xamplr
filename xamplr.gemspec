@@ -2,7 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{xamplr}
+<<<<<<< HEAD:xamplr.gemspec
   s.version = "1.2.0"
+=======
+  s.version = "1.1.4"
+>>>>>>> 2bfab88b25cad3dd63f850759971fb49d3feb399:xamplr.gemspec
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bob Hutchison"]
@@ -24,7 +28,6 @@ Gem::Specification.new do |s|
     "examples/random-people-shared-addresses/batch-load-users.rb",
     "examples/random-people-shared-addresses/find-mentions.rb",
     "examples/random-people-shared-addresses/find-people-by-address.rb",
-    "examples/random-people-shared-addresses/generated-elements.xml",
     "examples/random-people-shared-addresses/optimise.rb",
     "examples/random-people-shared-addresses/people.rb",
     "examples/random-people-shared-addresses/query.rb",

@@ -114,6 +114,10 @@ module Xampl
       TokyoCabinetPersister.kind
     end
 
+    def query_implemented
+      true
+    end
+
     def query(hint=false)
       open_tc_db
       query = TableQuery.new(@tc_db)

@@ -488,6 +488,11 @@ module Xampl
     @@persister.optimise(opts)
   end
 
+  def Xampl.query_implemented
+    raise NoActivePersister unless @@persister
+    @@persister.query_implemented
+  end
+
   def Xampl.query(hint=false)
     raise NoActivePersister unless @@persister
     @@persister.query(hint) { | q | yield q }
