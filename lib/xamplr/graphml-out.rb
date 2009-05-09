@@ -90,12 +90,7 @@ module XamplGenerator
 #      r
 #    end
 
-    #def write_graph_ml(filename, excluded_packages=[ 'C2', 'NavRelationships', 'App' ], included_packages=nil, include_mixins=false)
     def write_graph_ml(filename, excluded_packages=[ ], included_packages=nil, include_mixins=true)
-
-      #puts "#{File.basename(__FILE__)}:#{__LINE__} no graphml yet"
-      #return
-
       filename = devise_filename(filename)
 
       @excluded_packages = Set.new(excluded_packages)
