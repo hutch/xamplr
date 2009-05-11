@@ -1,4 +1,10 @@
 
+2009-05-11
+  -- lots of undocumented changes
+  -- when defining the mentions attributes, use 'mentioned_class'
+     rather than simply 'class'. Using just 'class' can cause some
+     wierd side-effects when querying.
+
 2009-04-16 (version 1.0.2)
 
   -- if tag starts with a number, prefix it with an 'x' (e.g. 0abc --> x0abc).
