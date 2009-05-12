@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{xamplr}
-  s.version = "1.2.0"
+  s.version = "1.3.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bob Hutchison"]
-  s.date = %q{2009-05-07}
+  s.date = %q{2009-05-12}
   s.email = %q{hutch@recursive.ca}
   s.extra_rdoc_files = [
     "LICENSE",
@@ -20,6 +20,28 @@ Gem::Specification.new do |s|
     "README.rdoc.orig",
     "Rakefile",
     "VERSION.yml",
+    "examples/employees/final/xampl-gen.rb",
+    "examples/employees/final/xml/ddd-final.xml",
+    "examples/employees/first/xampl-gen.rb",
+    "examples/employees/first/xml/ddd-first.xml",
+    "examples/employees/twist/twist.graphml",
+    "examples/employees/twist/xampl-gen.rb",
+    "examples/employees/twist/xml/twist.xml",
+    "examples/employees/xamplr-twist.xml",
+    "examples/employees/yuml-diagrams/ddd-final.png",
+    "examples/employees/yuml-diagrams/ddd-final.yuml",
+    "examples/employees/yuml-diagrams/ddd-first.png",
+    "examples/employees/yuml-diagrams/ddd-first.yuml",
+    "examples/employees/yuml-diagrams/final-yed.png",
+    "examples/employees/yuml-diagrams/first-yed.png",
+    "examples/employees/yuml-diagrams/twist.png",
+    "examples/employees/yuml-diagrams/twist.yuml",
+    "examples/employees/yuml-diagrams/xamplr-final-no-mixins.png",
+    "examples/employees/yuml-diagrams/xamplr-final-simplified.png",
+    "examples/employees/yuml-diagrams/xamplr-final-with-mixins.png",
+    "examples/employees/yuml-diagrams/yuml-simplified.txt",
+    "examples/employees/yuml-diagrams/yuml-with-mixins.txt",
+    "examples/employees/yuml-diagrams/yuml.txt",
     "examples/random-people-shared-addresses/Makefile",
     "examples/random-people-shared-addresses/batch-load-users.rb",
     "examples/random-people-shared-addresses/find-mentions.rb",
@@ -153,6 +175,7 @@ Gem::Specification.new do |s|
     "lib/xamplr/xml/options.xml",
     "lib/xamplr/xml/uche.xml",
     "lib/xamplr/yEd-sample.graphml",
+    "lib/xamplr/yuml-out.rb",
     "test/test_helper.rb",
     "test/xamplr_test.rb"
   ]
@@ -166,6 +189,9 @@ Gem::Specification.new do |s|
   s.test_files = [
     "test/test_helper.rb",
     "test/xamplr_test.rb",
+    "examples/employees/final/xampl-gen.rb",
+    "examples/employees/first/xampl-gen.rb",
+    "examples/employees/twist/xampl-gen.rb",
     "examples/random-people/batch-load-users.rb",
     "examples/random-people/optimise.rb",
     "examples/random-people/people.rb",
@@ -203,14 +229,14 @@ Gem::Specification.new do |s|
     s.specification_version = 2
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<hutch-xamplr-pp>, [">= 0"])
+      s.add_runtime_dependency(%q<xamplr-pp>, [">= 1.0.0"])
       s.add_runtime_dependency(%q<libxml-ruby>, [">= 1.1.3"])
     else
-      s.add_dependency(%q<hutch-xamplr-pp>, [">= 0"])
+      s.add_dependency(%q<xamplr-pp>, [">= 1.0.0"])
       s.add_dependency(%q<libxml-ruby>, [">= 1.1.3"])
     end
   else
-    s.add_dependency(%q<hutch-xamplr-pp>, [">= 0"])
+    s.add_dependency(%q<xamplr-pp>, [">= 1.0.0"])
     s.add_dependency(%q<libxml-ruby>, [">= 1.1.3"])
   end
 end
