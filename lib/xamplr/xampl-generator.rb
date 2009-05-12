@@ -7,6 +7,7 @@ module XamplGenerator
   require "xamplr/xampl-hand-generated"
   require "xamplr/simpleTemplate/simple-template"
   require "xamplr/graphml-out.rb"
+  require "xamplr/yuml-out.rb"
 
   class Attribute
     attr_accessor :tag_name
@@ -306,6 +307,9 @@ module XamplGenerator
 
       graphml_out = GraphMLOut.new(@elements_map)
       graphml_out.write_graph_ml(filename)
+
+      yuml_out = YUMLOut.new(@elements_map)
+      yuml_out.write_yuml(filename)
 
     end
 

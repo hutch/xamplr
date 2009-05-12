@@ -11,8 +11,8 @@ begin
     gem.authors = ["Bob Hutchison"]
     gem.rubyforge_project = 'xampl'
 
-    gem.add_dependency('hutch-xamplr-pp')
-    gem.add_dependency('libxml-ruby', ">=1.1.3")
+    gem.add_dependency('xamplr-pp', '>=1.0.0')
+    gem.add_dependency('libxml-ruby', '>=1.1.3')
 
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end

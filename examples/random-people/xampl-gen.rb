@@ -8,6 +8,8 @@ if $0 == __FILE__ then
     end
   end
 
+  $LOAD_PATH.unshift('../../lib/')
+
   require 'xamplr-generator'
 
   include XamplGenerator

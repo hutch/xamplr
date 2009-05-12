@@ -83,13 +83,6 @@ module XamplGenerator
       return false
     end
 
-#    def ignore_package(package)
-#      puts "#{File.basename(__FILE__)}:#{__LINE__} pkg: [#{ package }], exclude: #{ @excluded_packages.inspect }, include: #{ @included_packages.inspect }"
-#      r = ignore_package_work(package)
-#      puts "#{File.basename(__FILE__)}:#{__LINE__}      ignore? #{ r }"
-#      r
-#    end
-
     def write_graph_ml(filename, excluded_packages=[ ], included_packages=nil, include_mixins=true)
       filename = devise_filename(filename)
 

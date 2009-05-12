@@ -1,7 +1,7 @@
-#!/usr/bin/env ruby
 
 module Xampl
 
+  require 'rubygems'
   require "yaml"
   require "logger"
 

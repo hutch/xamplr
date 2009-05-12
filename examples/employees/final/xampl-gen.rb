@@ -8,7 +8,7 @@ if $0 == __FILE__ then
     end
   end
 
-  $LOAD_PATH.unshift('../../lib/')  
+  $LOAD_PATH.unshift('../../lib/')
 
   require 'xamplr-generator'
 
@@ -22,7 +22,7 @@ if $0 == __FILE__ then
       options.new_index_attribute("pid").persisted = true
       options.new_index_attribute("id")
 
-      options.resolve("http://xampl.com/people", "RandomPeople", "p")
+      options.resolve("http://example.com/employees", "Employees", "emp")
     end
 
     filenames = Dir.glob("./xml/**/*.xml")

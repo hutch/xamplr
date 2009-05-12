@@ -1,0 +1,8 @@
+[RetirementPlan]^[DefinedContribution],
+[RetirementPlan]^[DefinedBenefit],
+[Payroll]^[HourlyPayroll],
+[Payroll]^[SalariedPayroll],
+[EmployeeType]->*[RetirementPlan],
+[EmployeeType]->*[Payroll],
+[Employee]*->[EmployeeType],
+[Department]-*[Employee]

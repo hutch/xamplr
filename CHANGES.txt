@@ -1,4 +1,9 @@
 
+2009-05-12
+  -- enhancements and cleanup of the graphml generation (nice UML diagrams)
+  -- added a new yuml generation capability (very nice UML diagrams)
+  -- make xamplr-pp a prerequisite, rather than hutch-xamplr-pp
+
 2009-05-11
   -- lots of undocumented changes
   -- when defining the mentions attributes, use 'mentioned_class'

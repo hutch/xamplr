@@ -1,0 +1,90 @@
+<!--
+[RetirementPlan] ^[DefinedContribution],
+[RetirementPlan] ^[DefinedBenefit],
+[Payroll]^[HourlyPayroll],
+[Payroll]^[SalariedPayroll],
+[EmployeeType]->*[RetirementPlan],
+[EmployeeType]->*[Payroll],
+[Employee]*->[EmployeeType],
+[Department]-*[Employee]
+-->
+<company pid=''
+         xmlns="http://example.com/employees">
+
+    <hourly-payroll pid='singleton'>
+        <__payroll__/>
+    </hourly-payroll>
+    <salaried-payroll pid='singleton'>
+        <__payroll__/>
+    </salaried-payroll>
+
+    <defined-contribution pid="singleton">
+        <retirement-plan/>
+    </defined-contribution>
+    <defined-benefit pid="singleton">
+        <retirement-plan/>
+    </defined-benefit>
+
+    <employee-type pid="">
+      <__payroll__ />
+    </employee-type>
+
+    <employee-type pid=''
+                   title='janitor'>
+        <hourly-payroll pid='singleton'/>
+        <defined-contribution pid="singleton"/>
+    </employee-type>
+    <employee-type pid=''
+                   title='receptionist'>
+        <hourly-payroll pid='singleton'/>
+        <defined-contribution pid="singleton"/>
+    </employee-type>
+    <employee-type pid=''
+                   title='office-admin'>
+        <hourly-payroll pid='singleton'/>
+        <defined-benefit pid="singleton"/>
+    </employee-type>
+    <employee-type pid=''
+                   title='engineer'>
+        <salaried-payroll pid='singleton'/>
+        <defined-benefit pid="singleton"/>
+    </employee-type>
+    <employee-type pid=''
+                   title='manager'>
+        <salaried-payroll pid='singleton'/>
+        <defined-benefit pid="singleton"/>
+    </employee-type>
+
+
+    <department pid=''
+                name='widget design'>
+        <employee pid=''
+                  name='tom'>
+            <employee-type pid=''
+                           title='janitor'/>
+        </employee>
+        <employee pid=''
+                  name='mary'
+                  title='receptionist'>
+            <employee-type pid=''
+                           title='receptionist'/>
+        </employee>
+        <employee pid=''
+                  name='bob'
+                  title='office-admin'>
+            <employee-type pid=''
+                           title='office-admin'/>
+        </employee>
+
+        <employee pid=''
+                  name='jack'>
+            <employee-type pid=''
+                           title='engineer'/>
+        </employee>
+        <employee pid=''
+                  name='jill'>
+            <employee-type pid=''
+                           title='manager'/>
+        </employee>
+    </department>
+</company>
