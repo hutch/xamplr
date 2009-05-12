@@ -6,4 +6,4 @@ clean:
 	git clean -fdx
 
 release:
-	rake version:bump:minor release
+	rake version:bump:patch release
