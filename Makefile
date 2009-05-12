@@ -4,3 +4,6 @@ check:
 
 clean:
 	git clean -fdx
+
+release:
+	rake version:bump:minor release
