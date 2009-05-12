@@ -1,8 +1,11 @@
 
 2009-05-12
+  -- confirmed to work with tokyocabinet-1.4.20 and tokyocabinet-ruby-1.23
+  -- the begginings of a new employee example from DDD book
   -- enhancements and cleanup of the graphml generation (nice UML diagrams)
   -- added a new yuml generation capability (very nice UML diagrams)
   -- make xamplr-pp a prerequisite, rather than hutch-xamplr-pp
+
 
 2009-05-11
   -- lots of undocumented changes
