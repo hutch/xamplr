@@ -264,7 +264,7 @@ module Xampl
         next unless result
 
         mentioner = result['xampl_from']
-        class_name = result['class']
+        class_name = result['mentioned_class']
         result_class = class_cache[class_name]
         unless result_class then
           class_name.split("::").each do | chunk |
@@ -316,6 +316,10 @@ module Xampl
         msg = note_errors("TC[[#{ @filename }]]:: trancommit error: %s\n") do
           @tc_db.tranabort
         end
+        puts "------------------------------------------------------------------------"
+        puts "TokyoCabinetPersister Error:: #{ msg }/#{ e }"
+        puts e.backtrace.join("\n")
+        puts "------------------------------------------------------------------------"
         raise "TokyoCabinetPersister Error:: #{ msg }/#{ e }"
       else
         note_errors("TC[[#{ @filename }]]:: trancommit error: %s\n") do
@@ -327,6 +331,12 @@ module Xampl
         #        end
       end
 #      puts "               num records: #{ @tc_db.rnum() }"
+#      puts "#{ __FILE__ }:#{ __LINE__ } keys..."
+#      @tc_db.keys.each do | key |
+#        meta = @tc_db[key]
+#        meta['xampl'] = (meta['xampl'] || "no rep")[0..25]
+#        puts "         key: [#{ key }] -- #{ meta.inspect }"
+#      end
     end
 
     def write(xampl)
@@ -349,7 +359,7 @@ module Xampl
         pk = @tc_db.genuid
         mention_hash = {
                 'xampl_from' => place,
-                'class' => xampl.class.name,
+                'mentioned_class' => xampl.class.name,
                 'pid' => xampl.get_the_index,
                 'xampl_to' => mention_place
         }
