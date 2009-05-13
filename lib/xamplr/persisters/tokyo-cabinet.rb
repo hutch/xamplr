@@ -5,7 +5,7 @@ module Xampl
   require 'xamplr/persisters/caching'
   require 'set'
 
-#  require 'ruby-prof'
+  #  require 'ruby-prof'
 
   class TokyoCabinetPersister < AbstractCachingPersister
     include TokyoCabinet
@@ -26,7 +26,7 @@ module Xampl
       return rmsg
     end
 
-    $lexical_indexes = Set.new(%w{ class pid time-stamp xampl_from xampl_to }) unless defined?($lexical_indexes)
+    $lexical_indexes = Set.new(%w{ class pid time-stamp xampl-from xampl-to xampl-place }) unless defined?($lexical_indexes)
     $numeric_indexes = Set.new unless defined?($numeric_indexes)
 
     def TokyoCabinetPersister.add_lexical_indexs(indexes)
@@ -56,7 +56,7 @@ module Xampl
     def open_tc_db
       return if @tc_db
 #      puts "#{File.basename(__FILE__)}:#{__LINE__} open tc db: #{ @filename }"
-#puts "#{File.basename(__FILE__)}:#{__LINE__} callers..."
+      #puts "#{File.basename(__FILE__)}:#{__LINE__} callers..."
       #caller(0).each { | trace | puts "   #{trace}"}
       @tc_db = TDB.new
       note_errors("TC[[#{ @filename }]]:: tuning error: %s\n") do
@@ -255,7 +255,7 @@ module Xampl
       place = File.join(xampl.class.name.split("::"), xampl.get_the_index)
 
       query = TableQuery.new(@tc_db)
-      query.add_condition('xampl_to', :equals, place)
+      query.add_condition('xampl-to', :equals, place)
       result_keys = query.search
 
       class_cache = {}
@@ -263,7 +263,7 @@ module Xampl
         result = @tc_db[ key ]
         next unless result
 
-        mentioner = result['xampl_from']
+        mentioner = result['xampl-from']
         class_name = result['mentioned_class']
         result_class = class_cache[class_name]
         unless result_class then
@@ -331,12 +331,12 @@ module Xampl
         #        end
       end
 #      puts "               num records: #{ @tc_db.rnum() }"
-#      puts "#{ __FILE__ }:#{ __LINE__ } keys..."
-#      @tc_db.keys.each do | key |
-#        meta = @tc_db[key]
-#        meta['xampl'] = (meta['xampl'] || "no rep")[0..25]
-#        puts "         key: [#{ key }] -- #{ meta.inspect }"
-#      end
+      #      puts "#{ __FILE__ }:#{ __LINE__ } keys..."
+      #      @tc_db.keys.each do | key |
+      #        meta = @tc_db[key]
+      #        meta['xampl'] = (meta['xampl'] || "no rep")[0..25]
+      #        puts "         key: [#{ key }] -- #{ meta.inspect }"
+      #      end
     end
 
     def write(xampl)
@@ -346,8 +346,14 @@ module Xampl
       mentions = Set.new
       data = represent(xampl, mentions)
 
+      #get rid of any supplimentary indexes associated with this xampl object
       query = TableQuery.new(@tc_db)
-      query.add_condition('xampl_from', :equals, place)
+      query.add_condition('xampl-from', :equals, place)
+      note_errors("TC[[#{ @filename }]]:: failed to remove from mentions, error: %s\n") do
+        query.searchout
+      end
+      query = TableQuery.new(@tc_db)
+      query.add_condition('xampl-place', :equals, place)
       note_errors("TC[[#{ @filename }]]:: failed to remove from mentions, error: %s\n") do
         query.searchout
       end
@@ -358,10 +364,10 @@ module Xampl
 
         pk = @tc_db.genuid
         mention_hash = {
-                'xampl_from' => place,
+                'xampl-from' => place,
                 'mentioned_class' => xampl.class.name,
                 'pid' => xampl.get_the_index,
-                'xampl_to' => mention_place
+                'xampl-to' => mention_place
         }
 
         note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
@@ -376,13 +382,28 @@ module Xampl
               'xampl' => data
       }
 
-      hash = xampl.describe_yourself
-      if hash then
-        xampl_hash = hash.merge(xampl_hash)
+      primary_description, secondary_descriptions = xampl.describe_yourself
+      if primary_description then
+        xampl_hash = primary_description.merge(xampl_hash)
       end
 
       note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
         @tc_db.put(place, xampl_hash)
+      end
+
+      if secondary_descriptions then
+        xampl_hash = {
+                'class' => xampl.class.name,
+                'pid' => xampl.get_the_index,
+                'xampl-place' => place
+        }
+        secondary_descriptions.each do | secondary_description |
+          description = secondary_description.merge(xampl_hash)
+
+          note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
+            @tc_db.put(place, description)
+          end
+        end
       end
 
       @write_count = @write_count + 1
