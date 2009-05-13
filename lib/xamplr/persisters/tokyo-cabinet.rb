@@ -219,10 +219,15 @@ module Xampl
         result_keys = query.search
       end
 
+      results = result_keys.collect do |key|
+        meta = @tc_db[ key ]
+        meta['xampl-place'] || meta['place']
+      end
+
       if hint then
-        return result_keys, the_hint
+        return results, the_hint
       else
-        return result_keys
+        return results
       end
     end
 
@@ -352,6 +357,7 @@ module Xampl
       note_errors("TC[[#{ @filename }]]:: failed to remove from mentions, error: %s\n") do
         query.searchout
       end
+
       query = TableQuery.new(@tc_db)
       query.add_condition('xampl-place', :equals, place)
       note_errors("TC[[#{ @filename }]]:: failed to remove from mentions, error: %s\n") do
@@ -401,7 +407,8 @@ module Xampl
           description = secondary_description.merge(xampl_hash)
 
           note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
-            @tc_db.put(place, description)
+            pk = @tc_db.genuid
+            @tc_db.put(pk, description)
           end
         end
       end
