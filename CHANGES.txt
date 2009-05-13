@@ -1,11 +1,16 @@
 
-2009-05-12
+2009-05-13 (version 1.3.1)  REPO BREAKING CHANGE
+  -- added the ability to describe a xampl object using multiple criteria. This
+     is demonstrated in the new example called 'hobbies'
+
+2009-05-12 (version 1.3.0) 
   -- confirmed to work with tokyocabinet-1.4.20 and tokyocabinet-ruby-1.23
   -- the begginings of a new employee example from DDD book
   -- enhancements and cleanup of the graphml generation (nice UML diagrams)
   -- added a new yuml generation capability (very nice UML diagrams)
   -- make xamplr-pp a prerequisite, rather than hutch-xamplr-pp
-
+  -- this was supposed to be a patch release, the 1.3.1 release was supposed to be
+     the minor release.
 
 2009-05-11
   -- lots of undocumented changes
