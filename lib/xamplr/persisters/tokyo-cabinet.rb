@@ -155,9 +155,9 @@ module Xampl
       end
 
       if hint then
-        return results, the_hint
+        return results.uniq, the_hint
       else
-        return results
+        return results.uniq
       end
     end
 
@@ -199,9 +199,9 @@ module Xampl
       end
 
       if hint then
-        return results, the_hint
+        return results.uniq, the_hint
       else
-        return results
+        return results.uniq
       end
     end
 
@@ -225,9 +225,9 @@ module Xampl
       end
 
       if hint then
-        return results, the_hint
+        return results.uniq, the_hint
       else
-        return results
+        return results.uniq
       end
     end
 
@@ -285,7 +285,7 @@ module Xampl
 
         self.lookup(result_class, result['pid'])
       end
-      return results
+      return results.uniq
     end
 
     def do_sync_write
@@ -303,7 +303,7 @@ module Xampl
       open_tc_db
       @time_stamp = Time.now.to_f.to_s
 
-      #      puts "DO SYNC WRITE: #{ @changed.size } to be written (#{ @filename })"
+#            puts "DO SYNC WRITE: #{ @changed.size } to be written (#{ @filename })"
       #      note_errors("TC:: open error: %s\n") do
       #        @tc_db.open(@filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB ) #TDB::OTSYNC slows it down by almost 50 times
       #      end
