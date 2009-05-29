@@ -7,3 +7,6 @@ coverage
 rdoc
 pkg
 .idea
+generated-elements.*
+xampl_generated_code
+repo

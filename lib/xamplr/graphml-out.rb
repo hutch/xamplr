@@ -374,8 +374,8 @@ EOS
     def write_mixin_ref_edge(edge, class_node, mixin_node)
       @out << <<EOS
         <edge id="e#{ edge }"
-              source="n#{ class_node }"
-              target="n#{ mixin_node }">
+              source="n#{ mixin_node }"
+              target="n#{ class_node }">
             <data key="d2">
                 <y:PolyLineEdge>
                     <y:Path sx="0.0"
@@ -385,8 +385,8 @@ EOS
                     <y:LineStyle color="#000000"
                                  type="line"
                                  width="1.0"/>
-                    <y:Arrows source="none"
-                              target="white_delta"/>
+                    <y:Arrows source="white_delta"
+                              target="none"/>
                     <y:EdgeLabel alignment="center"
                                  distance="2.0"
                                  fontFamily="Dialog"

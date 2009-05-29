@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{xamplr}
-  s.version = "1.3.0"
+  s.version = "1.3.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bob Hutchison"]
-  s.date = %q{2009-05-12}
+  s.date = %q{2009-05-13}
   s.email = %q{hutch@recursive.ca}
   s.extra_rdoc_files = [
     "LICENSE",
@@ -42,6 +42,10 @@ Gem::Specification.new do |s|
     "examples/employees/yuml-diagrams/yuml-simplified.txt",
     "examples/employees/yuml-diagrams/yuml-with-mixins.txt",
     "examples/employees/yuml-diagrams/yuml.txt",
+    "examples/hobbies/hobbies.rb",
+    "examples/hobbies/xampl-gen.rb",
+    "examples/hobbies/xml/hobby.xml",
+    "examples/hobbies/xml/people.xml",
     "examples/random-people-shared-addresses/Makefile",
     "examples/random-people-shared-addresses/batch-load-users.rb",
     "examples/random-people-shared-addresses/find-mentions.rb",
@@ -192,6 +196,8 @@ Gem::Specification.new do |s|
     "examples/employees/final/xampl-gen.rb",
     "examples/employees/first/xampl-gen.rb",
     "examples/employees/twist/xampl-gen.rb",
+    "examples/hobbies/hobbies.rb",
+    "examples/hobbies/xampl-gen.rb",
     "examples/random-people/batch-load-users.rb",
     "examples/random-people/optimise.rb",
     "examples/random-people/people.rb",
