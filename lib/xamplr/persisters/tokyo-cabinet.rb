@@ -60,7 +60,9 @@ module Xampl
       #caller(0).each { | trace | puts "   #{trace}"}
       @tc_db = TDB.new
       note_errors("TC[[#{ @filename }]]:: tuning error: %s\n") do
-        @tc_db.tune(-1, -1, -1, TDB::TDEFLATE)
+        #@tc_db.tune(-1, -1, -1, TDB::TDEFLATE)
+        @tc_db.tune(-1, -1, -1, 0)
+        #@tc_db.tune(4 * 131071, -1, -1, 0)
       end
 
       note_errors("TC[[#{ @filename }]]:: open [#{ @filename }] error: %s\n") do

@@ -1,4 +1,10 @@
 
+2009-05-30 (version 1.3.x)
+  -- support tokyocabinet-1.4.23 and tokyocabinet-ruby-1.23 (looks as though
+     this is an optional upgrade)
+  -- using default tuning of TC. The former use of deflate seems to double the
+     commit times (no significant impact on query time though)
+
 2009-05-13 (version 1.3.1)  REPO BREAKING CHANGE
   -- added the ability to describe a xampl object using multiple criteria. This
      is demonstrated in the new example called 'hobbies'

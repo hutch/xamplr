@@ -35,6 +35,7 @@ module RandomPeople
 
   10.times do | iter |
     inner_start = Time.now
+    commit_start = 0
 
     Xampl.transaction("random-people") do
 
@@ -71,8 +72,10 @@ module RandomPeople
 
       end
       puts "transaction ending..."
+      commit_start = Time.now
     end
-    puts "iter: #{ iter } in #{ Time.now - inner_start }"
+    done_at = Time.now
+    puts "iter: #{ iter } in total: #{ done_at - inner_start }, insert: #{ commit_start - inner_start}, commit: #{done_at - commit_start}"
   end
 
   processed_at = Time.now
