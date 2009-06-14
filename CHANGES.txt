@@ -1,5 +1,5 @@
 
-2009-06-14 (version 1.3.4)
+2009-06-14 (version 1.3.5)
   -- first pass at supporting ruby 1.9.1 (seems to be working)
 
 2009-05-30 (version 1.3.3)
