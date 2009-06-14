@@ -1,5 +1,8 @@
 
-2009-05-30 (version 1.3.x)
+2009-06-14 (version 1.3.4)
+  -- first pass at supporting ruby 1.9.1 (seems to be working)
+
+2009-05-30 (version 1.3.3)
   -- support tokyocabinet-1.4.23 and tokyocabinet-ruby-1.23 (looks as though
      this is an optional upgrade)
   -- using default tuning of TC. The former use of deflate seems to double the
