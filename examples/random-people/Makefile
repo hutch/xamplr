@@ -12,5 +12,9 @@ raw:
 
 batch:
 	rm -rf repo/random-people
-	time ruby batch-load-users.rb
+	time ruby1.9 batch-load-users.rb
+
+gen:
+	ruby xampl-gen.rb
+	ruby1.9 xampl-gen-191.rb
 

@@ -27,12 +27,13 @@ if $0 == __FILE__ then
 
     filenames = Dir.glob("./xml/**/*.xml")
 
-    generator = Generator.new
+    #generator = Generator.new
+    generator = Generator.new('generator')
     generator.go(:options => options,
                  :filenames => filenames,
                  :directory => directory)
 
     #puts generator.print_elements("./generated-elements.xml")
-    exit!
+    #exit!
   end
 end

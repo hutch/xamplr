@@ -366,7 +366,7 @@ module XamplGenerator
       name.gsub!(/[A-Z]/, "_\\&")
       name.gsub!(/__+/, "_")
       class_name = ""
-      name.each("_") do |chunk|
+      name.split('_').each do |chunk|
         class_name << chunk.capitalize
       end
       class_name.gsub!("_", "")
