@@ -65,8 +65,7 @@ module Xampl
                                                  LibXML::XML::Parser::Options::NONET |
                                                  LibXML::XML::Parser::Options::NOCDATA |
                                                  LibXML::XML::Parser::Options::DTDATTR |
-                                                 #LibXML::XML::Parser::Options::COMPACT |
-                                        0)
+                                                 LibXML::XML::Parser::Options::COMPACT)
       #TODO CLOSE THIS THING!!
     end
 
@@ -79,11 +78,10 @@ module Xampl
       #      setInput(string)
       @reader = LibXML::XML::Reader.string(string,
                                            :options => LibXML::XML::Parser::Options::NOENT |
-                                                       LibXML::XML::Parser::Options::NONET |
-                                                       LibXML::XML::Parser::Options::NOCDATA |
-                                                       LibXML::XML::Parser::Options::DTDATTR |
-                                                       #LibXML::XML::Parser::Options::COMPACT |
-                                                       0)
+                                                   LibXML::XML::Parser::Options::NONET |
+                                                   LibXML::XML::Parser::Options::NOCDATA |
+                                                   LibXML::XML::Parser::Options::DTDATTR |
+                                                   LibXML::XML::Parser::Options::COMPACT)
       #TODO CLOSE THIS THING!!
     end
 

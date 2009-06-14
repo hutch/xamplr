@@ -83,7 +83,6 @@ module Xampl
     end
 
     def write(xampl)
-      return false unless xampl.persisted?
       raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index
       #return false unless xampl.get_the_index
 
