@@ -3,9 +3,11 @@ require 'xampl_generated_code/RandomPeople'
 require 'people'
 require 'settings'
 
+require 'ruby-prof'
+
 module RandomPeople
 
-  class BatchLoadUsers
+  class BatchLoadUsersProfiled
 
     attr_accessor :random_names, :created_addresses, :shared_addresses
 
@@ -62,8 +64,18 @@ module RandomPeople
       self.created_addresses = 0
       self.shared_addresses = 0
 
-      10.times do | iter |
-        load_names(iter)
+      2.times do | iter |
+        if 1 == iter then
+          RubyProf.start
+
+          load_names(iter)
+
+          result = RubyProf.stop
+          printer = RubyProf::FlatPrinter.new(result)
+          printer.print(STDOUT, 0)
+        else
+          load_names(iter)
+        end
       end
 
       processed_at = Time.now
@@ -74,6 +86,6 @@ module RandomPeople
 
   end
 
-  BatchLoadUsers.new.run
+  BatchLoadUsersProfiled.new.run
 
 end

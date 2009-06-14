@@ -11,12 +11,12 @@ module RandomPeople
 
     def load_names(iter)
       inner_start = Time.now
+      commit_total = 0
       commit_start = 0
       base = (1 + iter) * self.random_names.size
 
-      Xampl.transaction("random-people") do
-
-        random_names.each_with_index do | row, i |
+      random_names.each_with_index do | row, i |
+        Xampl.transaction("random-people") do
           person_pid = "person-#{ base + i }"
           person = Person.new(person_pid)
 
@@ -43,12 +43,14 @@ module RandomPeople
             self.created_addresses += 1
           end
 
+          commit_start = Time.now
         end
-        puts "transaction ending..."
-        commit_start = Time.now
+        commit_total += (Time.now - commit_start)
+        puts "total: #{ commit_total }, iter: #{ i } --> #{ i / commit_total }/s" if 0 == (i % 1000)
       end
       done_at = Time.now
-      puts "iter: #{ iter } in total: #{ done_at - inner_start }, insert: #{ commit_start - inner_start}, commit: #{done_at - commit_start}"
+      total_time = done_at - inner_start
+      puts "iter: #{ iter } in total: #{ total_time }, insert: #{ total_time - commit_total }, commit: #{ commit_total }"
     end
 
     def run
