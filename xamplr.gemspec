@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{xamplr}
-  s.version = "1.3.7"
+  s.version = "1.3.8"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bob Hutchison"]
@@ -219,9 +219,7 @@ Gem::Specification.new do |s|
     "test/test_helper.rb",
      "test/xamplr_test.rb",
      "examples/employees/final/xampl-gen.rb",
-     "examples/employees/final/xampl_generated_code/Employees.rb",
      "examples/employees/final-xampl/xampl-gen.rb",
-     "examples/employees/final-xampl/xampl_generated_code/Employees.rb",
      "examples/employees/first/xampl-gen.rb",
      "examples/employees/twist/xampl-gen.rb",
      "examples/hobbies/hobbies.rb",
@@ -247,7 +245,6 @@ Gem::Specification.new do |s|
      "examples/random-people-shared-addresses/settings.rb",
      "examples/random-people-shared-addresses/what-to-query-on.rb",
      "examples/random-people-shared-addresses/xampl-gen.rb",
-     "examples/random-people-shared-addresses/xampl_generated_code/RandomPeople.rb",
      "examples/read-testing/load.rb",
      "examples/read-testing/read.rb",
      "examples/read-testing/rrr.rb",
