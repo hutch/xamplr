@@ -4,9 +4,9 @@ module Xampl
 
   class FromXML
 
-    attr :checkWellFormed, false
-    attr :is_realising, false
-    attr :tokenise_content, false
+    attr :checkWellFormed #1.9.1 , false
+    attr :is_realising #1.9.1 , false
+    attr :tokenise_content #1.9.1 , false
 
     @reader = nil
 

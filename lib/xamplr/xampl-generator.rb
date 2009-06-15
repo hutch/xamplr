@@ -45,14 +45,14 @@ module XamplGenerator
             "xamplr/templates/package.template",
     ]
 
-    def initialize(options = nil, *predefined_elements)
+    def initialize(options_in = nil, *predefined_elements)
       @elements_map = {}
       @xpp = nil
       @templates = nil
       @generated_package_map = nil
 
-      if options then
-        @options = options
+      if options_in then
+        @options = options_in
       else
         @options = Xampl.make(Options) do |options|
           options.new_index_attribute("id")
@@ -366,7 +366,8 @@ module XamplGenerator
       name.gsub!(/[A-Z]/, "_\\&")
       name.gsub!(/__+/, "_")
       class_name = ""
-      name.each("_") do |chunk|
+      #name.each("_") do |chunk|
+      name.split("_").each do |chunk|
         class_name << chunk.capitalize
       end
       class_name.gsub!("_", "")
