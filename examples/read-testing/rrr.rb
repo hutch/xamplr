@@ -25,7 +25,8 @@ reader = LibXML::XML::Reader.string(xml,
                                             LibXML::XML::Parser::Options::NOCDATA |
                                             LibXML::XML::Parser::Options::DTDATTR |
                                             LibXML::XML::Parser::Options::NSCLEAN |
-                                            LibXML::XML::Parser::Options::COMPACT)
+                                            # LibXML::XML::Parser::Options::COMPACT |
+                                            0)
 
 while reader.read do
   #  puts reader.node_type

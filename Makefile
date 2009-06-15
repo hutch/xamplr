@@ -8,3 +8,6 @@ clean:
 
 release:
 	rake version:bump:patch release
+
+stalk:
+	gemstalk hutch xamplr

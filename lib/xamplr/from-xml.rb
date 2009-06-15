@@ -65,7 +65,8 @@ module Xampl
                                                  LibXML::XML::Parser::Options::NONET |
                                                  LibXML::XML::Parser::Options::NOCDATA |
                                                  LibXML::XML::Parser::Options::DTDATTR |
-                                                 LibXML::XML::Parser::Options::COMPACT)
+                                                 # LibXML::XML::Parser::Options::COMPACT |
+                                                 0)
       #TODO CLOSE THIS THING!!
     end
 
@@ -81,7 +82,8 @@ module Xampl
                                                    LibXML::XML::Parser::Options::NONET |
                                                    LibXML::XML::Parser::Options::NOCDATA |
                                                    LibXML::XML::Parser::Options::DTDATTR |
-                                                   LibXML::XML::Parser::Options::COMPACT)
+                                                   # LibXML::XML::Parser::Options::COMPACT) |
+                                                   0)
       #TODO CLOSE THIS THING!!
     end
 
