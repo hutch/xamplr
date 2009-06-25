@@ -1,1 +1,2 @@
--- escaped content is being repeatedly escaped (confirm, just a suspiscion from a long time ago)
+-- use the libxml form of escape attrs (look for apos)
+

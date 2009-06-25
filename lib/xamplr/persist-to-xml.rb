@@ -98,6 +98,7 @@ module Xampl
 
       result.gsub!("&", "&amp;")
       result.gsub!("<", "&lt;")
+      result.gsub!(">", "&gt;")
 
       return result
     end

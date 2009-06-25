@@ -1,4 +1,3 @@
-
 require 'fileutils'
 require 'getoptlong'
 
@@ -128,21 +127,21 @@ module XamplGenerator
 
       while not @xpp.endDocument? do
         case @xpp.nextEvent
-        when Xampl_PP::START_ELEMENT
-          element_stack.push current_element unless nil == current_element
-          current_element = start_element(current_element)
-        when Xampl_PP::END_ELEMENT
-          current_element = element_stack.pop
-        when Xampl_PP::TEXT,
-                Xampl_PP::CDATA_SECTION,
-                Xampl_PP::ENTITY_REF
-          if current_element then
-            text = @xpp.text
-            if (nil != @xpp.text) then
-              text = text.strip
-              current_element.found_text_content if 0 < text.size
+          when Xampl_PP::START_ELEMENT
+            element_stack.push current_element unless nil == current_element
+            current_element = start_element(current_element)
+          when Xampl_PP::END_ELEMENT
+            current_element = element_stack.pop
+          when Xampl_PP::TEXT,
+                  Xampl_PP::CDATA_SECTION,
+                  Xampl_PP::ENTITY_REF
+            if current_element then
+              text = @xpp.text
+              if (nil != @xpp.text) then
+                text = text.strip
+                current_element.found_text_content if 0 < text.size
+              end
             end
-          end
         end
       end
     end
@@ -469,6 +468,15 @@ module XamplGenerator
             end
           end
         end
+
+        if self.persisted then
+          attribute = Attribute.new
+          attribute.name = 'scheduled_for_deletion_at'
+          attribute.tag_name = 'scheduled-for-deletion-at'
+          attribute.namespace = nil
+          self.add_attribute(attribute)
+        end
+
       end
     end
   end
@@ -490,30 +498,30 @@ module XamplGenerator
 
     opts.each do |opt, arg|
       case opt
-      when "--help" then
-        puts "--help, -h          :: this help message"
-        puts "--options, -o       :: xml file seting the generation options"
-        puts "--elements, -e      :: xml file providing a hint 'schema' (very optional)"
-        puts "--gen:options, -O   :: write an xml file describing the options used (default gen-options.xml)"
-        puts "--gen:elements, -E  :: write an xml file describing the 'schema' (default gen-elements.xml)"
-        puts "--directory, -o     :: where to write the generated files (default #{directory})"
-        puts "--version, -o       :: what version of xampl is this?"
-        exit
-      when "--version" then
-        puts "version 0.0.0"
-        exit
-      when "--directory"
-        directory = arg
-      when "--options"
-        puts "sorry, cannot read options yet"
-      when "--elements"
-        puts "sorry, cannot read elements yet"
-      when "--gen:options"
-        write_options = (arg and (0 < arg.length)) ? arg : "gen-options.xml"
-      when "--gen:elements"
-        write_elements = (arg and (0 < arg.length)) ? arg : "gen-elements.xml"
-      else
-        puts "  #{opt} #{arg}"
+        when "--help" then
+          puts "--help, -h          :: this help message"
+          puts "--options, -o       :: xml file seting the generation options"
+          puts "--elements, -e      :: xml file providing a hint 'schema' (very optional)"
+          puts "--gen:options, -O   :: write an xml file describing the options used (default gen-options.xml)"
+          puts "--gen:elements, -E  :: write an xml file describing the 'schema' (default gen-elements.xml)"
+          puts "--directory, -o     :: where to write the generated files (default #{directory})"
+          puts "--version, -o       :: what version of xampl is this?"
+          exit
+        when "--version" then
+          puts "version 0.0.0"
+          exit
+        when "--directory"
+          directory = arg
+        when "--options"
+          puts "sorry, cannot read options yet"
+        when "--elements"
+          puts "sorry, cannot read elements yet"
+        when "--gen:options"
+          write_options = (arg and (0 < arg.length)) ? arg : "gen-options.xml"
+        when "--gen:elements"
+          write_elements = (arg and (0 < arg.length)) ? arg : "gen-elements.xml"
+        else
+          puts "  #{opt} #{arg}"
       end
     end
 
