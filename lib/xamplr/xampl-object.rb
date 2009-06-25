@@ -196,24 +196,12 @@ module Xampl
     end
 
     def should_schedule_delete?
-      puts "Xampl#should_schedule_delete? is NOT IMPLEMENTED FOR: #{ self.class.name }"
+      #puts "Xampl#should_schedule_delete? is NOT IMPLEMENTED FOR: #{ self.class.name }"
       false
     end
 
     def schedule_a_deletion_if_needed(at=Time.now.to_i)
       @scheduled_for_deletion_at = should_schedule_delete? ? at.to_s : nil #TODO -- necessary??
-    end
-
-    def schedule_delete_at
-      #TODO -- smarter regarding when to delete
-      if should_schedule_delete? and @scheduled_for_deletion_at then
-        [{ 'scheduled-delete' => 'true',
-           'scheduled-delete-at' => @scheduled_for_deletion_at }]
-      elsif @scheduled_for_deletion_at then
-        @scheduled_for_deletion_at = nil
-      else
-        nil
-      end
     end
 
     ################################################################################################
