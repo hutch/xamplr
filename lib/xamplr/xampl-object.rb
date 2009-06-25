@@ -189,9 +189,10 @@ module Xampl
 
     def Xampl.find_things_to_delete
       #TODO -- one of these for XamplObject to limit search???
-      Xampl.query do | q |
+      things = Xampl.query do | q |
         q.add_condition('scheduled-delete', :streq, 'true')
       end
+      things
     end
 
     def should_schedule_delete?
