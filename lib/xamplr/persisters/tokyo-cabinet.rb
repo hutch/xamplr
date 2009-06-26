@@ -26,8 +26,9 @@ module Xampl
       return rmsg
     end
 
-    $lexical_indexes = Set.new(%w{ class pid time-stamp xampl-from xampl-to xampl-place scheduled-delete }) unless defined?($lexical_indexes)
-    $numeric_indexes = Set.new unless defined?($numeric_indexes)
+    $lexical_indexes = Set.new(%w{ class pid time-stamp xampl-from xampl-to xampl-place }) unless defined?($lexical_indexes)
+
+    $numeric_indexes = Set.new(%w{ scheduled-delete-at }) unless defined?($numeric_indexes)
 
     def TokyoCabinetPersister.add_lexical_indexs(indexes)
       $lexical_indexes.merge(indexes)
@@ -400,10 +401,10 @@ module Xampl
       #TODO -- smarter regarding when to delete (e.g. mentions)
       if xampl.should_schedule_delete? and xampl.scheduled_for_deletion_at then
         secondary_descriptions = [] unless secondary_descriptions
-        secondary_descriptions << { 'scheduled-delete' => 'true',
-                                    'scheduled-delete-at' => @scheduled_for_deletion_at }
-      elsif @scheduled_for_deletion_at then
-        xampl.scheduled_for_deletion_at = nil
+        secondary_descriptions << { 'scheduled-delete-at' => xampl.scheduled_for_deletion_at }
+      elsif xampl.scheduled_for_deletion_at then
+        puts "#{ __FILE__ }:#{ __LINE__ } HOW TO DO THIS without violating xampl's change rules????? "
+        #xampl.scheduled_for_deletion_at = nil
       end
 
       if secondary_descriptions then
