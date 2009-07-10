@@ -118,12 +118,13 @@ module Xampl
       after_visit(xampl)
       return self
 
-    rescue  => e
-      puts "visit failed !!!!! #{ e }"
-      e.backtrace.each do | trace |
-        puts "  #{trace}"
-        break if /actionpack/ =~ trace
-      end
+    #rescue  => e
+    #  puts "visit failed !!!!! #{ e }"
+    #  e.backtrace.each do | trace |
+    #    puts "  #{trace}"
+    #    break if /actionpack/ =~ trace
+    #  end
+    #  raise e
 
     ensure
       n = @visiting[xampl]
