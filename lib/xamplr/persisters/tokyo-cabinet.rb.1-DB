@@ -10,12 +10,14 @@ module Xampl
   class TokyoCabinetPersister < AbstractCachingPersister
     include TokyoCabinet
 
+    @@tc_db = nil
+
     def note_errors(msg="TokyoCabinet Error:: %s\n")
       result = yield
 
       rmsg = nil
       unless result then
-        rmsg = sprintf(msg, @tc_db.errmsg(@tc_db.ecode))
+        rmsg = sprintf(msg, @@tc_db.errmsg(@@tc_db.ecode))
         STDERR.printf(rmsg)
         STDERR.puts "---------"
         caller(0).each do |trace|
@@ -47,64 +49,64 @@ module Xampl
       open_tc_db()
 
       #      note_errors("TC[[#{ @filename }]]:: optimisation error: %s\n") do
-      #        @tc_db.optimize(-1, -1, -1, TDB::TDEFLATE)
+      #        @@tc_db.optimize(-1, -1, -1, TDB::TDEFLATE)
       #      end
       #      note_errors("TC[[#{ @filename }]]:: close error: %s\n") do
-      #        @tc_db.close
+      #        @@tc_db.close
       #      end
     end
 
     def open_tc_db
-      return if @tc_db
+      return if @@tc_db
 #      puts "#{File.basename(__FILE__)}:#{__LINE__} open tc db: #{ @filename }"
       #puts "#{File.basename(__FILE__)}:#{__LINE__} callers..."
       #caller(0).each { | trace | puts "   #{trace}"}
-      @tc_db = TDB.new
+      @@tc_db = TDB.new
       note_errors("TC[[#{ @filename }]]:: tuning error: %s\n") do
-        @tc_db.tune(-1, -1, -1, TDB::TDEFLATE)
+        @@tc_db.tune(-1, -1, -1, TDB::TDEFLATE)
       end
 
       note_errors("TC[[#{ @filename }]]:: open [#{ @filename }] error: %s\n") do
-        @tc_db.open(@filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB ) #TDB::OTSYNC slows it down by almost 50 times
+        @@tc_db.open(@filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB ) #TDB::OTSYNC slows it down by almost 50 times
       end
 
       # Don't care if there are errors (in fact, if the index exists a failure is the expected thing)
 
       $lexical_indexes.each do | index_name |
-        r = @tc_db.setindex(index_name, TDB::ITLEXICAL | TDB::ITKEEP)
+        r = @@tc_db.setindex(index_name, TDB::ITLEXICAL | TDB::ITKEEP)
       end
       $numeric_indexes.each do | index_name |
-        @tc_db.setindex(index_name, TDB::ITDECIMAL | TDB::ITKEEP)
+        @@tc_db.setindex(index_name, TDB::ITDECIMAL | TDB::ITKEEP)
       end
 
     end
 
     def optimise(opts)
-      return unless @tc_db
+      return unless @@tc_db
 
       if opts[:indexes_only] then
         # Don't care if there are errors (in fact, if the index exists a failure is the expected thing)
         $lexical_indexes.each do | index_name |
-          @tc_db.setindex(index_name, 9998)
+          @@tc_db.setindex(index_name, 9998)
         end
         $numeric_indexes.each do | index_name |
-          @tc_db.setindex(index_name, 9998)
+          @@tc_db.setindex(index_name, 9998)
         end
       else
         note_errors("TC[[#{ @filename }]]:: optimisation error: %s\n") do
-          @tc_db.optimize(-1, -1, -1, 0xff)
+          @@tc_db.optimize(-1, -1, -1, 0xff)
         end
       end
     end
 
     def close
-      if @tc_db then
+      if @@tc_db then
         self.sync
 
         note_errors("TC[[#{ @filename }]]:: close error: %s\n") do
-          @tc_db.close
+          @@tc_db.close
         end
-        @tc_db = nil
+        @@tc_db = nil
 #        puts "#{File.basename(__FILE__)}:#{__LINE__} close tc db: #{ @filename }"
       end
     end
@@ -123,7 +125,7 @@ module Xampl
 
     def query(hint=false)
       open_tc_db
-      query = TableQuery.new(@tc_db)
+      query = TableQuery.new(@@tc_db)
 
       yield query
 
@@ -134,7 +136,7 @@ module Xampl
       else
         result_keys = query.search
       end
-      results = result_keys.collect { | key | @tc_db[ key ] }
+      results = result_keys.collect { | key | @@tc_db[ key ] }
 
       class_cache = {}
       results.each do | result |
@@ -166,7 +168,7 @@ module Xampl
 
     def find_xampl(hint=false)
       open_tc_db
-      query = TableQuery.new(@tc_db)
+      query = TableQuery.new(@@tc_db)
 
       yield query
 
@@ -181,7 +183,7 @@ module Xampl
       end
 
       results = result_keys.collect do | key |
-        result = @tc_db[ key ]
+        result = @@tc_db[ key ]
         next unless result
 
         class_name = result['class']
@@ -210,7 +212,7 @@ module Xampl
 
     def find_pids(hint=false)
       open_tc_db
-      query = TableQuery.new(@tc_db)
+      query = TableQuery.new(@@tc_db)
 
       yield query
 
@@ -223,7 +225,7 @@ module Xampl
       end
 
       results = result_keys.collect do |key|
-        meta = @tc_db[ key ]
+        meta = @@tc_db[ key ]
         meta['xampl-place'] || meta['place']
       end
 
@@ -236,7 +238,7 @@ module Xampl
 
     def find_meta(hint=false)
       open_tc_db
-      query = TableQuery.new(@tc_db)
+      query = TableQuery.new(@@tc_db)
 
       yield query
 
@@ -248,7 +250,7 @@ module Xampl
         result_keys = query.search
       end
 
-      results = result_keys.collect { | key | @tc_db[ key ] }
+      results = result_keys.collect { | key | @@tc_db[ key ] }
 
       if hint then
         return results, the_hint
@@ -262,13 +264,13 @@ module Xampl
 
       place = File.join(xampl.class.name.split("::"), xampl.get_the_index)
 
-      query = TableQuery.new(@tc_db)
+      query = TableQuery.new(@@tc_db)
       query.add_condition('xampl-to', :equals, place)
       result_keys = query.search
 
       class_cache = {}
       results = result_keys.collect do | key |
-        result = @tc_db[ key ]
+        result = @@tc_db[ key ]
         next unless result
 
         mentioner = result['xampl-from']
@@ -308,12 +310,12 @@ module Xampl
 
 #            puts "DO SYNC WRITE: #{ @changed.size } to be written (#{ @filename })"
       #      note_errors("TC:: open error: %s\n") do
-      #        @tc_db.open(@filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB ) #TDB::OTSYNC slows it down by almost 50 times
+      #        @@tc_db.open(@filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB ) #TDB::OTSYNC slows it down by almost 50 times
       #      end
 
       begin
         note_errors("TC[[#{ @filename }]]:: tranbegin error: %s\n") do
-          @tc_db.tranbegin
+          @@tc_db.tranbegin
         end
 
         @changed.each do |xampl, ignore|
@@ -322,7 +324,7 @@ module Xampl
       rescue => e
         msg = "no TC.abort attempted"
         msg = note_errors("TC[[#{ @filename }]]:: trancommit error: %s\n") do
-          @tc_db.tranabort
+          @@tc_db.tranabort
         end
         puts "------------------------------------------------------------------------"
         puts "TokyoCabinetPersister Error:: #{ msg }/#{ e }"
@@ -331,51 +333,20 @@ module Xampl
         raise "TokyoCabinetPersister Error:: #{ msg }/#{ e }"
       else
         note_errors("TC[[#{ @filename }]]:: trancommit error: %s\n") do
-          @tc_db.trancommit
+          @@tc_db.trancommit
         end
       ensure
 #                note_errors("TC[[#{ @filename }]]:: close error: %s\n") do
-#                  @tc_db.close()
+#                  @@tc_db.close()
 #                end
       end
-#      puts "               num records: #{ @tc_db.rnum() }"
+#      puts "               num records: #{ @@tc_db.rnum() }"
       #      puts "#{ __FILE__ }:#{ __LINE__ } keys..."
-      #      @tc_db.keys.each do | key |
-      #        meta = @tc_db[key]
+      #      @@tc_db.keys.each do | key |
+      #        meta = @@tc_db[key]
       #        meta['xampl'] = (meta['xampl'] || "no rep")[0..25]
       #        puts "         key: [#{ key }] -- #{ meta.inspect }"
       #      end
-    end
-
-    def how_indexed(xampl)
-      raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index
-      place = File.join(xampl.class.name.split("::"), xampl.get_the_index)
-
-      open_tc_db
-
-      result_keys = Set.new
-
-      query = TableQuery.new(@tc_db)
-      query.add_condition('xampl-place', :equals, place)
-      search_results = query.search
-      result_keys.merge( search_results)
-
-      primary = @tc_db[ place ]
-      if primary then
-        primary.delete('xampl')
-      end
-
-      results = primary ? [ primary ] : []
-      result_keys.each do | key |
-        result = @tc_db[ key ]
-        next unless result
-
-        result.delete('xampl')
-
-        results << result
-      end
-
-      results
     end
 
     def write(xampl)
@@ -386,13 +357,13 @@ module Xampl
       data = represent(xampl, mentions)
 
       #get rid of any supplimentary indexes associated with this xampl object
-      query = TableQuery.new(@tc_db)
+      query = TableQuery.new(@@tc_db)
       query.add_condition('xampl-from', :equals, place)
       note_errors("TC[[#{ @filename }]]:: failed to remove from mentions, error: %s\n") do
         query.searchout
       end
 
-      query = TableQuery.new(@tc_db)
+      query = TableQuery.new(@@tc_db)
       query.add_condition('xampl-place', :equals, place)
       note_errors("TC[[#{ @filename }]]:: failed to remove from mentions, error: %s\n") do
         query.searchout
@@ -402,7 +373,7 @@ module Xampl
         mention_place = File.join(mention.class.name.split("::"), mention.get_the_index)
         #TODO -- will repeadedly changing a persisted xampl object fragment the TC db?
 
-        pk = @tc_db.genuid
+        pk = @@tc_db.genuid
         mention_hash = {
                 'xampl-from' => place,
                 'mentioned_class' => xampl.class.name,
@@ -411,7 +382,7 @@ module Xampl
         }
 
         note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
-          @tc_db.put(pk, mention_hash)
+          @@tc_db.put(pk, mention_hash)
         end
       end
 
@@ -428,7 +399,7 @@ module Xampl
       end
 
       note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
-        @tc_db.put(place, xampl_hash)
+        @@tc_db.put(place, xampl_hash)
       end
 
       #TODO -- smarter regarding when to delete (e.g. mentions)
@@ -451,8 +422,8 @@ module Xampl
           description = secondary_description.merge(xampl_hash)
 
           note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
-            pk = @tc_db.genuid
-            @tc_db.put(pk, description)
+            pk = @@tc_db.genuid
+            @@tc_db.put(pk, description)
           end
         end
       end
@@ -475,7 +446,7 @@ module Xampl
       place = File.join(klass.name.split("::"), pid)
       representation = nil
 
-      meta = @tc_db[place]
+      meta = @@tc_db[place]
       representation = meta['xampl'] if meta
 
       #      puts "#{File.basename(__FILE__)}:#{__LINE__} TC: #{ klass }/#{ pid }" if representation
@@ -590,7 +561,6 @@ module Xampl
 
     def initialize (table)
       @query = TDBQRY::new(table)
-      @text_form = []
       @opts = {}
     end
 
@@ -685,8 +655,6 @@ module Xampl
       op = op | TDBQRY::QCNEGATE unless affirmative
       op = op | TDBQRY::QCNOIDX if no_index
 
-      @text_form << "operator: #{ operator }#{ affirmative ? '' : ' NEGATED'}#{ no_index ? ' NO INDEX' : ''} -- col: '#{ colname }', val: '#{ val }'"
-
       @query.addcond(colname, op, val)
     end
 
@@ -718,14 +686,6 @@ module Xampl
 
     def order_by (colname, direction=:strasc)
       @query.setorder(colname, DIRECTIONS[direction])
-    end
-
-    def inspect
-      "TableQuery:\n#{ @text_form.join("\n") }"
-    end
-
-    def to_s
-      inspect
     end
   end
 

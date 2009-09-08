@@ -55,7 +55,7 @@ module Hobbies
     end
   end
 
-  start_at = Time.now
+  start_at = Time.now.to_i
 
   repo_name = "hobbies-#{ start_at }"
 

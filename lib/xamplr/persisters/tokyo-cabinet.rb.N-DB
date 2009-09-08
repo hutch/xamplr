@@ -347,37 +347,6 @@ module Xampl
       #      end
     end
 
-    def how_indexed(xampl)
-      raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index
-      place = File.join(xampl.class.name.split("::"), xampl.get_the_index)
-
-      open_tc_db
-
-      result_keys = Set.new
-
-      query = TableQuery.new(@tc_db)
-      query.add_condition('xampl-place', :equals, place)
-      search_results = query.search
-      result_keys.merge( search_results)
-
-      primary = @tc_db[ place ]
-      if primary then
-        primary.delete('xampl')
-      end
-
-      results = primary ? [ primary ] : []
-      result_keys.each do | key |
-        result = @tc_db[ key ]
-        next unless result
-
-        result.delete('xampl')
-
-        results << result
-      end
-
-      results
-    end
-
     def write(xampl)
       raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index
 
@@ -590,7 +559,6 @@ module Xampl
 
     def initialize (table)
       @query = TDBQRY::new(table)
-      @text_form = []
       @opts = {}
     end
 
@@ -685,8 +653,6 @@ module Xampl
       op = op | TDBQRY::QCNEGATE unless affirmative
       op = op | TDBQRY::QCNOIDX if no_index
 
-      @text_form << "operator: #{ operator }#{ affirmative ? '' : ' NEGATED'}#{ no_index ? ' NO INDEX' : ''} -- col: '#{ colname }', val: '#{ val }'"
-
       @query.addcond(colname, op, val)
     end
 
@@ -718,14 +684,6 @@ module Xampl
 
     def order_by (colname, direction=:strasc)
       @query.setorder(colname, DIRECTIONS[direction])
-    end
-
-    def inspect
-      "TableQuery:\n#{ @text_form.join("\n") }"
-    end
-
-    def to_s
-      inspect
     end
   end
 
