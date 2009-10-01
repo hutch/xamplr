@@ -167,23 +167,33 @@ module Xampl
           Xampl.block_future_changes(false)
           Xampl.auto_persistence(original_automatic)
           if rollback then
+            # we get here if the transaction block finishes early
             if exception then
+              # the early finish was caused by an exception
               puts "ROLLBACK(#{__LINE__}):: #{exception}" if rollback and @@verbose_transactions
-#              print exception.backtrace.join("\n") if rollback
               raise exception
             else
-              Xampl.block_future_changes(true)
-              Xampl.sync
-              rollback = false
-#              if @@verbose_transactions and rollback then
-#                puts "ROLLBACK(#{__LINE__}):: UNKNOWN CAUSE" if rollback
-#                puts caller(0).each { | trace | puts " #{trace}"} if rollback
-#              end
+              # How could we have arrived at this point???
+              # Well, I don't know all the reasons, but the ones I do know are:
+              #  - return was used in the block passed into the transaction
+              #  - a throw was made
+              # There's no way that I know of to distinguish, so, assume that the transaction worked
+              begin
+                Xampl.block_future_changes(true)
+                Xampl.sync
+                rollback = false
+              rescue => e
+                # so we know the persister had a problem
+                puts "PERSISTER ERROR(#{__LINE__}) #{ e }"
+              ensure
+                Xampl.block_future_changes(false)
+              end
             end
           end
           Xampl.rollback if rollback
           @@persister = initial_persister
         end
+        raise exception if exception
       end
     end
   end
