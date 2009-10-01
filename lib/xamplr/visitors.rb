@@ -320,7 +320,8 @@ module Xampl
       @pid_translations_old_to_new = translate_pids
       @pid_translations_new_to_old = translate_pids.invert
 
-      @persisted_xampl_found = { @current_root.get_the_index => root }
+#      @persisted_xampl_found = { @current_root.get_the_index => root }
+      @persisted_xampl_found = { (@current_root || root).get_the_index => root } #TODO -- is root ever okay here?
       @copies_by_old_pid = {}
 
       while true do

@@ -1,4 +1,3 @@
-
 require 'sync'
 
 module Xampl
@@ -24,6 +23,7 @@ module Xampl
   end
 
   def Xampl.register_persister_kind(klass)
+    puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] REGISTER: #{ klass.kind } --> #{ klass }"
     @@persister_kinds[klass.kind] = klass
   end
 
@@ -43,6 +43,7 @@ module Xampl
   def Xampl.default_persister_kind
     @@default_persister_kind
   end
+
   def Xampl.set_default_persister_kind(kind)
     @@default_persister_kind = kind
     #puts "SET KIND format: #{@@default_persister_format}, kind: #{@@default_persister_kind}"
@@ -51,6 +52,7 @@ module Xampl
   def Xampl.default_persister_format
     @@default_persister_format
   end
+
   def Xampl.set_default_persister_format(format)
     @@default_persister_format = format
     #puts "SET FORMAT format: #{@@default_persister_format}, kind: #{@@default_persister_kind}"
@@ -78,7 +80,8 @@ module Xampl
     end
 
     unless @@persister then
-      # puts "CREATE PERSISTER #{name}, format: #{format}, kind: #{kind}"
+      puts "CREATE PERSISTER #{name}, format: #{format}, kind: #{kind}"
+      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] kinds available: #{ @@persister_kinds.keys.inspect }"
       @@persister = @@persister_kinds[kind].new(name, format)
       if (nil != name) then
         @@known_persisters[name] = @@persister
@@ -90,7 +93,7 @@ module Xampl
 
   def Xampl.print_known_persisters
     puts "Known Persisters:: --------------------------"
-    @@known_persisters.each { | n, k | puts "    #{n} #{k}" }
+    @@known_persisters.each { | n, k | puts " #{n} #{k}" }
     puts "---------------------------------------------"
   end
 
@@ -104,7 +107,7 @@ module Xampl
   def Xampl.drop_all_persisters(verbose=false)
     puts "Drop All Persisters:: --------------------------" if verbose
     @@known_persisters.each do |name, persister|
-      puts "    #{ name } #{ persister.class.name }" if verbose
+      puts " #{ name } #{ persister.class.name }" if verbose
       next if persister == @@persister
       persister.close
       persister.clear_cache
@@ -126,6 +129,7 @@ module Xampl
   @@xampl_lock = Sync.new
 
   @@verbose_transactions = true
+
   def Xampl.verboseTransactions(v)
     @@verbose_transactions = v
   end
@@ -165,12 +169,16 @@ module Xampl
           if rollback then
             if exception then
               puts "ROLLBACK(#{__LINE__}):: #{exception}" if rollback and @@verbose_transactions
-              #print exception.backtrace.join("\n") if rollback
+#              print exception.backtrace.join("\n") if rollback
               raise exception
             else
-              if @@verbose_transactions and rollback then
-                puts "ROLLBACK(#{__LINE__}):: UNKNOWN CAUSE" if rollback
-              end
+              Xampl.block_future_changes(true)
+              Xampl.sync
+              rollback = false
+#              if @@verbose_transactions and rollback then
+#                puts "ROLLBACK(#{__LINE__}):: UNKNOWN CAUSE" if rollback
+#                puts caller(0).each { | trace | puts " #{trace}"} if rollback
+#              end
             end
           end
           Xampl.rollback if rollback
@@ -216,11 +224,15 @@ module Xampl
           if 0 == @changed.size then
             @changed = original_changed
 
-            if rollback then
+            if exception then
               puts "ROLLBACK(#{__LINE__}):: #{exception}"
-              print exception.backtrace.join("\n")
-              Xampl.rollback
+              print exception.backtrace.join("\n") if exception
             end
+
+            #no change so don't bother with rollback
+#            if rollback then
+#              Xampl.rollback
+#            end
             @@persister = initial_persister
           else
             puts "CHANGED COUNT: #{@changed.size}"

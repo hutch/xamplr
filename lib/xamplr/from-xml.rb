@@ -357,7 +357,13 @@ TODO -- can these ever happen?
 
       #describe_current_element_type
 
+#TODO -- get rid of this, it is for debugging only
+begin
       okay = @reader.read
+rescue => e
+  puts "WHAT???? #{ e }"
+  raise e
+end
 
       @just_opened_an_element = start_element?
       @insert_end_element = (@just_opened_an_element and @reader.empty_element?)
