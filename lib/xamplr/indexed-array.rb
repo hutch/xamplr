@@ -48,14 +48,22 @@ class IndexedArray
     if String === index or Symbol === index then
       pos = @map.delete(index)
       if pos then
-        @map.each{ | k, v| @map[k] = (v - 1) if pos < v }
+#        @map.each{ | k, v| @map[k] = (v - 1) if pos < v }
+        @map.keys.each do |k|
+          v = @map[k]
+          @map[k] = (v - 1) if pos < v
+        end
         return @store.delete_at(pos)
       end
     else
       key = @map.index(index)
       pos = @map.delete(key) if key
       if pos then
-        @map.each{ | k, v | @map[k] = (v - 1) if pos < v }
+#        @map.each{ | k, v | @map[k] = (v - 1) if pos < v }
+        @map.keys.each do |k|
+          v = @map[k]
+          @map[k] = (v - 1) if pos < v
+        end
         return @store.delete_at(pos)
       end
     end
