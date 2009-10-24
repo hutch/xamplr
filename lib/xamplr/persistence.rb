@@ -23,7 +23,7 @@ module Xampl
   end
 
   def Xampl.register_persister_kind(klass)
-    puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] REGISTER: #{ klass.kind } --> #{ klass }"
+    #puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] REGISTER: #{ klass.kind } --> #{ klass }"
     @@persister_kinds[klass.kind] = klass
   end
 

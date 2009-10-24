@@ -90,7 +90,7 @@
 
     def #{attribute.name}=(v)
       accessed
-			# This is kind of optimistic, I think you are in trouble if you do this
+      # This is kind of optimistic, I think you are in trouble if you do this
       Xampl.auto_uncache(self) if @#{attribute.name}
       @#{attribute.name} = v
       changed
