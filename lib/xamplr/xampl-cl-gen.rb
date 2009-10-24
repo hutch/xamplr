@@ -1,8 +1,3 @@
-#!/usr/bin/env ruby
-#!/usr/bin/env ruby -w -I..
-
-
-#  $LOAD_PATH.unshift('../../../lib/')
 
 require 'xamplr-generator'
 
@@ -81,14 +76,3 @@ class ProjectGenerator
   end
 end
 
-if $0 == __FILE__ then
-
-  project_specialisations = File.join(%w{ . project-generator.rb })
-  if File.exists?(project_specialisations) then
-    load project_specialisations
-  end
-
-  generator = ProjectGenerator.new
-  generator.generate
-
-end
