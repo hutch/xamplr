@@ -292,7 +292,11 @@ module XamplGenerator
       end
     end
 
-    def print_elements(filename)
+    def print_elements(base_filename, print_options=nil)
+      return unless base_filename
+      return unless print_options
+      return if 0 == print_options.size
+
       root = Elements.new
       @elements_map.each_value do |elements|
         elements.element_child.each do |element|
@@ -300,16 +304,20 @@ module XamplGenerator
         end
       end
 
-      File.open(filename, "w") do |out|
-        root.pp_xml(out)
+      print_options.each do | print_option |
+        case print_option
+          when :schema then
+            File.open("#{base_filename}.xml", "w") do |out|
+              root.pp_xml(out)
+            end
+          when :graphml then
+            graphml_out = GraphMLOut.new(@elements_map)
+            graphml_out.write_graph_ml(base_filename)
+          when :yuml then
+            yuml_out = YUMLOut.new(@elements_map)
+            yuml_out.write_yuml(base_filename)
+        end
       end
-
-      graphml_out = GraphMLOut.new(@elements_map)
-      graphml_out.write_graph_ml(filename)
-
-      yuml_out = YUMLOut.new(@elements_map)
-      yuml_out.write_yuml(filename)
-
     end
 
     def go(args, &eval_context)

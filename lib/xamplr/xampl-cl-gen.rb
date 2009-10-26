@@ -14,6 +14,20 @@ class ProjectGenerator
     Dir.glob("./xml/**/*.xml")
   end
 
+  def print_base_filename
+    File.join(%w{ . generated })
+  end
+
+  def print_options
+    # return an array containing any (or none) of:
+    #    :schema    -- a schema-like xml representation of the generated code
+    #    :graphml   -- a graphml file describing the class model (compatible with yEd)
+    #    :yuml      -- a yuml file that represents a simplified class model (compatible with yUML)
+
+    # [:schema, :graphml, :yuml]
+    []
+  end
+
   def print
     nil
   end
@@ -66,10 +80,7 @@ class ProjectGenerator
                    :filenames => filenames,
                    :directory => directory)
 
-      if print then
-        #TODO -- this is stupid
-        puts generator.print_elements("./generated-elements.xml")
-      end
+      puts generator.print_elements(print_base_filename, print_options)
 
       Xampl.rollback
     end

@@ -1,11 +1,6 @@
+require 'xampl_generated_code/XamplAdHoc.rb'
 
-require 'xampl_generated_code/Example1.rb'
-
-#module Example1
-
-Xampl.transaction("setup") do
-  h = Hello.new
-  puts h.pp_xml
+Xampl.transaction("example1") do
+  h = HelloWorld.new
+  puts h.to_xml
 end
-
-#end

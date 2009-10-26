@@ -1,0 +1,1490 @@
+#LyX 1.6.4.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass book
+\begin_preamble
+\usepackage{color}
+\usepackage{alltt}
+
+
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0,0,0}{#1}}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.16,0.16,1}{#1}}
+\newcommand{\hlesc}[1]{\textcolor[rgb]{1,0,1}{#1}}
+\newcommand{\hlstr}[1]{\textcolor[rgb]{1,0,0}{#1}}
+\newcommand{\hldstr}[1]{\textcolor[rgb]{0.51,0.51,0}{#1}}
+\newcommand{\hlslc}[1]{\textcolor[rgb]{0.51,0.51,0.51}{\it{#1}}}
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.51,0.51,0.51}{\it{#1}}}
+\newcommand{\hldir}[1]{\textcolor[rgb]{0,0.51,0}{#1}}
+\newcommand{\hlsym}[1]{\textcolor[rgb]{0,0,0}{#1}}
+\newcommand{\hlline}[1]{\textcolor[rgb]{0.33,0.33,0.33}{#1}}
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0,0,0}{\bf{#1}}}
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.51,0,0}{#1}}
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0,0,0}{\bf{#1}}}
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0,0,0.51}{#1}}
+\end_preamble
+\use_default_options true
+\language british
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\float_placement h
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref false
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Xampl
+\end_layout
+
+\begin_layout Author
+Bob Hutchison
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part
+Introduction
+\end_layout
+
+\begin_layout Chapter
+Installing Xampl
+\end_layout
+
+\begin_layout Part
+Xampl by Example
+\end_layout
+
+\begin_layout Standard
+Over the last ten or eleven years I've taught a bunch of programmers how
+ to use xampl.
+ It normally takes about 45 minutes to get them going… and then an extended
+ period of intermittent answering questions and making suggestions.
+ To do this I took advantage of the shared context of a project we both
+ were working on.
+\end_layout
+
+\begin_layout Standard
+Xampl has never been documented, though several attempts have been made.
+ This time I'm serious.
+\end_layout
+
+\begin_layout Standard
+I think teaching technique won't translate very well to print and example
+ code.
+ I suppose I could try simulate this and choose some well understood domain,
+ like weblogs, and work that through\SpecialChar \ldots{}
+ and hope that'd work.
+ It might if I was sitting beside you, but I'm not.
+ And I have to do something, so I'm going to take a bunch of passes at writing
+ a progressively more complex 'Hello World' program.
+ A bit of a stretch, but\SpecialChar \ldots{}
+
+\end_layout
+
+\begin_layout Chapter
+Hello World
+\end_layout
+
+\begin_layout Section
+Hello World, Take One
+\end_layout
+
+\begin_layout Subsection
+The Experiment
+\end_layout
+
+\begin_layout Standard
+Let's see if we can get a start with xampl by using it to print hello-world
+ on the screen.
+ Then I'll explain what happened.
+\end_layout
+
+\begin_layout Standard
+\noindent
+You'll need to create a directory somewhere in which to place the files
+ associated with this project.
+ I'll be defining path names using 
+\family typewriter
+.
+
+\family default
+ to mean this directory, so you might want to open a terminal and change
+ directories to it.
+ The source for this example is distributed in the xampl gem and is located
+ at 
+\family typewriter
+<path to the xampl gem>/docs/intro/example1
+\family default
+ which will likely be read-only and so should be copied someplace else
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+If you are lazy, which is possibly one of the very good reasons you are
+ interested in xampl, then you can simply untar the file 
+\family typewriter
+<path to the xampl gem>/docs/intro/examples.tgz
+\family default
+ (or unzip 
+\family typewriter
+<path to the xampl gem>/docs/intro/examples.zip
+\family default
+) to someplace convenient.
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Xampl works by inspecting a collection of XML files and deriving a class
+ model from what it finds.
+ We'll only need one XML file right now: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset External
+	template XMLCode
+	filename example1/xml/hello.xml
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+./xml/hello.xml
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To make this happen and generate the xampl code, run
+\begin_inset Marginal
+status collapsed
+
+\begin_layout Plain Layout
+Are you in the right directory?
+\end_layout
+
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "numbers=left"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+[working] >> xampl-gen
+\end_layout
+
+\begin_layout Plain Layout
+
+comprehend file ./xml/hello.xml
+\end_layout
+
+\begin_layout Plain Layout
+
+WRITE TO FILE: ./xampl_generated_code/XamplAdHoc.rb
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+That's how I'll show a command line session―a mix of commands (with the
+ 
+\family typewriter
+[working] >> prefix
+\family default
+ like line 1) and the rest output.
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+Xampl-gen
+\family default
+ will print a line like line 2 for every xml file it finds, meaning that
+ xampl is have a look at it and analysing it.
+ By default 
+\family typewriter
+xampl-gen
+\family default
+ will analyse all files that match the pattern 
+\family typewriter
+./xml/**/*.xml
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+all files in ./xml and and all sub-directories for files with the extension
+ 
+\family typewriter
+.xml
+\end_layout
+
+\end_inset
+
+
+\family default
+.
+ The xml files 
+\emph on
+must
+\emph default
+ be well-formed and xampl-gen will choke if they are not.
+\end_layout
+
+\begin_layout Standard
+Xampl-gen will write something like line 3 for each file it generates.
+ In this example there is only one, and it is called XamplAdHoc.
+ This is xampl-gen's default output file, and we haven't told it anything
+ better, so try to suppress your gag-reflex until I show you how to deal
+ with this.
+ But, maybe to calm you down a bit, it is considered 
+\emph on
+very
+\emph default
+ bad form to allow xampl to generate code into this file for production
+ use.
+\end_layout
+
+\begin_layout Standard
+For the moment, lets just ignore what's in the XamplAdHoc.rb file.
+ It's a little frightening.
+\end_layout
+
+\begin_layout Standard
+To do something with this, let's run this short little ruby program:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset External
+	template RubyCode
+	filename example1/example1.rb
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+./example1.rb
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And this is what we get when we run it:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "numbers=left,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+[working] >> ruby example1.rb
+\end_layout
+
+\begin_layout Plain Layout
+
+<hello-world/> 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And by golly! I see a hello world right there on line 2.
+\end_layout
+
+\begin_layout Standard
+How'd that happen? The file we just generated was included on line 1.
+ In line 3 we start a transaction, called example1.
+ These transactions are necessary, but in this example doesn't buy us a
+ lot, it is mostly just overhead
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Yes, I know\SpecialChar \ldots{}
+ for such a simple program this seems like gross overkill.
+ It is I suppose, but it isn't often that xampl is used on simple programs
+ like this.
+\end_layout
+
+\end_inset
+
+.
+ For now just remember that when you create or change a xampl object you
+ have to be in a transaction or a Xampl::UnmanagedChange exception will
+ be raised and that involves a rollback.
+ I'll be covering transactions in pretty thorough detail, and there is a
+ prolonged discussion in chapter 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:Transactions"
+
+\end_inset
+
+.
+ Line 4 creates a new instance of the class 
+\family typewriter
+HelloWorld
+\family default
+.
+ Line 5 calls the 
+\family typewriter
+to_xml
+\family default
+ method and prints the result.
+\end_layout
+
+\begin_layout Standard
+HelloWorld is a class generated by xampl.
+ The name is derived from the XML element name using rules described in
+ 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:Name-Generation"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+What Did xampl Do?
+\end_layout
+
+\begin_layout Standard
+You can look in the generated code yourself and you'll find that one class
+ and one module were generated and a surprising 150 or more lines of code.
+ The class has 20 methods, and the module has 7.
+ The module and none of the methods are interesting to us right now, all
+ of them will be soon.
+ And all for this near-trivial example.
+\end_layout
+
+\begin_layout Standard
+The class is called 
+\family typewriter
+HelloWorld
+\family default
+.
+ It mixes in two modules: 
+\family typewriter
+Xampl::XamplObject
+\family default
+, and 
+\family typewriter
+Xampl::XamplWithoutContent
+\family default
+, and inherits nothing.
+ The mixin 
+\family typewriter
+Xampl::XamplObject
+\family default
+ means that his is a xampl object, and it carries a bunch of methods, including
+ the 
+\family typewriter
+to_xml
+\family default
+ method used in the example.
+ The mixin 
+\family typewriter
+Xampl::XamplWithoutContent
+\family default
+ means that 
+\family typewriter
+HelloWorld
+\family default
+ has no content and no references to any other xampl managed objects (like
+ an empty XML element).
+\end_layout
+
+\begin_layout Subsection
+Summary
+\end_layout
+
+\begin_layout Itemize
+basic structure of a xampl project on disk
+\end_layout
+
+\begin_layout Itemize
+basic usage of the xampl-gen program
+\end_layout
+
+\begin_layout Itemize
+a simple example of using the generated code
+\end_layout
+
+\begin_layout Itemize
+xampl has some kind of way of dealing with name incompatibilities between
+ XML and Ruby
+\end_layout
+
+\begin_layout Itemize
+xampl creates a Ruby class for each XML elements discovered
+\end_layout
+
+\begin_layout Section
+Hello hello?!
+\end_layout
+
+\begin_layout Subsection
+The Experiment
+\end_layout
+
+\begin_layout Standard
+Carrying on from the previous experiment\SpecialChar \ldots{}
+ That was nice but it could only
+ say hello to the world, and then only if we squinted.
+ What if we wanted to say hello to more than just the world? What if we
+ wanted to have objects that behaved differently? What if we wanted to say
+ it nicer? What if we wanted to get rid of that horribly ugly XamplAdHoc.rb
+ file and actually put the generated code in modules?
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align left
+The code for this experiment is in the directory:
+\family typewriter
+ <path to the xampl gem>/docs/intro/example2
+\end_layout
+
+\begin_layout Standard
+Okay, so lets look at this xml file, Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:./xml/example2.xml"
+
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset External
+	template XMLCode
+	filename example2/xml/hello.xml
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+./xml/example2.xml
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:./xml/example2.xml"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+There are two important differences between this xml file and the one for
+ the first example:
+\end_layout
+
+\begin_layout Itemize
+there is an attribute, who, associated with the element hello (no more hello-wor
+ld).
+ The value of the attribute is just for example, it does not find its way
+ into the generated code, it could have been anything including ''.
+\end_layout
+
+\begin_layout Itemize
+There is a namespace defined, in this case com.xampl.intro.example2
+\end_layout
+
+\begin_layout Standard
+As soon as we have a namespace defined, then we can map them to Ruby modules.
+ This is done in a ruby file called 
+\family typewriter
+project-generator.rb
+\family default
+.
+ It is always called that and is located in the directory from where the
+ 
+\family typewriter
+xampl-gen
+\family default
+ command is run.
+ This is what it looks like Figure
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:./project-generator.rb"
+
+\end_inset
+
+.
+ This file is loaded by the xampl-gen command if it exists.
+ It re-opens
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+xampl re-opens classes routinely and profits greatly by the technique.
+ There's a term, 
+\emph on
+monkey-patching,
+\emph default
+ applied to this technique that is intended to be derogatory, but it isn't
+ taken that way in the Ruby community.
+\end_layout
+
+\end_inset
+
+ the class 
+\family typewriter
+ProjectGenerator
+\family default
+ (line 1) and re-defines the method 
+\family typewriter
+resolve-namespaces
+\family default
+ (line 3).
+ An array of arrays is expected.
+ What line 15 is doing is saying that the namespace com.xampl.intro.example2
+ should be mapped to the Ruby module 
+\family typewriter
+Example2
+\family default
+, and when writing XML xampl should prefer the prefix ex2 to identify the
+ namespace.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset External
+	template RubyCode
+	filename example2/project-generator.rb
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+./project-generator.rb
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:./project-generator.rb"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So run xampl-gen and you should see something like:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+[working] >> xampl-gen
+\end_layout
+
+\begin_layout Plain Layout
+
+comprehend file ./xml/hello.xml
+\end_layout
+
+\begin_layout Plain Layout
+
+WRITE TO FILE: ./xampl_generated_code/Example2.rb 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+You'll note that the XamplAdHoc.rb file is gone, replaced by Exampl2.rb.
+ Xampl will place all code generated for a module into a single file named
+ after the module.
+ If you open up the generated Ruby file you'll see that the code is now
+ inside the module Example2.
+\end_layout
+
+\begin_layout Standard
+So, lets do something with this.
+ Have a look at this Figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:./example2.rb"
+
+\end_inset
+
+ and its output.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset External
+	template RubyCode
+	filename /Users/hutch/GIT-public/xamplr/docs/intro/example2/example2.rb
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+./example2.rb
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:./example2.rb"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "float,language=bash,numbers=left"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+[working] >> ruby example2.rb
+\end_layout
+
+\begin_layout Plain Layout
+
+haven't set the who attribute yet...
+\end_layout
+
+\begin_layout Plain Layout
+
+<ex2:hello xmlns:ex2="com.xampl.intro.example2"/>
+\end_layout
+
+\begin_layout Plain Layout
+
+Hello hello?!
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+have set the who attribute to 'world'...
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+<ex2:hello who="world" xmlns:ex2="com.xampl.intro.example2"/>
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+<ex2:hello who='world'
+\end_layout
+
+\begin_layout Plain Layout
+
+           xmlns:ex2='com.xampl.intro.example2'/> 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hello world!
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+there are two Hello things now...
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hello world! 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hello there!
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+print an array of the two Hello things...
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hello world! 
+\end_layout
+
+\begin_layout Plain Layout
+
+Hello there!
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+inspect an array of the two Hello things...
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+[ <ex2:hello who='world'
+\end_layout
+
+\begin_layout Plain Layout
+
+             xmlns:ex2='com.xampl.intro.example2'/>,
+\end_layout
+
+\begin_layout Plain Layout
+
+ <ex2:hello who='there'
+\end_layout
+
+\begin_layout Plain Layout
+
+            xmlns:ex2='com.xampl.intro.example2'/>] 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So what's happening here? Line 1 requires the generated Ruby code, line
+ 3 includes the module 
+\family typewriter
+Example2
+\family default
+ so we don't have to keep specifying the module name.
+ Line 5 re-opens the class 
+\family typewriter
+Hello
+\family default
+ and defines a 
+\family typewriter
+to_s
+\family default
+ method.
+ Line 11 starts one of those transactions again.
+\end_layout
+
+\begin_layout Standard
+Line 12 creates a new instance of 
+\family typewriter
+Hello
+\family default
+, 
+\family typewriter
+h
+\family default
+, and prints it's XML and string representation on lines 15-16 (see lines
+ 3-4 of the output listing).
+ Line 18 sets the value of 
+\family typewriter
+h
+\family default
+'s who attribute to '
+\family typewriter
+world
+\family default
+' then prints some stuff resulting in output lines 6-11.
+\end_layout
+
+\begin_layout Standard
+Line 25-28 creates another, different, instance of 
+\family typewriter
+Hello
+\family default
+, 
+\family typewriter
+h2
+\family default
+, and an array, 
+\family typewriter
+all
+\family default
+, that contains 
+\family typewriter
+h
+\family default
+ and 
+\family typewriter
+h2
+\family default
+.
+ Lines 30-37 generate the output lines 17-25.
+\end_layout
+
+\begin_layout Standard
+There's a new method being used called 
+\family typewriter
+pp_xml
+\family default
+.
+ It is similar to 
+\family typewriter
+to_xml
+\family default
+ in that it prints XML, but it does in a prettier way
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+the 'pp' in 
+\family typewriter
+pp_xml
+\family default
+ stands for pretty-print.
+\end_layout
+
+\end_inset
+
+.
+ There is another significant difference that we'll get to when we talk
+ about persistence.
+\end_layout
+
+\begin_layout Subsection
+What Did xampl do?
+\end_layout
+
+\begin_layout Standard
+Pretty much the same thing as the first experiment.
+ Except that the file is named after a module, and the generated code is
+ in that module.
+ There is also code to support an attribute.
+\end_layout
+
+\begin_layout Subsection
+Summary
+\end_layout
+
+\begin_layout Itemize
+how to map XML namespaces to Ruby modules
+\end_layout
+
+\begin_layout Itemize
+how an XML attribute maps to a Ruby instance variable
+\end_layout
+
+\begin_layout Itemize
+that there can be more than one instance of xampl objects created
+\end_layout
+
+\begin_layout Itemize
+the values taken by instance variables are in no way constrained to the
+ values found in the XML files the code was generated from
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+This has proved to be incredibly difficult for some programmers to grasp.
+ The xml files used to generate xampl objects are 
+\family typewriter
+\emph on
+not
+\family default
+\emph default
+ schemas, they are examples.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+there is a xampl build-in method, 
+\family typewriter
+pp_xml
+\family default
+, that prints xml from a xampl object in a prettier way than that of 
+\family typewriter
+to_xml
+\end_layout
+
+\begin_layout Section
+The Greeter
+\end_layout
+
+\begin_layout Subsection
+The Experiment
+\end_layout
+
+\begin_layout Standard
+xml goes here
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:./xml/greeter.xml"
+
+\end_inset
+
+, blah
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset External
+	template XMLCode
+	filename example3/xml/greeter.xml
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+./xml/greeter.xml
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:./xml/greeter.xml"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+object diagram
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:./generated3.yuml"
+
+\end_inset
+
+, blah
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename example3/generated.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+./generated.yuml
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:./generated3.yuml"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+greeter
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:./greeter3.rb"
+
+\end_inset
+
+, blah
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset External
+	template RubyCode
+	filename example3/greeter.rb
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+./greeter.rb
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:./greeter3.rb"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+greeting
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:./greeting3.rb"
+
+\end_inset
+
+, blah
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset External
+	template RubyCode
+	filename example3/greeting.rb
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+./greeting.rb
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:./greeting3.rb"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+example3
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:./example3.rb"
+
+\end_inset
+
+, blah
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset External
+	template RubyCode
+	filename example3/example3.rb
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+./example3.rb
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:./example3.rb"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+example3a
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:./example3a.rb"
+
+\end_inset
+
+, blah
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset External
+	template RubyCode
+	filename example3/example3a.rb
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+./example3a.rb
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:./example3a.rb"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+blather
+\end_layout
+
+\begin_layout Part
+Programming Manual
+\end_layout
+
+\begin_layout Chapter
+Code Generation
+\end_layout
+
+\begin_layout Section
+Name Generation
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Name-Generation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Persistence
+\end_layout
+
+\begin_layout Section
+Transactions
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Transactions"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Repositories
+\end_layout
+
+\begin_layout Section
+Persistence Managers
+\end_layout
+
+\end_body
+\end_document
