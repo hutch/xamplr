@@ -80,8 +80,8 @@ module Xampl
     end
 
     unless @@persister then
-      #puts "CREATE PERSISTER #{name}, format: #{format}, kind: #{kind}"
-      #puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] kinds available: #{ @@persister_kinds.keys.inspect }"
+#      puts "CREATE PERSISTER #{name}, format: #{format}, kind: #{kind}"
+#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] kinds available: #{ @@persister_kinds.keys.inspect }"
       @@persister = @@persister_kinds[kind].new(name, format)
       if (nil != name) then
         @@known_persisters[name] = @@persister
@@ -142,6 +142,7 @@ module Xampl
     else
       raise XamplException.new("can't base a transaction on a #{thing.class.name} (#{thing})")
     end
+
 
     if block_given? then
       @@xampl_lock.synchronize(:EX) do

@@ -52,13 +52,30 @@ module Xampl
       #      note_errors("TC[[#{ @filename }]]:: close error: %s\n") do
       #        @tc_db.close
       #      end
+
+      if @tc_db then
+        begin
+        note_errors("TC[[#{ @filename }]]:: close error: %s\n") do
+            @tc_db.close
+          end
+          @tc_db = nil
+        rescue => e
+          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] OH CRAP!!! #{ e }"
+        end
+      end
     end
 
     def open_tc_db
-      return if @tc_db
-#      puts "#{File.basename(__FILE__)}:#{__LINE__} open tc db: #{ @filename }"
+      return if @tc_db # if there is a tc_db then it is already open
+
+#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] #{ @filename }"
+#      callers = caller(0)
+#      puts "   0 #{ callers[0] }"
+#      puts "   1 #{ callers[1] }"
+#      puts "   2 #{ callers[2] }"
       #puts "#{File.basename(__FILE__)}:#{__LINE__} callers..."
       #caller(0).each { | trace | puts "   #{trace}"}
+
       @tc_db = TDB.new
       note_errors("TC[[#{ @filename }]]:: tuning error: %s\n") do
         @tc_db.tune(-1, -1, -1, TDB::TDEFLATE)
@@ -98,14 +115,24 @@ module Xampl
     end
 
     def close
-      if @tc_db then
-        self.sync
+#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] #{ @filename }"
+#      callers = caller(0)
+#      puts "   0 #{ callers[0] }"
+#      puts "   1 #{ callers[1] }"
+#      puts "   2 #{ callers[2] }"
 
-        note_errors("TC[[#{ @filename }]]:: close error: %s\n") do
-          @tc_db.close
+      if @tc_db then
+        begin
+#          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] NO SELF SYNC?? [#{ @currently_syncing }] --> db: #{ @tc_db.class.name }"
+          self.sync unless @currently_syncing
+        rescue => e
+          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] OH CRAP!!! #{ e }"
+        ensure
+          note_errors("TC[[#{ @filename }]]:: close error: %s\n") do
+            @tc_db.close
+          end
+          @tc_db = nil
         end
-        @tc_db = nil
-#        puts "#{File.basename(__FILE__)}:#{__LINE__} close tc db: #{ @filename }"
       end
     end
 
@@ -291,27 +318,37 @@ module Xampl
       return results.uniq
     end
 
-    def do_sync_write
-#      RubyProf.start
-      #
-      #      do_sync_write_work
-      #
-      #      result = RubyProf.stop
-      #      printer = RubyProf::FlatPrinter.new(result)
-      #      printer.print(STDOUT, 0)
-      #      puts "#{File.basename(__FILE__)}:#{__LINE__} stop this profiler"
-      #    end
-      #
-      #    def do_sync_write_work
+    def start_sync_write
+#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] #{ @filename }"
+#      callers = caller(0)
+#      puts "   0 #{ callers[0] }"
+#      puts "   1 #{ callers[1] }"
+#      puts "   2 #{ callers[2] }"
+
+      @currently_syncing = true
       open_tc_db
-      @time_stamp = Time.now.to_f.to_s
+    end
 
-#            puts "DO SYNC WRITE: #{ @changed.size } to be written (#{ @filename })"
-      #      note_errors("TC:: open error: %s\n") do
-      #        @tc_db.open(@filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB ) #TDB::OTSYNC slows it down by almost 50 times
-      #      end
-
+    def done_sync_write
       begin
+        close
+      ensure
+        @currently_syncing = false
+      end
+    end
+
+
+    def do_sync_write
+      begin
+#        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] **************************"
+#        callers = caller(0)
+#        puts "   0 #{ callers[0] }"
+#        puts "   1 #{ callers[1] }"
+#        puts "   2 #{ callers[2] }"
+
+#        open_tc_db
+        @time_stamp = Time.now.to_f.to_s
+
         note_errors("TC[[#{ @filename }]]:: tranbegin error: %s\n") do
           @tc_db.tranbegin
         end
@@ -334,17 +371,16 @@ module Xampl
           @tc_db.trancommit
         end
       ensure
-#                note_errors("TC[[#{ @filename }]]:: close error: %s\n") do
-#                  @tc_db.close()
-#                end
-      end
 #      puts "               num records: #{ @tc_db.rnum() }"
-      #      puts "#{ __FILE__ }:#{ __LINE__ } keys..."
-      #      @tc_db.keys.each do | key |
-      #        meta = @tc_db[key]
-      #        meta['xampl'] = (meta['xampl'] || "no rep")[0..25]
-      #        puts "         key: [#{ key }] -- #{ meta.inspect }"
-      #      end
+        #      puts "#{ __FILE__ }:#{ __LINE__ } keys..."
+        #      @tc_db.keys.each do | key |
+        #        meta = @tc_db[key]
+        #        meta['xampl'] = (meta['xampl'] || "no rep")[0..25]
+        #        puts "         key: [#{ key }] -- #{ meta.inspect }"
+        #      end
+
+#        close
+      end
     end
 
     def how_indexed(xampl)

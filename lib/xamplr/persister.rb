@@ -207,6 +207,14 @@ module Xampl
       @changed.each { | xampl, ignore | puts "   #{xampl.tag} #{xampl.get_the_index}" }
     end
 
+    def start_sync_write
+      #only if needed
+    end
+
+    def done_sync_write
+      # only if needed
+    end
+
     def do_sync_write
       unchanged_in_changed_list = 0
       @changed.each do |xampl, ignore|
@@ -242,7 +250,14 @@ module Xampl
         busy(true)
         @syncing = true
 
-        do_sync_write
+        begin
+          start_sync_write
+          do_sync_write
+        ensure
+          done_sync_write
+        end
+
+
 
         @changed = {}
 
