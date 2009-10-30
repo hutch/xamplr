@@ -65,7 +65,7 @@ module Xampl
       end
 
       note_errors("TC[[#{ @filename }]]:: open [#{ @filename }] error: %s\n") do
-        @tc_db.open(@filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB ) #TDB::OTSYNC slows it down by almost 50 times
+        @tc_db.open(@filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB | TDB::OTSYNC ) #TDB::OTSYNC slows it down by almost 50 times
       end
 
       # Don't care if there are errors (in fact, if the index exists a failure is the expected thing)
