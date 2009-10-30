@@ -1,3 +1,11 @@
+2009-10-24
+  -- added a to_s method to all xampl objects that will call to_xml on itself
+  -- added an inspect method to all xampl objects that will call pp_xml on itself
+  -- complete re-work of the xampl-gen process, and a binary that will do it for you
+  -- beginnings of documentation
+
+2009-06-14 through 2009-10-24
+  -- lots of minor changes
 
 2009-06-14 (version 1.3.5)
   -- first pass at supporting ruby 1.9.1 (seems to be working)

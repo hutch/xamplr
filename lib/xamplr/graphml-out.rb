@@ -9,13 +9,6 @@ module XamplGenerator
       @elements_map = elements_map
     end
 
-    def devise_filename(filename)
-      bn = File.basename(filename)
-      ext = File.extname(bn)
-      bn = bn[0..(bn.size - ext.size - 1)]
-      fn = "#{bn}.graphml"
-    end
-
     def generate_class_nodes(element, include_mixins)
 
       node = @element_to_node_map[element.nstag]
@@ -83,8 +76,8 @@ module XamplGenerator
       return false
     end
 
-    def write_graph_ml(filename, excluded_packages=[ ], included_packages=nil, include_mixins=true)
-      filename = devise_filename(filename)
+    def write_graph_ml(base_filename, excluded_packages=[ ], included_packages=nil, include_mixins=true)
+      filename = "#{base_filename}.graphml"
 
       @excluded_packages = Set.new(excluded_packages)
       @included_packages = included_packages ? Set.new(included_packages) : nil

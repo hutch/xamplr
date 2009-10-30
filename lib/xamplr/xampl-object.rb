@@ -128,6 +128,14 @@ module Xampl
       return true
     end
 
+    def to_s
+      self.to_xml
+    end
+
+    def inspect
+      self.pp_xml
+    end
+
     def to_ruby(mentions=nil)
       accessed
       return RubyPrinter.new(mentions).to_ruby(self)
@@ -224,6 +232,13 @@ module Xampl
     end
   end
 
+    def Xampl.from_xml_string(xml_string, tokenise=true)
+      return FromXML.new.parse_string(xml_string, tokenise)
+    end
+
+    def Xampl.from_xml_file(file_name, tokenise=true)
+      return FromXML.new.parse(file_name, tokenise)
+    end
 
 end
 

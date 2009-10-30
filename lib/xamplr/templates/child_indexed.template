@@ -30,7 +30,7 @@
 
       return existing if existing == #{element.attribute_name}
 
-			self.remove_#{element.attribute_name}(index) if existing
+      self.remove_#{element.attribute_name}(index) if existing
 
       @children << #{element.attribute_name}
       @#{element.attribute_name}_child[index] = #{element.attribute_name}
@@ -62,7 +62,7 @@
       accessed
 
       #{element.attribute_name} = @#{element.attribute_name}_child[index]
-		  return #{element.attribute_name} if #{element.attribute_name} 
+      return #{element.attribute_name} if #{element.attribute_name} 
 
 |
 |if @element.persisted then
@@ -75,14 +75,14 @@
 
       yield(#{element.attribute_name}) if block_given?
       return add_#{element.attribute_name}(#{element.attribute_name})
-		end
+    end
 
     def remove_#{element.attribute_name}(index)
       accessed
-			changed
-	    unless String === index or Symbol === index then
+      changed
+      unless String === index or Symbol === index then
         index = index.get_the_index
-			end
+      end
       #{element.attribute_name} = @#{element.attribute_name}_child.delete(index) if index
       @children.delete(#{element.attribute_name})
     end

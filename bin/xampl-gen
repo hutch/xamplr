@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w -I..
+
+require 'xamplr-generator'
+require 'xamplr/xampl-cl-gen'
+
+include XamplGenerator
+include Xampl
+
+project_specialisations = File.join(%w{ . project-generator.rb })
+if File.exists?(project_specialisations) then
+  load project_specialisations
+end
+
+generator = ProjectGenerator.new
+generator.generate
+
