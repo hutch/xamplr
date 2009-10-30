@@ -1400,7 +1400,7 @@ reference "fig:./example3a.rb"
 \begin_inset Float figure
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset External
@@ -1441,7 +1441,7 @@ name "fig:./example3a.rb"
 \end_layout
 
 \begin_layout Standard
-blather
+blather blather
 \end_layout
 
 \begin_layout Part
