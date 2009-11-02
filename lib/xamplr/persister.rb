@@ -41,6 +41,11 @@ module Xampl
       self.sync
     end
 
+    def shutdown
+      self.sync
+      self.close
+    end
+
     def busy(yes)
       if yes then
         @busy_count += 1
@@ -230,7 +235,7 @@ module Xampl
       begin
         #puts "SYNC"
         #puts "SYNC"
-        #puts "SYNC changed: #{@changed.size}" if 0 < @changed.size
+#        puts "SYNC changed: #{@changed.size}" if 0 < @changed.size
         #@changed.each do | key, value |
         ##puts "   #{key.class.name}"
         ##puts "key: #{key.class.name}, value: #{value.class.name}"
@@ -247,14 +252,21 @@ module Xampl
         ##  break if /actionpack/ =~ trace
         ##end
         #end
-        busy(true)
-        @syncing = true
+        if 0 < @changed.size then
+          begin
+#            puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNC changed: #{@changed.size}"
+            busy(true)
+            @syncing = true
 
-        begin
-          start_sync_write
-          do_sync_write
-        ensure
-          done_sync_write
+            start_sync_write
+            do_sync_write
+          ensure
+#            puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNC done"
+
+            done_sync_write
+          end
+        else
+#          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNC, noting changed"
         end
 
 

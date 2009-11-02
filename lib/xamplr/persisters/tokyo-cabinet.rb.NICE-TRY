@@ -1,3 +1,7 @@
+
+# this is an attempt to ensure that the tc db is closed unless actively being accessed.
+# it will not work, because a lot of code is assuming that it is actually open
+# further more, it is incredibly slow
 module Xampl
 
   require 'fileutils'
@@ -24,13 +28,15 @@ module Xampl
         end
         STDERR.puts "---------"
 
-#        STDOUT.puts "NOTE: TokyoCabinet Error!"
-#        STDOUT.printf(rmsg)
-#        STDOUT.puts "---------"
-#        caller(0).each do |trace|
-#          STDOUT.puts(trace)
-#        end
-#        STDOUT.puts "---------"
+        STDOUT.puts "NOTE: TokyoCabinet Error!"
+        STDOUT.printf(rmsg)
+        STDOUT.puts "---------"
+        caller(0).each do |trace|
+          STDOUT.puts(trace)
+        end
+        STDOUT.puts "---------"
+
+
       end
       return rmsg
     end
@@ -52,39 +58,45 @@ module Xampl
 
       FileUtils.mkdir_p(@root_dir) unless File.exist?(@root_dir)
       @filename = "#{@root_dir}/repo.tct"
-#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] file: #{ @filename }, db: #{ @tc_db.class.name }"
+      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] "
+
+      if @tc_db then
+        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] TC[[#{ @filename }]]:: tc db already open"
+      end
 
       open_tc_db()
 
-#      note_errors("TC[[#{ @filename }]]:: optimisation error: %s\n") do
-#        @tc_db.optimize(-1, -1, -1, TDB::TDEFLATE)
-#      end
-#      note_errors("TC[[#{ @filename }]]:: close error: %s\n") do
-#        @tc_db.close
-#      end
+      #      note_errors("TC[[#{ @filename }]]:: optimisation error: %s\n") do
+      #        @tc_db.optimize(-1, -1, -1, TDB::TDEFLATE)
+      #      end
+      #      note_errors("TC[[#{ @filename }]]:: close error: %s\n") do
+      #        @tc_db.close
+      #      end
 
-      begin
-        note_errors("TC[[#{ @filename }]]:: close error in initialize: %s\n") do
-          @tc_db.close
+      if @tc_db then
+        begin
+          note_errors("TC[[#{ @filename }]]:: close error in initialize: %s\n") do
+            @tc_db.close
+          end
+          @tc_db = nil
+        rescue => e
+          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] OH CRAP!!! #{ e }"
         end
-        @tc_db = nil
-      rescue => e
-        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] OH CRAP!!! #{ e }"
       end
     end
 
     def open_tc_db
-#      if @tcdb then
-#        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] ALREADY OPEN #{ @filename }"
-#      else
-#        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] OPEN #{ @filename }"
-##        callers = caller(0)
-##        puts "   0 #{ callers[0] }"
-##        puts "   1 #{ callers[1] }"
-##        puts "   2 #{ callers[2] }"
-#        #puts "#{File.basename(__FILE__)}:#{__LINE__} callers..."
-#        #caller(0).each { | trace | puts "   #{trace}"}
-#      end
+      if @tcdb then
+        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] ALREADY OPEN #{ @filename }"
+      else
+        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] #{ @filename }"
+#        callers = caller(0)
+#        puts "   0 #{ callers[0] }"
+#        puts "   1 #{ callers[1] }"
+#        puts "   2 #{ callers[2] }"
+        #puts "#{File.basename(__FILE__)}:#{__LINE__} callers..."
+        #caller(0).each { | trace | puts "   #{trace}"}
+      end
 
       return if @tc_db # if there is a tc_db then it is already open
 
@@ -126,12 +138,13 @@ module Xampl
     end
 
     def close
-#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] CLOSE #{ @filename }"
+#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] #{ @filename }"
 #      callers = caller(0)
 #      puts "   0 #{ callers[0] }"
 #      puts "   1 #{ callers[1] }"
 #      puts "   2 #{ callers[2] }"
 
+      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] "
       if @tc_db then
         begin
 #          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] NO SELF SYNC?? [#{ @currently_syncing }] --> db: #{ @tc_db.class.name }"
@@ -330,7 +343,7 @@ module Xampl
     end
 
     def start_sync_write
-#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] #{ @filename }"
+      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] #{ @filename }"
 #      callers = caller(0)
 #      puts "   0 #{ callers[0] }"
 #      puts "   1 #{ callers[1] }"
@@ -341,9 +354,9 @@ module Xampl
     end
 
     def done_sync_write
-#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] #{ @filename }"
+      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] #{ @filename }"
       begin
-#        close
+        close
       ensure
         @currently_syncing = false
       end
@@ -379,7 +392,7 @@ module Xampl
         puts "------------------------------------------------------------------------"
         raise "TokyoCabinetPersister Error:: #{ msg }/#{ e }"
       else
-#        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] COMMIT"
+        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] COMMIT"
         note_errors("TC[[#{ @filename }]]:: trancommit error: %s\n") do
           @tc_db.trancommit
         end
@@ -521,32 +534,39 @@ module Xampl
       #      caller(0).each { | trace | puts "  #{trace}"}
 
       representation = nil
+      require_close = false
+      begin
+        unless @tc_db then
+          require_close = true
+          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] OPEN TC DB"
+          open_tc_db
+        end
+        place = File.join(klass.name.split("::"), pid)
 
-      unless @tc_db then
-#        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] READ REP"
-        open_tc_db
-      end
-      place = File.join(klass.name.split("::"), pid)
+        meta = @tc_db[place]
+        representation = meta['xampl'] if meta
 
-      meta = @tc_db[place]
-      representation = meta['xampl'] if meta
+        #      puts "#{File.basename(__FILE__)}:#{__LINE__} TC: #{ klass }/#{ pid }" if representation
+        $TC_COUNT += 1 if representation
 
-      #      puts "#{File.basename(__FILE__)}:#{__LINE__} TC: #{ klass }/#{ pid }" if representation
-      $TC_COUNT += 1 if representation
+        # puts "read: #{ place }, size: #{ representation.size }"
+        # puts representation[0..100]
 
-      # puts "read: #{ place }, size: #{ representation.size }"
-      # puts representation[0..100]
-
-      unless representation then
-        # try the filesystem if it is not in the TC repository
-        place = File.join(@root_dir, klass.name.split("::"), pid)
-        representation = File.read(place) if File.exist?(place)
-        $FS_COUNT += 1 if representation
+        unless representation then
+          # try the filesystem if it is not in the TC repository
+          place = File.join(@root_dir, klass.name.split("::"), pid)
+          representation = File.read(place) if File.exist?(place)
+          $FS_COUNT += 1 if representation
 #        puts "#{File.basename(__FILE__)}:#{__LINE__} FS: #{ klass }/#{ pid } (FS: #{ $FS_COUNT}, TC: #{ $TC_COUNT }, NF: #{ $NF_COUNT }" if representation
-      end
+        end
 #      puts "#{File.basename(__FILE__)}:#{__LINE__} ??: #{ klass }/#{ pid }" unless representation
-      $NF_COUNT += 1
+        $NF_COUNT += 1
 
+        return representation
+      ensure
+        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] CLOSE TC DB" if require_close
+#        close if require_close
+      end
       return representation
     end
   end
