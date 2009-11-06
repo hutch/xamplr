@@ -61,6 +61,7 @@ module Xampl
   def Xampl.enable_persister(name, kind=nil, format=nil)
     kind = kind || @@default_persister_kind
     format = format || @@default_persister_format
+#    puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] persister format: #{kind}/#{ Xampl.default_persister_kind }"
     @@persister = @@known_persisters[name]
 
     if @@persister then
@@ -142,7 +143,6 @@ module Xampl
     else
       raise XamplException.new("can't base a transaction on a #{thing.class.name} (#{thing})")
     end
-
 
     if block_given? then
       @@xampl_lock.synchronize(:EX) do

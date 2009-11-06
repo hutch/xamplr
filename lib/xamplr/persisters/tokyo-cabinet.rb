@@ -343,6 +343,9 @@ module Xampl
     def done_sync_write
 #      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] #{ @filename }"
       begin
+        note_errors("TC[[#{ @filename }]]:: sync error in done_sync_write: %s\n") do
+          @tc_db.sync
+        end
 #        close
       ensure
         @currently_syncing = false
@@ -471,6 +474,7 @@ module Xampl
               'xampl' => data
       }
 
+#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] #{ xampl.class.name } ... describe"
       primary_description, secondary_descriptions = xampl.describe_yourself
       if primary_description then
         xampl_hash = primary_description.merge(xampl_hash)

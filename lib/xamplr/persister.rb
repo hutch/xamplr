@@ -1,4 +1,3 @@
-
 require "xamplr/persistence"
 
 module Xampl
@@ -42,8 +41,8 @@ module Xampl
     end
 
     def shutdown
-      self.sync
-      self.close
+#      self.sync
+#      self.close
     end
 
     def busy(yes)
@@ -209,7 +208,7 @@ module Xampl
 
     def put_changed(msg="")
       puts "Changed::#{msg}:"
-      @changed.each { | xampl, ignore | puts "   #{xampl.tag} #{xampl.get_the_index}" }
+      @changed.each { | xampl, ignore | puts " #{xampl.tag} #{xampl.get_the_index}" }
     end
 
     def start_sync_write
@@ -233,29 +232,28 @@ module Xampl
     def sync
       #raise XamplException.new(:live_across_rollback) if @rolled_back
       begin
-        #puts "SYNC"
-        #puts "SYNC"
-#        puts "SYNC changed: #{@changed.size}" if 0 < @changed.size
-        #@changed.each do | key, value |
-        ##puts "   #{key.class.name}"
-        ##puts "key: #{key.class.name}, value: #{value.class.name}"
-        #puts key.to_xml
-        #end
-        #puts "SYNC"
-        #puts "SYNC"
-
-        #if 0 < @changed.size then
-        #puts "SYNC changed: #{@changed.size}"
-        ##caller(0).each do | trace |
-        ##  next if /xamplr/ =~ trace
-        ##  puts "  #{trace}"
-        ##  break if /actionpack/ =~ trace
-        ##end
-        #end
+#        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNC changed: #{@changed.size}" if 0 < @changed.size
+#        @changed.each do | key, value |
+#          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] key: #{key.class.name}, pid: #{key.get_the_index}"
+#        end
+#
+#        if 0 < @changed.size then
+#          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNC changed: #{@changed.size}"
+#          caller(0).each do | trace |
+#            next if /xamplr/ =~ trace
+#            puts " #{trace}"
+#            break if /actionpack/ =~ trace
+#          end
+#        end
+#
+#        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNC changed: #{@changed.size}"
         if 0 < @changed.size then
           begin
 #            puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNC changed: #{@changed.size}"
             busy(true)
+#            if @syncing then
+#              puts "\n\n\n\n#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNCING IS ALREADY TRUE!!!!!!\n\n\n"
+#            end
             @syncing = true
 
             start_sync_write
@@ -264,12 +262,11 @@ module Xampl
 #            puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNC done"
 
             done_sync_write
+            @syncing = false
           end
         else
 #          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNC, noting changed"
         end
-
-
 
         @changed = {}
 
@@ -287,6 +284,7 @@ module Xampl
         return @last_write_count
       ensure
         busy(false)
+#        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] **** SYNCING IS FALSE"
         @syncing = false
       end
     end
