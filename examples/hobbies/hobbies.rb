@@ -1,9 +1,9 @@
 require 'rubygems'
 require 'xampl_generated_code/Hobbies'
 
-Xampl.set_default_persister_kind(:tokyo_cabinet)
-Xampl.set_default_persister_format(:xml_format)
-
+#Xampl.set_default_persister_properties(kind: :tokyo_cabinet)
+#Xampl.set_default_persister_properties(kind: :tokyo_cabinet, write_through: true)
+Xampl.set_default_persister_properties(kind: :tokyo_cabinet, write_through: :sync)
 
 module Hobbies
 
@@ -12,7 +12,7 @@ module Hobbies
       %w{ hobby-name }
     end
 
-    Xampl::TokyoCabinetPersister.add_lexical_indexs(Hobby.indexed_attributes)
+    Xampl.add_lexical_indexs(Hobby.indexed_attributes)
 
 #    puts "#{ __FILE__ }:#{ __LINE__ } lexical indexes: #{ Hobby.indexed_attributes.inspect }"
 
@@ -32,7 +32,7 @@ module Hobbies
       %w{ person-name person-hobby }
     end
 
-    Xampl::TokyoCabinetPersister.add_lexical_indexs(Person.indexed_attributes)
+    Xampl.add_lexical_indexs(Hobby.indexed_attributes)
 
 #    puts "#{ __FILE__ }:#{ __LINE__ } lexical indexes: #{ Person.indexed_attributes.inspect }"
 

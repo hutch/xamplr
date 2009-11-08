@@ -1,4 +1,3 @@
-
 module Xampl
 
   class XamplIsInvalid < Exception
@@ -75,6 +74,18 @@ module Xampl
 
     def initialize(persister, feature_name, requested_feature_value, actual_feature_value)
       @msg = "persister #{persister.name}:: requested feature: #{feature_name} #{requested_feature_value}, actual: #{actual_feature_value}"
+    end
+
+    def message
+      @msg
+    end
+  end
+
+  class IncompatiblePersisterConfiguration < Exception
+    attr_reader :msg
+
+    def initialize(persister_kind, feature_name)
+      @msg = "persister kind #{persister_kind}:: requested feature: #{feature_name}"
     end
 
     def message

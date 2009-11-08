@@ -37,31 +37,49 @@ module Xampl
     @@persister = nil
   end
 
-  @@default_persister_kind = :simple
-  @@default_persister_format = :xml_format
+  $is_darwin = RUBY_PLATFORM.include? 'darwin'  
+
+  @@factory_default_persister_options = {
+          :kind => :simple,
+          :format => :xml_format
+  }
+  @@default_persister_options = {}.merge(@@factory_default_persister_options)
+
+  def Xampl.default_persister_options
+    {}.merge(@@default_persister_options)
+  end
+
+  def Xampl.raw_persister_options
+    @@default_persister_options
+  end
+
+  def Xampl.set_default_persister_properties(options)
+    if options[:reset] then
+      @@default_persister_options = @@factory_default_persister_options.merge(options)
+    else
+      @@default_persister_options = @@default_persister_options.merge(options)
+    end
+  end
 
   def Xampl.default_persister_kind
-    @@default_persister_kind
+    @@default_persister_options[:kind]
   end
 
   def Xampl.set_default_persister_kind(kind)
-    @@default_persister_kind = kind
-    #puts "SET KIND format: #{@@default_persister_format}, kind: #{@@default_persister_kind}"
+    @@default_persister_options[:kind] = kind
   end
 
   def Xampl.default_persister_format
-    @@default_persister_format
+    @@default_persister_options[:format]
   end
 
   def Xampl.set_default_persister_format(format)
-    @@default_persister_format = format
-    #puts "SET FORMAT format: #{@@default_persister_format}, kind: #{@@default_persister_kind}"
+    @@default_persister_options[:format] = format
   end
 
   def Xampl.enable_persister(name, kind=nil, format=nil)
-    kind = kind || @@default_persister_kind
-    format = format || @@default_persister_format
-#    puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] persister format: #{kind}/#{ Xampl.default_persister_kind }"
+    kind = kind || Xampl.default_persister_kind
+    format = format || Xampl.default_persister_format
     @@persister = @@known_persisters[name]
 
     if @@persister then
@@ -71,7 +89,6 @@ module Xampl
       kind = @@persister.kind || kind
       format = @@persister.format || format
 
-      #raise XamplException.new(:live_across_rollback) if @@persister.rolled_back
       if kind and kind != @@persister.kind then
         raise IncompatiblePersisterRequest.new(@@persister, "kind", kind, @@persister.kind)
       end
@@ -125,6 +142,24 @@ module Xampl
     p.close if p
     @@known_persisters.delete(name)
     Xampl.print_known_persisters
+  end
+
+  def Xampl.add_lexical_indexs(indexes)
+    case Xampl.default_persister_kind
+      when :tokyo_cabinet then
+        Xampl::TokyoCabinetPersister.add_lexical_indexs(indexes)
+      else
+        raise IncompatiblePersisterConfiguration.new(Xampl.default_persister_kind, "lexical_indexes")
+    end
+  end
+
+  def Xampl.add_numerical_indexs(indexes)
+    case Xampl.default_persister_kind
+      when :tokyo_cabinet then
+        Xampl::TokyoCabinetPersister.add_numerical_indexs(indexes)
+      else
+        raise IncompatiblePersisterConfiguration.new(Xampl.default_persister_kind, "numerical_indexs")
+    end
   end
 
   @@xampl_lock = Sync.new

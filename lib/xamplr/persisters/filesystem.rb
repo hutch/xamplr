@@ -25,7 +25,6 @@ module Xampl
       end
     end
 
-
     def write(xampl)
       #raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index or xampl.ignore_when_no_index
       raise XamplException.new("no_index_so_no_persist [#{xampl.class.name}]") unless xampl.get_the_index or xampl.ignore_when_no_index
@@ -39,7 +38,14 @@ module Xampl
 
       representation = represent(xampl)
       if representation then
-        File.open(place, "w"){ | out | out.puts representation }
+        File.open(place, "w")do |out|
+          out.puts representation
+          out.fsync
+          if $is_darwin then
+            out.fcntl(51, 0) # Attempt an F_FULLFSYNC fcntl to commit data to disk
+          end
+
+        end
         @write_count = @write_count + 1
       end
       xampl.changes_accepted

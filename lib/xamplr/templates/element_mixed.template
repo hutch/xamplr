@@ -5,6 +5,7 @@
 |
     include Xampl::XamplPersistedObject
 
+    #supports class based over-ride of persister format
     @@default_persister_format = nil
 
     def default_persister_format

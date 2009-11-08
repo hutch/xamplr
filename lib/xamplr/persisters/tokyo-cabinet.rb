@@ -50,8 +50,11 @@ module Xampl
     def initialize(name=nil, format=nil, root=File.join(".", "repo"))
       super(root, name, format)
 
-      FileUtils.mkdir_p(@root_dir) unless File.exist?(@root_dir)
+      @files_dir = "#{ @root_dir }/files"
+#      FileUtils.mkdir_p(@root_dir) unless File.exist?(@root_dir)
+      FileUtils.mkdir_p(@files_dir) unless File.exist?(@files_dir)
       @filename = "#{@root_dir}/repo.tct"
+      @tc_db = nil
 #      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] file: #{ @filename }, db: #{ @tc_db.class.name }"
 
       open_tc_db()
@@ -433,7 +436,9 @@ module Xampl
     def write(xampl)
       raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index
 
-      place = File.join(xampl.class.name.split("::"), xampl.get_the_index)
+      place_dir = xampl.class.name.split("::")
+      place = File.join( place_dir, xampl.get_the_index)
+      place_dir = File.join( @files_dir, place_dir )
       mentions = Set.new
       data = represent(xampl, mentions)
 
@@ -481,6 +486,20 @@ module Xampl
       end
 
       note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
+        if Xampl.raw_persister_options[:write_through] then
+          FileUtils.mkdir_p(place_dir) unless File.exist?(place_dir)
+          file_place = "#{ @files_dir }/#{ place }"
+          File.open(file_place, "w")do |out|
+            out.write xampl_hash['xampl']
+            if :sync == Xampl.raw_persister_options[:write_through] then
+              out.fsync
+              if $is_darwin then
+                out.fcntl(51, 0) # Attempt an F_FULLFSYNC fcntl to commit data to disk (darwin *ONLY*)
+              end
+            end
+          end
+
+        end
         @tc_db.put(place, xampl_hash)
       end
 
