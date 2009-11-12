@@ -43,7 +43,9 @@ module Xampl
       return prefix
     end
 
-    def attr_esc(s)
+    def attr_esc_fast(s)
+      #NOTE -- there are known issues with using Ruby 1.9.1 and libxml-ruby, which this is using. Seems to mostly
+      #        be related to DOM and XPATH but...
       unless defined?(@@doc) then
         @@doc = LibXML::XML::Document.new()
         @@doc.root = LibXML::XML::Node.new('r')
@@ -54,10 +56,7 @@ module Xampl
       (@@doc.root.to_s)[6..-4]
     end
 
-
-=begin
-
-    def attr_esc_old(s)
+    def attr_esc_slow(s)
       if (s.kind_of? XamplObject)
         return attr_esc(s.to_xml)
       end
@@ -75,8 +74,7 @@ module Xampl
       return result
     end
 
-=end
-
+    alias attr_esc attr_esc_fast
 
 #    def content_esc(s)
 #      #NO! the attribute has the right to compact white space

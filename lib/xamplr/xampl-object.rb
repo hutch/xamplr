@@ -133,7 +133,7 @@ module Xampl
     end
 
     def inspect
-      self.pp_xml
+      self.to_xml
     end
 
     def to_ruby(mentions=nil)
