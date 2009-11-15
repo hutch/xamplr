@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'getoptlong'
+require 'set'
 
 module XamplGenerator
   require "xamplr"
@@ -224,6 +225,14 @@ module XamplGenerator
 
       ensure_templates
 
+      module_names = Set.new
+      @elements_map.each do |ns, elements|
+        elements.element_child.each do |element|
+          module_names << element.package
+          break
+        end
+      end
+
       lookup_element = {}
       @elements_map.each do |ns, elements|
         elements.element_child.each do |element|
@@ -239,6 +248,12 @@ module XamplGenerator
 
           @templates.element = element
           @templates.package_name = element.package
+
+          if element.class_name == element.package then
+            puts "ERROR: Class #{ element.package } is in a module with the same name -- this NOT going to work"
+          elsif module_names.member?(element.class_name)
+            puts "WARNING: a Class and a Module have the same name (#{ element.package }) -- this is highly unlikely to work"
+          end
 
           @templates.child_modules(place)
         end
