@@ -196,7 +196,6 @@ module Xampl
     ################################################################################################
 
     def Xampl.find_things_to_delete(scheduled_before=Time.now.to_i)
-      #TODO -- one of these for XamplObject to limit search???
       things = Xampl.query do | q |
         q.add_condition('scheduled-delete-at', :lte, scheduled_before)
       end

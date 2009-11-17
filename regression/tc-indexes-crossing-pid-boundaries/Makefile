@@ -1,5 +1,8 @@
 
-f:
+fb:
+	ruby fail-badly.rb
+
+b:
 	ruby fail.rb
 
 s:

@@ -37,15 +37,14 @@ module Xampl
           if not @persister.syncing then
             Xampl.lazy_load(self)
           else
-            begin
-              puts "LOAD NEEDED(3): REFUSED (persister: #{@persister.name})"
-              puts "                #{self.class.name}"
-              puts "                pid: #{self.get_the_index}"
-#              puts "                pid: #{self.get_the_index} #{self}"
-              caller(0).each { | trace | puts "  #{trace}"}
-            rescue => e
-              puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] WTF? #{ e }"
-            end
+            puts "LOAD NEEDED(3): BAD IDEA, but load anyway (persister: #{@persister.name})"
+            puts "                #{self.class.name}"
+            puts "                pid: #{self.get_the_index}"
+            Xampl.lazy_load(self)
+#            puts "LOAD NEEDED(3): REFUSED (persister: #{@persister.name})"
+#            puts "                #{self.class.name}"
+#            puts "                pid: #{self.get_the_index}"
+#            caller(0).each { | trace | puts "  #{trace}"}
           end
         else
           puts "LOAD NEEDED(4): REFUSED (persister: #{@persister.name})"
