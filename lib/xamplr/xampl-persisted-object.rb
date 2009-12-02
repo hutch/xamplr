@@ -59,7 +59,7 @@ module Xampl
     end
 
     def changed
-      #puts "CHANGED: is_changed #{@is_changed} xampl #{self}"
+#      puts "CHANGED: is_changed #{@is_changed} xampl #{self}"
       unless Xampl.persister then
         raise UnmanagedChange.new(self)
       end

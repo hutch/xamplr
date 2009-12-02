@@ -37,7 +37,7 @@ module Xampl
     @@persister = nil
   end
 
-  $is_darwin = RUBY_PLATFORM.include? 'darwin'  
+  $is_darwin = RUBY_PLATFORM.include? 'darwin'
 
   @@factory_default_persister_options = {
           :kind => :simple,
@@ -181,55 +181,81 @@ module Xampl
 
     if block_given? then
       @@xampl_lock.synchronize(:EX) do
-        initial_persister = @@persister
-        Xampl.enable_persister(name, kind, format)
-
-        rollback = true
-        exception = nil
-        original_automatic = @@persister.automatic
-
+#      if true then
         begin
-          #TODO -- impose some rules on nested transactions/enable_persisters??
+#          @@xampl_lock.sync_lock(:EX)
+          initial_persister = @@persister
+          Xampl.enable_persister(name, kind, format)
 
-          Xampl.auto_persistence(automatic)
-          result = yield
-          Xampl.block_future_changes(true)
-          Xampl.sync
-          rollback = false
-          return result
-        rescue => e
-          exception = e
-        ensure
-          Xampl.block_future_changes(false)
-          Xampl.auto_persistence(original_automatic)
-          if rollback then
-            # we get here if the transaction block finishes early
-            if exception then
-              # the early finish was caused by an exception
-              puts "ROLLBACK(#{__LINE__}):: #{exception}" if rollback and @@verbose_transactions
-              raise exception
-            else
-              # How could we have arrived at this point???
-              # Well, I don't know all the reasons, but the ones I do know are:
-              #  - return was used in the block passed into the transaction
-              #  - a throw was made
-              # There's no way that I know of to distinguish, so, assume that the transaction worked
-              begin
-                Xampl.block_future_changes(true)
-                Xampl.sync
-                rollback = false
-              rescue => e
-                # so we know the persister had a problem
-                puts "PERSISTER ERROR(#{__LINE__}) #{ e }"
-              ensure
-                Xampl.block_future_changes(false)
+          rollback = true
+          exception = nil
+          original_automatic = @@persister.automatic
+
+          begin
+            #TODO -- impose some rules on nested transactions/enable_persisters??
+
+            Xampl.auto_persistence(automatic)
+            result = yield
+            Xampl.block_future_changes(true)
+            Xampl.sync
+            rollback = false
+            return result
+          rescue => e
+            exception = e
+          ensure
+            Xampl.block_future_changes(false)
+            Xampl.auto_persistence(original_automatic)
+            if rollback then
+              # we get here if the transaction block finishes early
+              if exception then
+                # the early finish was caused by an exception
+                puts "ROLLBACK(#{__LINE__}):: #{exception}" if rollback and @@verbose_transactions
+                raise exception
+              else
+                # How could we have arrived at this point???
+                # Well, I don't know all the reasons, but the ones I do know are:
+                #  - return was used in the block passed into the transaction
+                #  - a throw was made
+                # There's no way that I know of to distinguish, so, assume that the transaction worked
+                #    20091202 -- well maybe not...
+
+#                Xampl.rollback # this is bad
+                rollback = true
+#                raise  ReturnOrThrowInTransaction
+                STDERR.puts "---------"
+                STDERR.puts "Either a return or a throw from a transaction. The DB is possibly not synced."
+                caller(0).each do |trace|
+                  STDERR.puts(trace)
+                end
+                STDERR.puts "---------"
+
+=begin
+
+                begin
+                  puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] "
+                  Xampl.block_future_changes(true)
+                  puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] "
+                  Xampl.sync
+                  rollback = false
+                rescue => e
+                  puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] "
+                  # so we know the persister had a problem
+                  puts "PERSISTER ERROR(#{__LINE__}) #{ e }"
+                ensure
+                  puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] "
+                  Xampl.block_future_changes(false)
+                end
+
+=end
               end
             end
+            Xampl.rollback if rollback
+            @@persister = initial_persister
           end
-          Xampl.rollback if rollback
-          @@persister = initial_persister
+          raise exception if exception
+#        ensure
+#          @@xampl_lock.sync_unlock
         end
-        raise exception if exception
       end
     end
   end

@@ -57,6 +57,18 @@ module Xampl
     end
   end
 
+  class ReturnOrThrowInTransaction < Exception
+    attr_reader :xampl
+
+    def initialize(xampl=nil)
+      @xampl = xampl
+    end
+
+    def message
+      "attempt to change #{@xampl}, pid: #{@xampl.get_the_index}, oid: #{@xampl.object_id} when changes are blocked"
+    end
+  end
+
   class UnmanagedChange < Exception
     attr_reader :xampl
 

@@ -259,8 +259,6 @@ module Xampl
             start_sync_write
             do_sync_write
           ensure
-#            puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNC done"
-
             done_sync_write
             @syncing = false
           end

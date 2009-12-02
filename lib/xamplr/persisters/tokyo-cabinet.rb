@@ -11,7 +11,16 @@ module Xampl
     include TokyoCabinet
 
     def note_errors(msg="TokyoCabinet Error:: %s\n")
-      result = yield
+#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] START"
+#      puts "--------------------------------------------------"
+#      caller(0).each { |trace| puts " #{trace}" }
+#      puts "--------------------------------------------------\n\n"
+      exception = nil
+      begin
+        result = yield
+      rescue => e
+        exception = e
+      end
 
       rmsg = nil
       unless result then
@@ -32,6 +41,7 @@ module Xampl
 #        end
 #        STDOUT.puts "---------"
       end
+      raise exception if exception
       return rmsg
     end
 
@@ -344,7 +354,6 @@ module Xampl
     end
 
     def done_sync_write
-#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] #{ @filename }"
       begin
         note_errors("TC[[#{ @filename }]]:: sync error in done_sync_write: %s\n") do
           @tc_db.sync
