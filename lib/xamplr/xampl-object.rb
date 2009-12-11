@@ -128,12 +128,22 @@ module Xampl
       return true
     end
 
+    def indexed_by
+      nil
+    end
+
     def to_s
-      self.to_xml
+      if self.persisted? then
+        "<<#{ self.class.name } #{ self.object_id } [#{ self.get_the_index }]#{ @is_changed ? ' DIRTY' : ''}>>" 
+      elsif self.indexed_by then
+        "<<#{ self.class.name } #{ self.object_id } [#{ self.get_the_index }]>>"
+      else
+        "<<#{ self.class.name } #{ self.object_id }>>"
+      end
     end
 
     def inspect
-      self.to_xml
+      self.to_s
     end
 
     def to_ruby(mentions=nil)

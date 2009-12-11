@@ -58,6 +58,10 @@ module Xampl
       end
     end
 
+    def changed?
+      @is_changed = true
+    end
+
     def changed
 #      puts "CHANGED: is_changed #{@is_changed} xampl #{self}"
       unless Xampl.persister then
