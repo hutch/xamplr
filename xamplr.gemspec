@@ -2,12 +2,14 @@
 
 Gem::Specification.new do |s|
   s.name = %q{xamplr}
-  s.version = "1.3.14"
+  s.version = "1.4.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bob Hutchison"]
-  s.date = %q{2009-06-26}
+  s.date = %q{2009-12-11}
+  s.default_executable = %q{xampl-gen}
   s.email = %q{hutch@recursive.ca}
+  s.executables = ["xampl-gen"]
   s.extra_rdoc_files = [
     "LICENSE",
      "README.rdoc",
@@ -24,6 +26,32 @@ Gem::Specification.new do |s|
      "README.rdoc.orig",
      "Rakefile",
      "VERSION.yml",
+     "bin/xampl-gen",
+     "docs/intro/.gitignore",
+     "docs/intro/example1/example1.rb",
+     "docs/intro/example1/xml/hello.xml",
+     "docs/intro/example2/example2.rb",
+     "docs/intro/example2/project-generator.rb",
+     "docs/intro/example2/xml/hello.xml",
+     "docs/intro/example3/example3.rb",
+     "docs/intro/example3/example3a.rb",
+     "docs/intro/example3/generated.png",
+     "docs/intro/example3/grab-yuml.rb",
+     "docs/intro/example3/greeter.rb",
+     "docs/intro/example3/greeting.rb",
+     "docs/intro/example3/project-generator.rb",
+     "docs/intro/example3/xml/greeter.xml",
+     "docs/intro/example4/example4.rb",
+     "docs/intro/example4/example4a.rb",
+     "docs/intro/example4/grab-yuml.rb",
+     "docs/intro/example4/greeter.rb",
+     "docs/intro/example4/greeting.rb",
+     "docs/intro/example4/project-generator.rb",
+     "docs/intro/example4/xml/greeter.xml",
+     "docs/intro/grab-yuml.rb",
+     "docs/intro/project-generator.rb",
+     "docs/intro/xampl.lyx",
+     "docs/intro/xampl.pdf",
      "examples/employees/final-xampl/xampl-gen.rb",
      "examples/employees/final-xampl/xml/ddd-final-xampl.xml",
      "examples/employees/final/xampl-gen.rb",
@@ -51,8 +79,9 @@ Gem::Specification.new do |s|
      "examples/employees/yuml-diagrams/yuml-simplified.txt",
      "examples/employees/yuml-diagrams/yuml-with-mixins.txt",
      "examples/employees/yuml-diagrams/yuml.txt",
+     "examples/hobbies/Makefile",
      "examples/hobbies/hobbies.rb",
-     "examples/hobbies/xampl-gen.rb",
+     "examples/hobbies/project-generator.rb",
      "examples/hobbies/xml/hobby.xml",
      "examples/hobbies/xml/people.xml",
      "examples/random-people-shared-addresses/.gitignore",
@@ -100,6 +129,10 @@ Gem::Specification.new do |s|
      "examples/tokyo-cabinet-experimental/expt.rb",
      "examples/tokyo-cabinet-experimental/xampl-gen.rb",
      "examples/tokyo-cabinet-experimental/xml/tcx.xml",
+     "examples/write-testing/README",
+     "examples/write-testing/RESULTS.home",
+     "examples/write-testing/RESULTS.raconteur",
+     "examples/write-testing/write-speed-test.rb",
      "lib/xampl-generator.rb",
      "lib/xampl.rb",
      "lib/xamplr-generator.rb",
@@ -134,6 +167,9 @@ Gem::Specification.new do |s|
      "lib/xamplr/persisters/in-memory.rb",
      "lib/xamplr/persisters/simple.rb",
      "lib/xamplr/persisters/tokyo-cabinet.rb",
+     "lib/xamplr/persisters/tokyo-cabinet.rb.1-DB",
+     "lib/xamplr/persisters/tokyo-cabinet.rb.N-DB",
+     "lib/xamplr/persisters/tokyo-cabinet.rb.NICE-TRY",
      "lib/xamplr/simpleTemplate/danger.rx",
      "lib/xamplr/simpleTemplate/obsolete/input-c.r4",
      "lib/xamplr/simpleTemplate/obsolete/play.r6.txt",
@@ -182,6 +218,7 @@ Gem::Specification.new do |s|
      "lib/xamplr/version.rb",
      "lib/xamplr/visitor.rb",
      "lib/xamplr/visitors.rb",
+     "lib/xamplr/xampl-cl-gen.rb",
      "lib/xamplr/xampl-generator.rb",
      "lib/xamplr/xampl-hand-generated.rb",
      "lib/xamplr/xampl-module.rb",
@@ -197,6 +234,13 @@ Gem::Specification.new do |s|
      "lib/xamplr/xml/uche.xml",
      "lib/xamplr/yEd-sample.graphml",
      "lib/xamplr/yuml-out.rb",
+     "regression/tc-indexes-crossing-pid-boundaries/Makefile",
+     "regression/tc-indexes-crossing-pid-boundaries/bad-idea.rb",
+     "regression/tc-indexes-crossing-pid-boundaries/fail-badly.rb",
+     "regression/tc-indexes-crossing-pid-boundaries/fail.rb",
+     "regression/tc-indexes-crossing-pid-boundaries/fucking-bad-idea.rb",
+     "regression/tc-indexes-crossing-pid-boundaries/setup.rb",
+     "regression/tc-indexes-crossing-pid-boundaries/xml/bad-idea.xml",
      "regression/tightly-nested-mutual-mentions/Makefile",
      "regression/tightly-nested-mutual-mentions/build.rb",
      "regression/tightly-nested-mutual-mentions/load.rb",
@@ -210,7 +254,7 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{xampl}
-  s.rubygems_version = %q{1.3.4}
+  s.rubygems_version = %q{1.3.5}
   s.summary = %q{xamplr is the ruby version of xampl}
   s.test_files = [
     "examples/employees/final/xampl-gen.rb",
@@ -218,7 +262,7 @@ Gem::Specification.new do |s|
      "examples/employees/first/xampl-gen.rb",
      "examples/employees/twist/xampl-gen.rb",
      "examples/hobbies/hobbies.rb",
-     "examples/hobbies/xampl-gen.rb",
+     "examples/hobbies/project-generator.rb",
      "examples/random-people/batch-load-users.rb",
      "examples/random-people/optimise.rb",
      "examples/random-people/people.rb",
@@ -250,7 +294,8 @@ Gem::Specification.new do |s|
      "examples/tokyo-cabinet-experimental/expt-query3.rb",
      "examples/tokyo-cabinet-experimental/expt-reader.rb",
      "examples/tokyo-cabinet-experimental/expt.rb",
-     "examples/tokyo-cabinet-experimental/xampl-gen.rb"
+     "examples/tokyo-cabinet-experimental/xampl-gen.rb",
+     "examples/write-testing/write-speed-test.rb"
   ]
 
   if s.respond_to? :specification_version then
