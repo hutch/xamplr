@@ -452,6 +452,7 @@ module Xampl
       data = represent(xampl, mentions)
 
       #get rid of any supplimentary indexes associated with this xampl object
+      # TODO -- This can be slow
       query = TableQuery.new(@tc_db)
       query.add_condition('xampl-from', :equals, place)
       note_errors("TC[[#{ @filename }]]:: failed to remove from mentions, error: %s\n") do
@@ -464,6 +465,7 @@ module Xampl
         query.searchout
       end
 
+      # TODO -- This can be slow
       mentions.each do | mention |
         mention_place = File.join(mention.class.name.split("::"), mention.get_the_index)
         #TODO -- will repeadedly changing a persisted xampl object fragment the TC db?
