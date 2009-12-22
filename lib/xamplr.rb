@@ -31,6 +31,7 @@ module Xampl
   require 'xamplr/visitor'
   require 'xamplr/persist-to-xml'
   require 'xamplr/visitors'
+  require 'xamplr/iterator'
 
 end
 
