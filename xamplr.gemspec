@@ -10,11 +10,11 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bob Hutchison"]
   s.date = %q{2009-12-27}
+  s.description = %q{xamplr is the ruby version of xampl.}
   s.email = %q{hutch@recursive.ca}
   s.extra_rdoc_files = [
     "LICENSE",
-     "README.rdoc",
-     "README.rdoc.orig"
+     "README.md"
   ]
   s.files = [
     ".document",
@@ -23,8 +23,7 @@ Gem::Specification.new do |s|
      "COPYING",
      "LICENSE",
      "Makefile",
-     "README.rdoc",
-     "README.rdoc.orig",
+     "README.md",
      "Rakefile",
      "VERSION.yml",
      "lib/xampl.rb",
@@ -106,7 +105,6 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/hutch/xamplr}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubyforge_project = %q{xampl}
   s.rubygems_version = %q{1.3.5}
   s.summary = %q{xamplr is the ruby version of xampl}
 
