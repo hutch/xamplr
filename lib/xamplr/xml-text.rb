@@ -23,9 +23,9 @@ module Xampl
         pp.attributeCount.times do |i|
           @text << " " << pp.attributeQName(i) << "='" << pp.attributeValue(i) << "'"
 
-          prefix = pp.attributePrefix(i)
+          prefix = pp.attribute_prefix(i)
           if prefix then
-            @prefix_ns_map[prefix] = pp.attributeNamespace(i)
+            @prefix_ns_map[prefix] = pp.attribute_namespace(i)
           end
         end
       else
@@ -34,9 +34,9 @@ module Xampl
         pp.attributeCount.times do |i|
           @first_text << " " << pp.attributeQName(i) << "='" << pp.attributeValue(i) << "'"
 
-          prefix = pp.attributePrefix(i)
+          prefix = pp.attribute_prefix(i)
           if prefix then
-            @prefix_ns_map[prefix] = pp.attributeNamespace(i)
+            @prefix_ns_map[prefix] = pp.attribute_namespace(i)
           end
         end
         @text = ""
@@ -113,5 +113,5 @@ module Xampl
       @first_text = nil
     end
   end
-  
+
 end

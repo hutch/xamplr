@@ -94,10 +94,10 @@ module XamplGenerator
       element.nstag = nstag
       element.empty = is_empty
 
-      @xpp.attributeName.each_index do |i|
+      @xpp.attribute_name.each_index do |i|
         attribute = Attribute.new
-        attribute.name = @xpp.attributeName[i]
-        attribute.namespace = @xpp.attributeNamespace[i]
+        attribute.name = @xpp.attribute_name[i]
+        attribute.namespace = @xpp.attribute_namespace[i]
         element.add_attribute(attribute)
       end
 

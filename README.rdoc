@@ -42,5 +42,5 @@ relaxed.
 
 Copyright Info:
 
-Copyright (c) 2009 Bob Hutchison. See LICENSE and COPYING for details.
+Copyright (c) 2002-2010 Bob Hutchison.
 
