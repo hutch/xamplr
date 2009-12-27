@@ -6,10 +6,10 @@ begin
   Jeweler::Tasks.new do |gem|
     gem.name = "xamplr"
     gem.summary = %Q{xamplr is the ruby version of xampl}
+    gem.description = %Q{xamplr is the ruby version of xampl.}
     gem.email = "hutch@recursive.ca"
     gem.homepage = "http://github.com/hutch/xamplr"
     gem.authors = ["Bob Hutchison"]
-    gem.rubyforge_project = 'xampl'
 
     gem.add_dependency('xamplr-pp', '>=1.2.0')
     gem.add_dependency('libxml-ruby', '>=1.1.3')
