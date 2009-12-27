@@ -10,3 +10,4 @@ pkg
 generated-elements.*
 xampl_generated_code
 repo
+*.gem

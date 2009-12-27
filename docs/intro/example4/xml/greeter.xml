@@ -1,6 +1,0 @@
-<greeter xmlns='com.xampl.intro.example3'>
-    <greeting id='greeting name'>
-        Hello $$$, how are you?
-    </greeting>
-    <who name='world'/>
-</greeter>
