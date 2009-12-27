@@ -35,20 +35,10 @@ Gem::Specification.new do |s|
      "lib/xamplr/exceptions.rb",
      "lib/xamplr/from-xml-orig.rb",
      "lib/xamplr/from-xml.rb",
-     "lib/xamplr/gen-elements.xml",
-     "lib/xamplr/gen.elements.xml",
-     "lib/xamplr/generate-elements.rb.split",
-     "lib/xamplr/generator.rb.split",
-     "lib/xamplr/graphml-out.rb.split",
-     "lib/xamplr/handwritten.split/example.rb",
-     "lib/xamplr/handwritten.split/hand-example.rb",
-     "lib/xamplr/handwritten.split/test-handwritten.rb",
      "lib/xamplr/indexed-array.rb",
      "lib/xamplr/iterator.rb",
      "lib/xamplr/mixins.rb",
-     "lib/xamplr/my.gen.elements.xml",
      "lib/xamplr/notifications.rb",
-     "lib/xamplr/obsolete/fsdb.rb",
      "lib/xamplr/persist-to-xml.rb",
      "lib/xamplr/persistence.rb",
      "lib/xamplr/persistence.rb.more_thread_safe",
@@ -86,8 +76,6 @@ Gem::Specification.new do |s|
      "lib/xamplr/version.rb",
      "lib/xamplr/visitor.rb",
      "lib/xamplr/visitors.rb",
-     "lib/xamplr/xampl-cl-gen.rb.split",
-     "lib/xamplr/xampl-hand-generated.rb.split",
      "lib/xamplr/xampl-module.rb",
      "lib/xamplr/xampl-object-internals.rb",
      "lib/xamplr/xampl-object.rb",
@@ -99,8 +87,6 @@ Gem::Specification.new do |s|
      "lib/xamplr/xml/example.xml",
      "lib/xamplr/xml/options.xml",
      "lib/xamplr/xml/uche.xml",
-     "lib/xamplr/yEd-sample.graphml",
-     "lib/xamplr/yuml-out.rb.split",
      "regression/tc-indexes-crossing-pid-boundaries/Makefile",
      "regression/tc-indexes-crossing-pid-boundaries/bad-idea.rb",
      "regression/tc-indexes-crossing-pid-boundaries/fail-badly.rb",
@@ -129,14 +115,14 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<xamplr-pp>, [">= 1.1.2"])
+      s.add_runtime_dependency(%q<xamplr-pp>, [">= 1.2.0"])
       s.add_runtime_dependency(%q<libxml-ruby>, [">= 1.1.3"])
     else
-      s.add_dependency(%q<xamplr-pp>, [">= 1.1.2"])
+      s.add_dependency(%q<xamplr-pp>, [">= 1.2.0"])
       s.add_dependency(%q<libxml-ruby>, [">= 1.1.3"])
     end
   else
-    s.add_dependency(%q<xamplr-pp>, [">= 1.1.2"])
+    s.add_dependency(%q<xamplr-pp>, [">= 1.2.0"])
     s.add_dependency(%q<libxml-ruby>, [">= 1.1.3"])
   end
 end
