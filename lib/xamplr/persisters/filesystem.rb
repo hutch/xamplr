@@ -1,7 +1,5 @@
 module Xampl
 
-  require 'xamplr/version'
-
   require "fileutils"
   require "xamplr/persisters/caching"
 
@@ -17,12 +15,6 @@ module Xampl
 
     def kind
       FilesystemPersister.kind
-    end
-
-    def version(stream)
-      catch(:refuse_to_version) do
-        Version.new(@repo_name, @repo_root).make(stream)
-      end
     end
 
     def write(xampl)

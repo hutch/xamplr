@@ -83,7 +83,6 @@ module Xampl
     end
 
     def write_to_cache(xampl)
-      # puts "WRITE TO CACHE (#{xampl})"
       return Xampl.store_in_cache(@cache, xampl, self) { xampl }
     end
 
@@ -92,9 +91,10 @@ module Xampl
       if xampl then
         if target and target != xampl then
 
-          puts "#{File.basename(__FILE__)} #{__LINE__} CACHE CONFLICT:: klass: #{ klass }, pid: #{ pid }, target: #{ target }, cached: #{ xampl }"
-          dump(@cache)
-          caller(0).each { | trace | puts "  #{trace}"}
+          #TODO -- report this better
+          #puts "#{File.basename(__FILE__)} #{__LINE__} CACHE CONFLICT:: klass: #{ klass }, pid: #{ pid }, target: #{ target }, cached: #{ xampl }"
+          #dump(@cache)
+          #caller(0).each { | trace | puts "  #{trace}"}
 
           target.invalidate
           raise XamplException.new(:cache_conflict)
@@ -147,12 +147,12 @@ module Xampl
         #puts "ABSTRACT_READ[#{__LINE__}]:: klass: #{klass} pid: #{pid} target: #{target}"
         xampl = realise(representation, target)
         return nil unless xampl
-      rescue Exception => e
-        puts "FAILED TO READ -- persister: #{name} klass: #{klass} pid: #{pid} target: #{target}"
-        puts "Exception: #{e}"
-        print e.backtrace.join("\n")
-        #sleep 10
-        raise e
+      rescue => e
+        raise RuntimeError, "FAILED TO READ -- persister: #{name} klass: #{klass} pid: #{pid} target: #{target}\n#{ e }", e.backtrace
+        #puts "FAILED TO READ -- persister: #{name} klass: #{klass} pid: #{pid} target: #{target}"
+        #puts "Exception: #{e}"
+        #print e.backtrace.join("\n")
+        #raise e
       end
 
       #      puts "#{File.basename(__FILE__)} #{__LINE__} STORE IN CACHE:: xampl: #{xampl }, persister: #{ self }"

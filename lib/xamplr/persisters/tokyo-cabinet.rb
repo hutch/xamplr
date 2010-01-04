@@ -26,20 +26,10 @@ module Xampl
       unless result then
         rmsg = sprintf(msg, @tc_db.errmsg(@tc_db.ecode))
         STDERR.puts "NOTE: TokyoCabinet Error!"
-        STDERR.printf(rmsg)
+        STDERR.puts(rmsg)
         STDERR.puts "---------"
-        caller(0).each do |trace|
-          STDERR.puts(trace)
-        end
+        STDERR.puts caller(0)
         STDERR.puts "---------"
-
-#        STDOUT.puts "NOTE: TokyoCabinet Error!"
-#        STDOUT.printf(rmsg)
-#        STDOUT.puts "---------"
-#        caller(0).each do |trace|
-#          STDOUT.puts(trace)
-#        end
-#        STDOUT.puts "---------"
       end
       raise exception if exception
       return rmsg
@@ -82,6 +72,7 @@ module Xampl
         end
         @tc_db = nil
       rescue => e
+        #TODO -- why do this???
         puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] OH CRAP!!! #{ e }"
       end
     end
@@ -150,6 +141,7 @@ module Xampl
 #          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] NO SELF SYNC?? [#{ @currently_syncing }] --> db: #{ @tc_db.class.name }"
           self.sync unless @currently_syncing
         rescue => e
+          #TODO -- why do this
           puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] OH CRAP!!! #{ e }"
         ensure
           note_errors("TC[[#{ @filename }]]:: close error: %s\n") do
@@ -388,11 +380,12 @@ module Xampl
         msg = note_errors("TC[[#{ @filename }]]:: tranabort error: %s\n") do
           @tc_db.tranabort
         end
-        puts "------------------------------------------------------------------------"
-        puts "TokyoCabinetPersister Error:: #{ msg }/#{ e }"
-        puts e.backtrace.join("\n")
-        puts "------------------------------------------------------------------------"
-        raise "TokyoCabinetPersister Error:: #{ msg }/#{ e }"
+        #puts "------------------------------------------------------------------------"
+        #puts "TokyoCabinetPersister Error:: #{ msg }/#{ e }"
+        #puts e.backtrace.join("\n")
+        #puts "------------------------------------------------------------------------"
+        #raise "TokyoCabinetPersister Error:: #{ msg }/#{ e }"
+        raise RuntimeError, "TokyoCabinetPersister Error:: #{ msg }/#{ e }", e.backtrace
       else
 #        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] COMMIT"
         note_errors("TC[[#{ @filename }]]:: trancommit error: %s\n") do
@@ -519,7 +512,7 @@ module Xampl
         secondary_descriptions = [] unless secondary_descriptions
         secondary_descriptions << { 'scheduled-delete-at' => xampl.scheduled_for_deletion_at }
       elsif xampl.scheduled_for_deletion_at then
-        puts "#{ __FILE__ }:#{ __LINE__ } HOW TO DO THIS without violating xampl's change rules????? "
+        #TODO -- puts "#{ __FILE__ }:#{ __LINE__ } HOW TO DO THIS without violating xampl's change rules????? "
         #xampl.scheduled_for_deletion_at = nil
       end
 

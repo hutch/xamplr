@@ -1,0 +1,150 @@
+x rubytypes.rb:class Class
+  rubytypes.rb:class Object
+  rubytypes.rb:class Hash
+  rubytypes.rb:class Struct
+  rubytypes.rb:class Array
+  rubytypes.rb:class Exception
+  rubytypes.rb:class String
+  rubytypes.rb:class Symbol
+  rubytypes.rb:class Range
+  rubytypes.rb:class Regexp
+  rubytypes.rb:class Time
+  rubytypes.rb:class Date
+  rubytypes.rb:class Integer
+  rubytypes.rb:class Float
+  rubytypes.rb:class Rational
+  rubytypes.rb:class Complex
+  rubytypes.rb:class TrueClass
+  rubytypes.rb:class FalseClass
+x rubytypes.rb:class NilClass 
+  
+require 'yaml'
+require 'date'
+
+def fmttime(t)
+            tz = "Z"
+            # from the tidy Tobias Peters <t-peters@gmx.de> Thanks!
+            unless t.utc?
+                utc_same_instant = t.dup.utc
+                utc_same_writing = Time.utc(t.year,t.month,t.day,t.hour,t.min,t.sec,t.usec)
+                difference_to_utc = utc_same_writing - utc_same_instant
+                if (difference_to_utc < 0) 
+                    difference_sign = '-'
+                    absolute_difference = -difference_to_utc
+                else
+                    difference_sign = '+'
+                    absolute_difference = difference_to_utc
+                end
+                difference_minutes = (absolute_difference/60).round
+                tz = "%s%02d:%02d" % [ difference_sign, difference_minutes / 60, difference_minutes % 60]
+            end
+            standard = t.strftime( "%Y-%m-%d %H:%M:%S" )
+            standard += ".%06d" % [t.usec] if t.usec.nonzero?
+            standard += " %s" % [tz]
+            standard
+end
+
+def rep(h)
+  h.each do | k, v |
+    puts "#{ k }: #{ v }/#{ v.class }"
+  end
+end
+
+class Play
+  def initialize(x)
+    @x = x
+  end
+  def to_s
+    "#<Play:#{ object_id }> :: x: #{ @x }/#{ @x.class }"
+  end
+end
+
+def go
+  h={}
+  h['time'] = Time.now
+  #h['date'] = Date.now
+  h['datetime'] = DateTime.now
+  h['int'] = 10
+  h['bigint'] = 1234567890987654321
+  h['float'] = 1.23
+  h['play'] = Play.new(Time.now)
+
+
+  rep(h)
+
+  y = YAML.dump(h)
+  puts "YAML...."
+  puts y
+  puts "....YAML"
+
+  hh = YAML.load(y)
+  rep(hh)
+
+
+  puts
+  puts
+  puts 'play a little....'
+
+  parser = YAML::Syck::Parser.new
+  ss = YAML.dump(Time.now)
+
+  puts "this should come back as a time object"
+  tt = parser.load( ss )
+  puts "tt: #{ tt }/#{ tt.class }"
+  puts "ss : [[#{ ss }]]"
+
+
+
+  puts "try to reproduce the effect"
+  #sss = Time.now.to_yaml
+  #sss = "--- #{ Time.now }\n"
+
+  sss = "--- 2009-12-31 09:57:32.810439 -05:00\n"
+  puts "sss: [[#{ sss }]]"
+  ttt = parser.load( sss )
+  puts "ttt: #{ ttt }/#{ ttt.class } <<<--- should be a Time"
+
+  sss = "--- 2009-12-31 09:57:32 -05:00\n"
+  puts "sss: [[#{ sss }]]"
+  ttt = parser.load( sss )
+  puts "ttt: #{ ttt }/#{ ttt.class } <<<--- should be a Time"
+
+  sss = "--- #{ Time.now }\n"
+  puts "sss: [[#{ sss }]]"
+  ttt = parser.load( sss )
+  puts "ttt: #{ ttt }/#{ ttt.class } <<<--- should be a Time"
+
+
+puts
+puts
+puts
+
+  p = Play.new(Time.now)
+  puts p.to_s
+  pp = p.to_yaml
+  puts "pp: [[#{ pp }]]"
+  ppp = parser.load(pp)
+  puts ppp.to_s
+
+  begin
+    puts "what if it isn't yaml?"
+    x = parser.load("hello world")
+    puts "x: [[#{x}]]/#{ x.class }"
+    x = parser.load("1234567890987654321")
+    puts "x: [[#{x}]]/#{ x.class }"
+    x = parser.load(Time.now.to_s)
+    puts "x: [[#{x}]]/#{ x.class }"
+    x = parser.load("2009-12-31 09:57:32 -05:00")
+    puts "x: [[#{x}]]/#{ x.class }"
+    x = parser.load(fmttime(Time.now))
+    puts "x: [[#{x}]]/#{ x.class } <<< uses the fmttime thing, should be a Time"
+  rescue => e
+    puts e
+    puts e.backtrace
+  end
+
+
+end
+
+go
+

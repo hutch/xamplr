@@ -23,7 +23,6 @@ module Xampl
   end
 
   def Xampl.register_persister_kind(klass)
-    #puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] REGISTER: #{ klass.kind } --> #{ klass }"
     @@persister_kinds[klass.kind] = klass
   end
 
@@ -98,8 +97,6 @@ module Xampl
     end
 
     unless @@persister then
-#      puts "CREATE PERSISTER #{name}, format: #{format}, kind: #{kind}"
-#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] kinds available: #{ @@persister_kinds.keys.inspect }"
       @@persister = @@persister_kinds[kind].new(name, format)
       if (nil != name) then
         @@known_persisters[name] = @@persister
@@ -209,8 +206,7 @@ module Xampl
               # we get here if the transaction block finishes early
               if exception then
                 # the early finish was caused by an exception
-                puts "ROLLBACK(#{__LINE__}):: #{exception}" if rollback and @@verbose_transactions
-                raise exception
+                raise RuntimeError, "ROLLBACK(#{__LINE__}):: #{exception}", exception.backtrace
               else
                 # How could we have arrived at this point???
                 # Well, I don't know all the reasons, but the ones I do know are:
@@ -296,10 +292,10 @@ module Xampl
           if 0 == @changed.size then
             @changed = original_changed
 
-            if exception then
-              puts "ROLLBACK(#{__LINE__}):: #{exception}"
-              print exception.backtrace.join("\n") if exception
-            end
+            #if exception then
+            #  puts "ROLLBACK(#{__LINE__}):: #{exception}"
+            #  print exception.backtrace.join("\n") if exception
+            #end
 
             #no change so don't bother with rollback
 #            if rollback then
@@ -307,11 +303,11 @@ module Xampl
 #            end
             @@persister = initial_persister
           else
-            puts "CHANGED COUNT: #{@changed.size}"
+            #puts "CHANGED COUNT: #{@changed.size}"
             @changed = original_changed
 
-            puts "ROLLBACK(#{__LINE__}) #{exception}" if rollback
-            print exception.backtrace.join("\n")
+            #puts "ROLLBACK(#{__LINE__}) #{exception}" if rollback
+            #print exception.backtrace.join("\n")
             Xampl.rollback
 
             @@persister = initial_persister
@@ -362,14 +358,14 @@ module Xampl
         if 0 == @changed.size then
           @changed = original_changed
 
-          puts "ROLLBACK(#{__LINE__})" if rollback
+          #puts "ROLLBACK(#{__LINE__})" if rollback
           Xampl.rollback if rollback
           @@persister = initial_persister
         else
-          puts "CHANGED COUNT: #{@changed.size}"
+          #puts "CHANGED COUNT: #{@changed.size}"
           @changed = original_changed
 
-          puts "ROLLBACK(#{__LINE__})" if rollback
+          #puts "ROLLBACK(#{__LINE__})" if rollback
           Xampl.rollback
 
           @@persister = initial_persister
@@ -418,10 +414,6 @@ module Xampl
     #raise XamplException.new(:live_across_rollback) if @@persister.rolled_back
     raise NoActivePersister unless @@persister
     @@persister.sync
-  end
-
-  def Xampl.version(stream)
-    @@persister.version(stream) if nil != @@persister
   end
 
   def Xampl.sync_all

@@ -1,4 +1,3 @@
-
 module Xampl
 
   module XamplObject
@@ -134,7 +133,7 @@ module Xampl
 
     def to_s
       if self.persisted? then
-        "<<#{ self.class.name } #{ self.object_id } [#{ self.get_the_index }]#{ @is_changed ? ' DIRTY' : ''}>>" 
+        "<<#{ self.class.name } #{ self.object_id } [#{ self.get_the_index }]#{ @is_changed ? ' DIRTY' : ''}>>"
       elsif self.indexed_by then
         "<<#{ self.class.name } #{ self.object_id } [#{ self.get_the_index }]>>"
       else
@@ -175,18 +174,9 @@ module Xampl
 
     def XamplObject.from_string(string, target=nil)
       return FromXML.new.parse_string(string, true, false, target)
-
-      #       if '<' == string[0] then
-      #         puts "XO.from_string XML ------------------------------------------------------"
-      #         return FromXML.new.parse_string(string, true, false, target)
-      #       else
-      #         puts "XO.from_string RUBY ------------------------------------------------------"
-      #         return XamplObject.from_ruby(string, target)
-      #       end
     end
 
     def XamplObject.recover_from_string(string)
-      #       return FromXML.new.realise_string(string)
       return FromXML.new(true).parse_string(string, true, false, nil)
     end
 
@@ -225,11 +215,25 @@ module Xampl
     ################################################################################################
     ################################################################################################
 
-
-
     def XamplObject.realise_from_xml_string(xml_string, target=nil, tokenise=true)
       xampl = FromXML.new.realise_string(xml_string, tokenise, target)
       return xampl
+    end
+
+    def new_from_xml_string(xml_string, id=nil, tokenise=true)
+      thing = FromXML.new.parse_string(xml_string, tokenise)
+      if thing.indexed_by then
+        thing.set_the_index(id) if id
+        self << thing if thing.get_the_index
+      end
+    end
+
+    def new_from_xml_file(file_name, id=nil, tokenise=true)
+      thing = FromXML.new.parse(file_name, tokenise)
+      if thing.indexed_by then
+        thing.set_the_index(id) if id
+        self << thing if thing.get_the_index
+      end
     end
 
     def XamplObject.from_xml_string(xml_string, tokenise=true)
@@ -241,13 +245,13 @@ module Xampl
     end
   end
 
-    def Xampl.from_xml_string(xml_string, tokenise=true)
-      return FromXML.new.parse_string(xml_string, tokenise)
-    end
+  def Xampl.from_xml_string(xml_string, tokenise=true)
+    return FromXML.new.parse_string(xml_string, tokenise)
+  end
 
-    def Xampl.from_xml_file(file_name, tokenise=true)
-      return FromXML.new.parse(file_name, tokenise)
-    end
+  def Xampl.from_xml_file(file_name, tokenise=true)
+    return FromXML.new.parse(file_name, tokenise)
+  end
 
 end
 

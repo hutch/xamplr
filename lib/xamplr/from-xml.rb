@@ -92,10 +92,8 @@ module Xampl
         setup_parse(filename, tokenise_content, is_realising)
         element, ignore = parse_element
         return element
-      rescue Exception => e
-        puts "trouble parsing file: '#{filename}'"
-        puts "Exception: #{e}"
-        raise
+      rescue => e
+        raise RuntimeError, "trouble parsing file: '#{filename}' -- #{ e }", e.backtrace
       end
     end
 
@@ -108,10 +106,8 @@ module Xampl
         setup_parse_string(string, tokenise_content, is_realising)
         element, ignore = parse_element(nil, target)
         return element
-      rescue Exception => e
-        puts "trouble parsing string: '#{string}'"
-        puts "Exception: #{e}"
-        raise
+      rescue => e
+        raise RuntimeError, "trouble parsing string: '#{string}' -- #{ e }", e.backtrace
       end
     end
 
@@ -263,8 +259,10 @@ TODO -- can these ever happen?
                   child = element.note_add_child(child, @is_realising) if element
                   child.append_to(element) if element and child
                 when XMLText then
+                  #TODO -- get rid of this puts
                   puts "UNRECOGNISED Well-formed XML: #{child.to_s[0..25]}..."
                 else
+                  #TODO -- get rid of this puts
                   puts "WHAT IS THIS??? #{child.class.name}"
               end
             end
@@ -358,11 +356,11 @@ TODO -- can these ever happen?
       #describe_current_element_type
 
 #TODO -- get rid of this, it is for debugging only
+#TODO -- really?
 begin
       okay = @reader.read
 rescue => e
-  puts "WHAT???? #{ e }"
-  raise e
+  raise RuntimeError, "WHAT?? -- #{ e }", e.backtrace
 end
 
       @just_opened_an_element = start_element?

@@ -146,12 +146,6 @@ module Xampl
       end
     end
 
-    def version(stream)
-      raise XamplException.new(:unimplemented)
-      # catch(:refuse_to_version) do
-      # end
-    end
-
     def write(xampl)
       raise XamplException.new(:unimplemented)
     end

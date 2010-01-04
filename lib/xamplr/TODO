@@ -1,2 +1,22 @@
--- use the libxml form of escape attrs (look for apos)
+
+-- use nokogiri, libxml, then xamplr-pp if installed
+-- type experiments
+-- mark the repo with creation parameters (so we don't loose them. We
+   are setting *defaults* and then using the *defaults* to re-open a
+   repo -- this is clearly wrong if the defaults are changed, or the
+   persister types are deliberately mixed (which is an intended thing
+   to support and was *really* handy in Java)
+-- support conversions between types:
+     - fs -> tokyo  (no loss of information)
+     - tokyo -> fs  (currently all indexing will be lost)
+     - fs, tokyo -> in-memory (well, no, won't do this)
+-- read-through support, especially handy for in-memory. Makes sense for
+   fs and tokyo repos
+-- tokyo tyrant persisters
+-- add NO-CACHE to tokyo persisters (theory is that they cache at a certain
+   level (below object level) and that this will allow sharing of the DB a
+   little better -- still don't know about multiple writers to the same repo...
+   can tyrant help here.
+-- mongo, and a couple of others might be interesting
+-- what about SQL dbs? Maybe an SQL or DataMapper version??
 
