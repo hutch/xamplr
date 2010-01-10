@@ -25,6 +25,7 @@ module Xampl
       @write_count = 0
       @total_write_count = 0
       @last_write_count = 0
+      @last_cache_hits = 0
       @total_sync_count = 0
       @total_rollback_count = 0
       @rolled_back = false
@@ -224,6 +225,7 @@ module Xampl
     end
 
     def sync
+      @last_sync_time = Time.now
       #raise XamplException.new(:live_across_rollback) if @rolled_back
       begin
 #        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNC changed: #{@changed.size}" if 0 < @changed.size
@@ -267,8 +269,10 @@ module Xampl
         @total_cache_hits = @total_cache_hits + @cache_hits
         @total_sync_count = @total_sync_count + 1
 
-        @read_count = 0
+        @last_cache_hits = @cache_hits
         @last_write_count = @write_count
+        @cache_hits = 0
+        @read_count = 0
         @write_count = 0
 
         self.sync_done()
@@ -278,6 +282,7 @@ module Xampl
         busy(false)
 #        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] **** SYNCING IS FALSE"
         @syncing = false
+        @last_sync_time = Time.now - @last_sync_time
       end
     end
 
@@ -300,10 +305,10 @@ module Xampl
     end
 
     def print_stats
-      printf("SYNC:: TOTAL cache_hits: %d, reads: %d, writes: %d\n",
-             @total_cache_hits, @total_read_count, @total_write_count)
-      printf("             cache_hits: %d, reads: %d, last writes: %d\n",
-             @cache_hits, @read_count, @last_write_count)
+      printf("SYNC[%s]:: TOTAL cache_hits: %d, reads: %d, writes: %d\n",
+             self.name, @total_cache_hits, @total_read_count, @total_write_count)
+      printf("             cache_hits: %d, reads: %d, writes: %d, time: %fms \n",
+             @last_cache_hits, @read_count, @last_write_count, @last_sync_time)
       printf("             syncs: %d\n", @total_sync_count)
       printf("             changed count: %d (%d)\n", count_changed, @changed.size)
       @changed.each do |thing, ignore|
