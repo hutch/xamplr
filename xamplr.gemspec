@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{xamplr}
-  s.version = "1.9.0"
+  s.version = "1.9.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bob Hutchison"]
-  s.date = %q{2009-12-27}
+  s.date = %q{2010-01-12}
   s.description = %q{xamplr is the ruby version of xampl.}
   s.email = %q{hutch@recursive.ca}
   s.extra_rdoc_files = [
@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
      "lib/xamplr/.cvsignore",
      "lib/xamplr/README-POSSIBLE-PROBLEMS",
      "lib/xamplr/TODO",
+     "lib/xamplr/TYPES.txt",
      "lib/xamplr/exceptions.rb",
      "lib/xamplr/from-xml-orig.rb",
      "lib/xamplr/from-xml.rb",
@@ -40,8 +41,6 @@ Gem::Specification.new do |s|
      "lib/xamplr/notifications.rb",
      "lib/xamplr/persist-to-xml.rb",
      "lib/xamplr/persistence.rb",
-     "lib/xamplr/persistence.rb.more_thread_safe",
-     "lib/xamplr/persistence.rb.partially_thread_safe",
      "lib/xamplr/persister.rb",
      "lib/xamplr/persisters/caches.rb",
      "lib/xamplr/persisters/caching.rb",
@@ -72,7 +71,6 @@ Gem::Specification.new do |s|
      "lib/xamplr/test-support/test.rb",
      "lib/xamplr/to-ruby.rb",
      "lib/xamplr/to-xml.rb",
-     "lib/xamplr/version.rb",
      "lib/xamplr/visitor.rb",
      "lib/xamplr/visitors.rb",
      "lib/xamplr/xampl-module.rb",
@@ -86,6 +84,12 @@ Gem::Specification.new do |s|
      "lib/xamplr/xml/example.xml",
      "lib/xamplr/xml/options.xml",
      "lib/xamplr/xml/uche.xml",
+     "regression/.gitignore",
+     "regression/parsing-namespaced-xml/Makefile",
+     "regression/parsing-namespaced-xml/README",
+     "regression/parsing-namespaced-xml/project-generator.rb",
+     "regression/parsing-namespaced-xml/simple.rb",
+     "regression/parsing-namespaced-xml/xml/simple.xml",
      "regression/tc-indexes-crossing-pid-boundaries/Makefile",
      "regression/tc-indexes-crossing-pid-boundaries/bad-idea.rb",
      "regression/tc-indexes-crossing-pid-boundaries/fail-badly.rb",
