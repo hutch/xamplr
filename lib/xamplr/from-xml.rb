@@ -136,6 +136,9 @@ module Xampl
         klass_name = "{#{namespace}}#{name}"
         klasses = FromXML.registered(klass_name)
         if (0 == klasses.size) then
+          # The class has not been registered (either it was never generated, or it was never loaded)
+#          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] @@by_ns_tag: #{ @@by_ns_tag.inspect }"
+#          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] @@by_tag: #{ @@by_tag.inspect }"
           xml_text = XMLText.new
           xml_text.build(self)
           xml_text = parent.note_adding_text_content(xml_text, @is_realising)
