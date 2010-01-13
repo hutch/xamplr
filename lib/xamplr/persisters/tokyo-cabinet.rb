@@ -98,7 +98,11 @@ module Xampl
       end
 
       note_errors("TC[[#{ @filename }]]:: open [#{ @filename }] error: %s\n") do
-        @tc_db.open(@filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB | TDB::OTSYNC ) #TDB::OTSYNC slows it down by almost 50 times
+        if Xampl.raw_persister_options[:otsync] then
+          @tc_db.open(@filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB | TDB::OTSYNC ) #TDB::OTSYNC slows it down by almost 50 times
+        else
+          @tc_db.open(@filename, TDB::OWRITER | TDB::OCREAT | TDB::OLCKNB)
+        end
       end
 
       # Don't care if there are errors (in fact, if the index exists a failure is the expected thing)
@@ -359,6 +363,9 @@ module Xampl
 
     def do_sync_write
       begin
+#@start = Time.now
+#@last = Time.now
+#puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }"
 #        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] **************************"
 #        callers = caller(0)
 #        puts "   0 #{ callers[0] }"
@@ -371,9 +378,11 @@ module Xampl
         note_errors("TC[[#{ @filename }]]:: tranbegin error: %s\n") do
           @tc_db.tranbegin
         end
+#puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
 
         @changed.each do |xampl, ignore|
           write(xampl)
+#puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
         end
       rescue => e
         msg = "no TC.abort attempted"
@@ -388,9 +397,11 @@ module Xampl
         raise RuntimeError, "TokyoCabinetPersister Error:: #{ msg }/#{ e }", e.backtrace
       else
 #        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] COMMIT"
+#puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
         note_errors("TC[[#{ @filename }]]:: trancommit error: %s\n") do
           @tc_db.trancommit
         end
+#puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
       ensure
 #      puts "               num records: #{ @tc_db.rnum() }"
         #      puts "#{ __FILE__ }:#{ __LINE__ } keys..."
@@ -401,6 +412,7 @@ module Xampl
         #      end
 
 #        close
+#puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
       end
     end
 
@@ -458,21 +470,23 @@ module Xampl
         query.searchout
       end
 
-      # TODO -- This can be slow
-      mentions.each do | mention |
-        mention_place = File.join(mention.class.name.split("::"), mention.get_the_index)
-        #TODO -- will repeadedly changing a persisted xampl object fragment the TC db?
+      if Xampl.raw_persister_options[:mentions] then
+        # TODO -- This can be slow
+        mentions.each do | mention |
+          mention_place = File.join(mention.class.name.split("::"), mention.get_the_index)
+          #TODO -- will repeadedly changing a persisted xampl object fragment the TC db?
 
-        pk = @tc_db.genuid
-        mention_hash = {
-                'xampl-from' => place,
-                'mentioned_class' => xampl.class.name,
-                'pid' => xampl.get_the_index,
-                'xampl-to' => mention_place
-        }
+          pk = @tc_db.genuid
+          mention_hash = {
+                  'xampl-from' => place,
+                  'mentioned_class' => xampl.class.name,
+                  'pid' => xampl.get_the_index,
+                  'xampl-to' => mention_place
+          }
 
-        note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
-          @tc_db.put(pk, mention_hash)
+          note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
+            @tc_db.put(pk, mention_hash)
+          end
         end
       end
 
