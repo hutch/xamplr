@@ -43,7 +43,9 @@ module Xampl
     end
 
     def FromXML.registered(name)
+      #puts "registered by ns tag: #{ @@by_ns_tag.keys.sort.inspect }"
       klass = @@by_ns_tag[name]
+      #puts "registered by tag: #{ @@by_tag.keys.sort.inspect }"
       klass = @@by_tag[name] unless klass
       klass = [] unless klass
       return klass
@@ -137,6 +139,7 @@ module Xampl
         klasses = FromXML.registered(klass_name)
         if (0 == klasses.size) then
           # The class has not been registered (either it was never generated, or it was never loaded)
+          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] Don't know about class name: #{ klass_name }"
 #          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] @@by_ns_tag: #{ @@by_ns_tag.inspect }"
 #          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] @@by_tag: #{ @@by_tag.inspect }"
           xml_text = XMLText.new

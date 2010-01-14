@@ -113,9 +113,11 @@ module Xampl
       $numeric_indexes.each do | index_name |
         @tc_db.setindex(index_name, TDB::ITDECIMAL | TDB::ITKEEP)
       end
+
+      optimise
     end
 
-    def optimise(opts)
+    def optimise(opts={})
       return unless @tc_db
 
       if opts[:indexes_only] then
@@ -365,7 +367,7 @@ module Xampl
       begin
 #@start = Time.now
 #@last = Time.now
-#puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }"
+#puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
 #        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] **************************"
 #        callers = caller(0)
 #        puts "   0 #{ callers[0] }"
@@ -449,12 +451,16 @@ module Xampl
 
     def write(xampl)
       raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index
+#@start = Time.now
+#@last = Time.now
+#puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
 
       place_dir = xampl.class.name.split("::")
       place = File.join( place_dir, xampl.get_the_index)
       place_dir = File.join( @files_dir, place_dir )
       mentions = Set.new
       data = represent(xampl, mentions)
+#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
 
       #get rid of any supplimentary indexes associated with this xampl object
       # TODO -- This can be slow
@@ -463,12 +469,14 @@ module Xampl
       note_errors("TC[[#{ @filename }]]:: failed to remove from mentions, error: %s\n") do
         query.searchout
       end
+#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
 
       query = TableQuery.new(@tc_db)
       query.add_condition('xampl-place', :equals, place)
       note_errors("TC[[#{ @filename }]]:: failed to remove from mentions, error: %s\n") do
         query.searchout
       end
+#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
 
       if Xampl.raw_persister_options[:mentions] then
         # TODO -- This can be slow
@@ -489,6 +497,7 @@ module Xampl
           end
         end
       end
+#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
 
       xampl_hash = {
               'class' => xampl.class.name,
@@ -502,6 +511,7 @@ module Xampl
       if primary_description then
         xampl_hash = primary_description.merge(xampl_hash)
       end
+#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
 
       note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
         if Xampl.raw_persister_options[:write_through] then
@@ -520,6 +530,7 @@ module Xampl
         end
         @tc_db.put(place, xampl_hash)
       end
+#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
 
       #TODO -- smarter regarding when to delete (e.g. mentions)
       if xampl.should_schedule_delete? and xampl.scheduled_for_deletion_at then
@@ -529,6 +540,7 @@ module Xampl
         #TODO -- puts "#{ __FILE__ }:#{ __LINE__ } HOW TO DO THIS without violating xampl's change rules????? "
         #xampl.scheduled_for_deletion_at = nil
       end
+#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
 
       if secondary_descriptions then
         xampl_hash = {
@@ -546,9 +558,11 @@ module Xampl
           end
         end
       end
+#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
 
       @write_count = @write_count + 1
       xampl.changes_accepted
+#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
       return true
     end
 

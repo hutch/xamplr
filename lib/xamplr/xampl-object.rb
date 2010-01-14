@@ -188,7 +188,12 @@ module Xampl
 
     def persist(out="", mentions=nil, rules=nil)
       persist_xml_new = PersistXML.new(out, mentions)
-      return persist_xml_new.start(self).done
+
+#      start = Time.now
+      r = persist_xml_new.start(self).done
+#      done = Time.now
+#      puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] SIZE: #{ r.size }, Time: #{ done - start } #{ self }"
+      return r
     end
 
     ################################################################################################
