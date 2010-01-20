@@ -1,5 +1,7 @@
 require "xamplr/persistence"
 
+require 'set'
+
 module Xampl
   class Persister
     attr_accessor :name,
@@ -10,7 +12,8 @@ module Xampl
                   :total_sync_count, :total_rollback_count,
                   :cache_hits, :total_cache_hits,
                   :last_write_count,
-                  :rolled_back
+                  :rolled_back,
+                  :expunged
     attr_reader :syncing, :format
 
     def initialize(name=nil, format=nil)
@@ -18,6 +21,7 @@ module Xampl
       @format = format
       @automatic = false
       @changed = {}
+      @expunged = Set.new
       @cache_hits = 0
       @total_cache_hits = 0
       @read_count = 0
@@ -167,6 +171,10 @@ module Xampl
       end
     end
 
+    def expunge(xampl)
+      false
+    end
+
     def lookup(klass, pid)
       #raise XamplException.new(:live_across_rollback) if @rolled_back
       #puts "#{File.basename(__FILE__)} #{__LINE__} LOOKUP:: klass: #{klass} pid: #{pid}"
@@ -263,6 +271,9 @@ module Xampl
         end
 
         @changed = {}
+
+        puts "SOME NOT EXPUNGED: #{ @expunged.inspect }" unless 0 == @expunged.size
+        @expunged = Set.new
 
         @total_read_count = @total_read_count + @read_count
         @total_write_count = @total_write_count + @write_count

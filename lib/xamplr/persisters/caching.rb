@@ -134,7 +134,7 @@ module Xampl
     end
 
     def read(klass, pid, target=nil)
-      #      puts "#{File.basename(__FILE__)} #{__LINE__} READ:: klass: #{klass} pid: #{pid} target: [[#{target}]], PM: #{ self }"
+#      puts "#{File.basename(__FILE__)} #{__LINE__} READ:: klass: #{klass} pid: #{pid} target: [[#{target}]], PM: #{ self }"
 
       xampl, target = read_from_cache(klass, pid, target)
       return xampl if xampl and !target

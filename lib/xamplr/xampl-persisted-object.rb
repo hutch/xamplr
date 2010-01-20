@@ -5,6 +5,7 @@ module Xampl
 
     attr_reader :persister
     attr_accessor :load_needed
+    attr_accessor :must_be_mentioned
 
     def persist_required
       return true

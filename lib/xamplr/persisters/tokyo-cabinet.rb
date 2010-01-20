@@ -449,18 +449,35 @@ module Xampl
       results
     end
 
+    def expunge(xampl)
+      #NOTE -- this *must* be in a transaction
+      #NOTE -- the expunge is completed in write
+
+      mentions = Xampl.find_mentions_of(xampl)
+      mentions.each do | has_a_xampl |
+#        puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] kill mentions of #{ xampl } in #{ has_a_xampl }"
+        xampl.remove_from(has_a_xampl)
+      end
+      xampl.changed
+      self.expunged << xampl
+
+      false
+    end
+
     def write(xampl)
       raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index
-#@start = Time.now
-#@last = Time.now
-#puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
+
+      expunging = self.expunged.include?(xampl)
+      self.expunged.delete(xampl) if expunging
+#      if expunging
+#        puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] EXPUNGING #{ xampl }/#{ expunging }"
+#      end
 
       place_dir = xampl.class.name.split("::")
       place = File.join( place_dir, xampl.get_the_index)
       place_dir = File.join( @files_dir, place_dir )
       mentions = Set.new
-      data = represent(xampl, mentions)
-#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
+      xampl_in_xml = represent(xampl, mentions)
 
       #get rid of any supplimentary indexes associated with this xampl object
       # TODO -- This can be slow
@@ -469,100 +486,102 @@ module Xampl
       note_errors("TC[[#{ @filename }]]:: failed to remove from mentions, error: %s\n") do
         query.searchout
       end
-#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
 
       query = TableQuery.new(@tc_db)
       query.add_condition('xampl-place', :equals, place)
       note_errors("TC[[#{ @filename }]]:: failed to remove from mentions, error: %s\n") do
         query.searchout
       end
-#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
 
-      if Xampl.raw_persister_options[:mentions] then
-        # TODO -- This can be slow
-        mentions.each do | mention |
-          mention_place = File.join(mention.class.name.split("::"), mention.get_the_index)
-          #TODO -- will repeadedly changing a persisted xampl object fragment the TC db?
-
-          pk = @tc_db.genuid
-          mention_hash = {
-                  'xampl-from' => place,
-                  'mentioned_class' => xampl.class.name,
-                  'pid' => xampl.get_the_index,
-                  'xampl-to' => mention_place
-          }
-
-          note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
-            @tc_db.put(pk, mention_hash)
-          end
+      if expunging then
+        file_place = "#{ @files_dir }/#{ place }"
+        File.delete(file_place) if File.exists?(file_place)
+        note_errors("TC[[#{ place }]]:: write error: %s\n") do
+          @tc_db.out(place)
         end
-      end
-#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
 
-      xampl_hash = {
-              'class' => xampl.class.name,
-              'pid' => xampl.get_the_index,
-              'time-stamp' => @time_stamp,
-              'xampl' => data
-      }
+        uncache(xampl)
+      else
+        if Xampl.raw_persister_options[:mentions] then
+          # TODO -- This can be slow
+          mentions.each do | mention |
+            mention_place = File.join(mention.class.name.split("::"), mention.get_the_index)
+            #TODO -- will repeadedly changing a persisted xampl object fragment the TC db?
 
-#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] #{ xampl.class.name } ... describe"
-      primary_description, secondary_descriptions = xampl.describe_yourself
-      if primary_description then
-        xampl_hash = primary_description.merge(xampl_hash)
-      end
-#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
+            pk = @tc_db.genuid
+            mention_hash = {
+                    'xampl-from' => place,
+                    'mentioned_class' => xampl.class.name,
+                    'pid' => xampl.get_the_index,
+                    'xampl-to' => mention_place
+            }
 
-      note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
-        if Xampl.raw_persister_options[:write_through] then
-          FileUtils.mkdir_p(place_dir) unless File.exist?(place_dir)
-          file_place = "#{ @files_dir }/#{ place }"
-          File.open(file_place, "w")do |out|
-            out.write xampl_hash['xampl']
-            if :sync == Xampl.raw_persister_options[:write_through] then
-              out.fsync
-              if $is_darwin then
-                out.fcntl(51, 0) # Attempt an F_FULLFSYNC fcntl to commit data to disk (darwin *ONLY*)
-              end
+            note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
+              @tc_db.put(pk, mention_hash)
             end
           end
-
         end
-        @tc_db.put(place, xampl_hash)
-      end
-#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
 
-      #TODO -- smarter regarding when to delete (e.g. mentions)
-      if xampl.should_schedule_delete? and xampl.scheduled_for_deletion_at then
-        secondary_descriptions = [] unless secondary_descriptions
-        secondary_descriptions << { 'scheduled-delete-at' => xampl.scheduled_for_deletion_at }
-      elsif xampl.scheduled_for_deletion_at then
-        #TODO -- puts "#{ __FILE__ }:#{ __LINE__ } HOW TO DO THIS without violating xampl's change rules????? "
-        #xampl.scheduled_for_deletion_at = nil
-      end
-#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
-
-      if secondary_descriptions then
         xampl_hash = {
                 'class' => xampl.class.name,
                 'pid' => xampl.get_the_index,
-                'xampl-place' => place
+                'time-stamp' => @time_stamp,
+                'xampl' => xampl_in_xml
         }
 
-        secondary_descriptions.each do | secondary_description |
-          description = secondary_description.merge(xampl_hash)
+        primary_description, secondary_descriptions = xampl.describe_yourself
+        if primary_description then
+          xampl_hash = primary_description.merge(xampl_hash)
+        end
 
-          note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
-            pk = @tc_db.genuid
-            @tc_db.put(pk, description)
+        note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
+          if Xampl.raw_persister_options[:write_through] then
+            FileUtils.mkdir_p(place_dir) unless File.exist?(place_dir)
+            file_place = "#{ @files_dir }/#{ place }"
+            File.open(file_place, "w") do |out|
+              out.write xampl_hash['xampl']
+              if :sync == Xampl.raw_persister_options[:write_through] then
+                out.fsync
+                if $is_darwin then
+                  out.fcntl(51, 0) # Attempt an F_FULLFSYNC fcntl to commit data to disk (darwin *ONLY*)
+                end
+              end
+            end
+
+          end
+          @tc_db.put(place, xampl_hash)
+        end
+
+        #TODO -- smarter regarding when to delete (e.g. mentions)
+        if xampl.should_schedule_delete? and xampl.scheduled_for_deletion_at then
+          secondary_descriptions = [] unless secondary_descriptions
+          secondary_descriptions << { 'scheduled-delete-at' => xampl.scheduled_for_deletion_at }
+        elsif xampl.scheduled_for_deletion_at then
+          #TODO -- puts "#{ __FILE__ }:#{ __LINE__ } HOW TO DO THIS without violating xampl's change rules????? "
+          #xampl.scheduled_for_deletion_at = nil
+        end
+
+        if secondary_descriptions then
+          xampl_hash = {
+                  'class' => xampl.class.name,
+                  'pid' => xampl.get_the_index,
+                  'xampl-place' => place
+          }
+
+          secondary_descriptions.each do | secondary_description |
+            description = secondary_description.merge(xampl_hash)
+
+            note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
+              pk = @tc_db.genuid
+              @tc_db.put(pk, description)
+            end
           end
         end
-      end
-#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
 
-      @write_count = @write_count + 1
-      xampl.changes_accepted
-#      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] time: #{ Time.now - @start }/#{ Time.now - @last }"; @last = Time.now
+        @write_count = @write_count + 1
+        xampl.changes_accepted
+      end
+
       return true
     end
 
