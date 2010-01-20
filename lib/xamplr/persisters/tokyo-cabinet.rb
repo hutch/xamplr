@@ -449,14 +449,21 @@ module Xampl
       results
     end
 
+    def remove_all_mention(root, xampl)
+      xampl.remove_from(root)
+      root.children.each do | child |
+        remove_all_mention(child, xampl)
+      end
+    end
+
     def expunge(xampl)
       #NOTE -- this *must* be in a transaction
-      #NOTE -- the expunge is completed in write
+      #NOTE -- the expunge operation is in two steps and is completed in write
 
       mentions = Xampl.find_mentions_of(xampl)
       mentions.each do | has_a_xampl |
-#        puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] kill mentions of #{ xampl } in #{ has_a_xampl }"
-        xampl.remove_from(has_a_xampl)
+#        xampl.remove_from(has_a_xampl)
+        remove_all_mention(has_a_xampl, xampl)
       end
       xampl.changed
       self.expunged << xampl
