@@ -5,13 +5,14 @@ module Xampl
   class PersistXML < Visitor
     attr_accessor :ns_to_prefix, :start_body, :body, :out, :mentions
 
-    def initialize(out="", mentions=nil)
+    def initialize(out="", mentions=nil, substitutions={})
       super()
 
       @out = out
       @was_attr = false
 
       @mentions = mentions
+      @pid_substitutions = substitutions
 
       @ns_to_prefix = {}
       @start_body = nil
@@ -103,11 +104,19 @@ module Xampl
 
     def attribute(xampl)
       @attr_list = []
+      pattr = xampl.indexed_by.to_s
+
       if (nil != xampl.attributes) then
         xampl.attributes.each do |attr_spec|
           prefix = (2 < attr_spec.length) ? register_ns(attr_spec[2]) : ""
-          value = xampl.instance_variable_get(attr_spec[0])
-#          @attr_list << (" " << prefix << attr_spec[1] << "='" << attr_esc(value) << "'") unless nil == value
+          value = nil
+          if pattr == attr_spec[1] then
+            value = @pid_substitutions[xampl]
+#            puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] xampl: #{ xampl }, substitute: #{ value }" if value
+            value = xampl.instance_variable_get(attr_spec[0]) unless value
+          else
+            value = xampl.instance_variable_get(attr_spec[0])
+          end
           @attr_list << (" " << prefix << attr_spec[1] << '="' << attr_esc(value) << '"') unless nil == value
         end
       end
@@ -120,8 +129,9 @@ module Xampl
         xampl.attributes.each do |attr_spec|
           if pattr == attr_spec[1] then
             prefix = (2 < attr_spec.length) ? register_ns(attr_spec[2]) : ""
-            value = xampl.instance_variable_get(attr_spec[0])
-#            @attr_list << (" " << prefix << attr_spec[1] << "='" << attr_esc(value) << "'") unless nil == value
+            value = @pid_substitutions[xampl]
+#            puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] xampl: #{ xampl }, substitute: #{ value }" if value
+            value = xampl.instance_variable_get(attr_spec[0]) unless value
             @attr_list << (" " << prefix << attr_spec[1] << '="' << attr_esc(value) << '"') unless nil == value
             break
           end
@@ -241,6 +251,11 @@ module Xampl
   module XamplObject
     def to_xml(out="", skip=[])
       PersistXML.new(out).start(self).done
+    end
+
+    def substituting_to_xml(opts={})
+      substitutions = opts[:substitutions] || {}
+      PersistXML.new("", [], substitutions).start(self).done
     end
   end
 
