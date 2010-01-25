@@ -44,6 +44,11 @@ module Xampl
       return self
     end
 
+    # this element has been realised
+    def note_realised
+      return self
+    end
+
     # replacing the original
 
     def note_replacing(original)

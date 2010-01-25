@@ -144,11 +144,13 @@ module Xampl
       # Normally we'd expect to see the representation in the @format format, but
       # that isn't necessarily the case. Try to work out what the format might be...
 
+      xampl = nil
       if representation =~ /^</ then
-        return XamplObject.realise_from_xml_string(representation, target)
+        xampl = XamplObject.realise_from_xml_string(representation, target)
       else
-        XamplObject.from_ruby(representation, target)
+        xampl = XamplObject.from_ruby(representation, target)
       end
+      return xampl.note_realised
     end
 
     def write(xampl)
