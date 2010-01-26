@@ -607,6 +607,7 @@ module Xampl
 #        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] READ REP"
         open_tc_db
       end
+
       place = File.join(klass.name.split("::"), pid)
 
       meta = @tc_db[place]

@@ -335,6 +335,7 @@ module Xampl
   end
 
   require "xamplr/persisters/simple"
+  require "xamplr/persisters/dumb"
   require "xamplr/persisters/in-memory"
   require "xamplr/persisters/filesystem"
 
