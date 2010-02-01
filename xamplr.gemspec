@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{xamplr}
-  s.version = "1.9.2"
+  s.version = "1.9.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bob Hutchison"]
-  s.date = %q{2010-01-20}
+  s.date = %q{2010-02-01}
   s.description = %q{xamplr is the ruby version of xampl.}
   s.email = %q{hutch@recursive.ca}
   s.extra_rdoc_files = [
@@ -44,6 +44,7 @@ Gem::Specification.new do |s|
      "lib/xamplr/persister.rb",
      "lib/xamplr/persisters/caches.rb",
      "lib/xamplr/persisters/caching.rb",
+     "lib/xamplr/persisters/dumb.rb",
      "lib/xamplr/persisters/filesystem.rb",
      "lib/xamplr/persisters/in-memory.rb",
      "lib/xamplr/persisters/simple.rb",
