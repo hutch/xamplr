@@ -478,6 +478,7 @@ module Xampl
 
     def write(xampl)
 
+#      puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] write #{ xampl }"
       raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index
 
       expunging = self.expunged.include?(xampl)
@@ -568,14 +569,14 @@ module Xampl
         end
 
         if secondary_descriptions then
-          xampl_hash = {
+          secondary_xampl_hash = {
                   'class' => xampl.class.name,
                   'pid' => xampl.get_the_index,
                   'xampl-place' => place
           }
 
           secondary_descriptions.each do | secondary_description |
-            description = secondary_description.merge(xampl_hash)
+            description = secondary_description.merge(secondary_xampl_hash)
             index_info[:secondary] << secondary_description
 
             note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
@@ -591,7 +592,8 @@ module Xampl
               FileUtils.mkdir_p(place_dir) unless File.exist?(place_dir)
               file_place = "#{ @files_dir }/#{ place }"
               File.open(file_place, "w") do |out|
-                out.write xampl_hash['xampl']
+#                out.write xampl_hash['xampl']
+                out.write xampl_in_xml
                 if :sync == Xampl.raw_persister_options[:write_through] then
                   out.fsync
                   if $is_darwin then
