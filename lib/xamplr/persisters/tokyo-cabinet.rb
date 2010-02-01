@@ -1,9 +1,13 @@
 module Xampl
 
   require 'fileutils'
-  require 'tokyocabinet'
-  require 'xamplr/persisters/caching'
   require 'set'
+  require 'json'
+  require 'yaml'
+
+  require 'tokyocabinet'
+
+  require 'xamplr/persisters/caching'
 
   #  require 'ruby-prof'
 
@@ -472,6 +476,7 @@ module Xampl
     end
 
     def write(xampl)
+
       raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index
 
       expunging = self.expunged.include?(xampl)
@@ -541,23 +546,12 @@ module Xampl
           xampl_hash = primary_description.merge(xampl_hash)
         end
 
-        note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
-          if Xampl.raw_persister_options[:write_through] then
-            FileUtils.mkdir_p(place_dir) unless File.exist?(place_dir)
-            file_place = "#{ @files_dir }/#{ place }"
-            File.open(file_place, "w") do |out|
-              out.write xampl_hash['xampl']
-              if :sync == Xampl.raw_persister_options[:write_through] then
-                out.fsync
-                if $is_darwin then
-                  out.fcntl(51, 0) # Attempt an F_FULLFSYNC fcntl to commit data to disk (darwin *ONLY*)
-                end
-              end
-            end
-
-          end
-          @tc_db.put(place, xampl_hash)
+        index_info = {}
+        if primary_description && 0 < primary_description.size then
+          index_info[:primary] = xampl_hash.dup
+          index_info[:primary].delete('xampl')
         end
+        index_info[:secondary] = []
 
         #TODO -- smarter regarding when to delete (e.g. mentions)
         if xampl.should_schedule_delete? and xampl.scheduled_for_deletion_at then
@@ -577,12 +571,37 @@ module Xampl
 
           secondary_descriptions.each do | secondary_description |
             description = secondary_description.merge(xampl_hash)
+            index_info[:secondary] << secondary_description
 
             note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
               pk = @tc_db.genuid
               @tc_db.put(pk, description)
             end
           end
+        end
+
+        note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
+          if Xampl.raw_persister_options[:write_through] then
+            FileUtils.mkdir_p(place_dir) unless File.exist?(place_dir)
+            file_place = "#{ @files_dir }/#{ place }"
+            File.open(file_place, "w") do |out|
+              out.write xampl_hash['xampl']
+              if :sync == Xampl.raw_persister_options[:write_through] then
+                out.fsync
+                if $is_darwin then
+                  out.fcntl(51, 0) # Attempt an F_FULLFSYNC fcntl to commit data to disk (darwin *ONLY*)
+                end
+              end
+            end
+            if index_info[:primary] && 0 < index_info[:secondary].size then
+              file_place += ".idx"
+              File.open(file_place, "w") do |out|
+                out.write index_info.to_yaml
+              end
+            end
+          end
+          
+          @tc_db.put(place, xampl_hash)
         end
 
         @write_count = @write_count + 1
