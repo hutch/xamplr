@@ -251,6 +251,7 @@ module Xampl
           class_cache[class_name] = result_class
         end
 
+
         self.lookup(result_class, result['pid'])
       end
 
@@ -490,6 +491,10 @@ module Xampl
       place_dir = File.join( @files_dir, place_dir )
       mentions = Set.new
       xampl_in_xml = represent(xampl, mentions)
+      unless xampl_in_xml && 0 < xampl_in_xml.size then
+        puts "Cannot persist #{ xampl } because representation is unobtainable"
+        return
+      end
 
       #get rid of any supplimentary indexes associated with this xampl object
       # TODO -- This can be slow
@@ -581,26 +586,30 @@ module Xampl
         end
 
         note_errors("TC[[#{ @filename }]]:: write error: %s\n") do
-          if Xampl.raw_persister_options[:write_through] then
-            FileUtils.mkdir_p(place_dir) unless File.exist?(place_dir)
-            file_place = "#{ @files_dir }/#{ place }"
-            File.open(file_place, "w") do |out|
-              out.write xampl_hash['xampl']
-              if :sync == Xampl.raw_persister_options[:write_through] then
-                out.fsync
-                if $is_darwin then
-                  out.fcntl(51, 0) # Attempt an F_FULLFSYNC fcntl to commit data to disk (darwin *ONLY*)
+          begin
+            if Xampl.raw_persister_options[:write_through] then
+              FileUtils.mkdir_p(place_dir) unless File.exist?(place_dir)
+              file_place = "#{ @files_dir }/#{ place }"
+              File.open(file_place, "w") do |out|
+                out.write xampl_hash['xampl']
+                if :sync == Xampl.raw_persister_options[:write_through] then
+                  out.fsync
+                  if $is_darwin then
+                    out.fcntl(51, 0) # Attempt an F_FULLFSYNC fcntl to commit data to disk (darwin *ONLY*)
+                  end
+                end
+              end
+              if index_info[:primary] && 0 < index_info[:secondary].size then
+                file_place += ".idx"
+                File.open(file_place, "w") do |out|
+                  out.write index_info.to_yaml
                 end
               end
             end
-            if index_info[:primary] && 0 < index_info[:secondary].size then
-              file_place += ".idx"
-              File.open(file_place, "w") do |out|
-                out.write index_info.to_yaml
-              end
-            end
+          rescue => e
+            puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] write through failed #{ xampl }"
           end
-          
+
           @tc_db.put(place, xampl_hash)
         end
 
