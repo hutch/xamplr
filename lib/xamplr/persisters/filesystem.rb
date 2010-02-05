@@ -30,7 +30,7 @@ module Xampl
 
       representation = represent(xampl)
       if representation then
-        File.open(place, "w")do |out|
+        File.open(place, "w") do |out|
           out.puts representation
           out.fsync
           if $is_darwin then

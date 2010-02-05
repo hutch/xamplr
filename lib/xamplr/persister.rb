@@ -277,10 +277,10 @@ module Xampl
         puts "SOME NOT EXPUNGED: #{ @expunged.inspect }" unless 0 == @expunged.size
         @expunged = Set.new
 
-        @total_read_count = @total_read_count + @read_count
-        @total_write_count = @total_write_count + @write_count
-        @total_cache_hits = @total_cache_hits + @cache_hits
-        @total_sync_count = @total_sync_count + 1
+        @total_read_count += @read_count
+        @total_write_count += @write_count
+        @total_cache_hits += @cache_hits
+        @total_sync_count += 1
 
         @last_cache_hits = @cache_hits
         @last_write_count = @write_count
@@ -323,12 +323,14 @@ module Xampl
       printf("             cache_hits: %d, reads: %d, writes: %d, time: %fms \n",
              @last_cache_hits, @read_count, @last_write_count, @last_sync_time)
       printf("             syncs: %d\n", @total_sync_count)
-      printf("             changed count: %d (%d)\n", count_changed, @changed.size)
-      @changed.each do |thing, ignore|
-        if thing.is_changed then
-          puts "             changed: #{thing}, index: #{thing.get_the_index}"
-        else
-          puts "             UNCHANGED: #{thing}, index: #{thing.get_the_index} <<<<<<<<<<<<<<<<<<< BAD!"
+      if 0 < @changed.size then
+        printf("             changed count: %d (%d)\n", count_changed, @changed.size)
+        @changed.each do |thing, ignore|
+          if thing.is_changed then
+            puts "             changed: #{thing}, index: #{thing.get_the_index}"
+          else
+            puts "             UNCHANGED: #{thing}, index: #{thing.get_the_index} <<<<<<<<<<<<<<<<<<< BAD!"
+          end
         end
       end
     end
@@ -339,8 +341,20 @@ module Xampl
   require "xamplr/persisters/in-memory"
   require "xamplr/persisters/filesystem"
 
-  if require 'tokyocabinet' then
-    require "xamplr/persisters/tokyo-cabinet"
+  begin
+    if require 'tokyocabinet' then
+      require "xamplr/persisters/tokyo-cabinet"
+    end
+  rescue
+    # Well. No Tokyo Cabinet.
+  end
+
+  begin
+    if require 'mongo' then
+      require "xamplr/persisters/mongo"
+    end
+  rescue
+    # Well. No MongoDB.
   end
 
 end

@@ -61,7 +61,7 @@ module Xampl
       @tc_db = nil
 #      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] file: #{ @filename }, db: #{ @tc_db.class.name }"
 
-      open_tc_db()
+      setup_db()
 
 #      note_errors("TC[[#{ @filename }]]:: optimisation error: %s\n") do
 #        @tc_db.optimize(-1, -1, -1, TDB::TDEFLATE)
@@ -175,7 +175,7 @@ module Xampl
     end
 
     def query(hint=false)
-      open_tc_db
+      setup_db
       query = TableQuery.new(@tc_db)
 
       yield query
@@ -218,7 +218,7 @@ module Xampl
     end
 
     def find_xampl(hint=false)
-      open_tc_db
+      setup_db
       query = TableQuery.new(@tc_db)
 
       yield query
@@ -263,7 +263,7 @@ module Xampl
     end
 
     def find_pids(hint=false)
-      open_tc_db
+      setup_db
       query = TableQuery.new(@tc_db)
 
       yield query
@@ -289,7 +289,7 @@ module Xampl
     end
 
     def find_meta(hint=false)
-      open_tc_db
+      setup_db
       query = TableQuery.new(@tc_db)
 
       yield query
@@ -312,7 +312,7 @@ module Xampl
     end
 
     def find_mentions_of(xampl)
-      open_tc_db
+      setup_db
 
       place = File.join(xampl.class.name.split("::"), xampl.get_the_index)
 
@@ -353,7 +353,7 @@ module Xampl
 #      puts "   2 #{ callers[2] }"
 
       @currently_syncing = true
-      open_tc_db
+      setup_db
     end
 
     def done_sync_write
@@ -427,7 +427,7 @@ module Xampl
       raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index
       place = File.join(xampl.class.name.split("::"), xampl.get_the_index)
 
-      open_tc_db
+      setup_db
 
       result_keys = Set.new
 
@@ -635,7 +635,7 @@ module Xampl
 
       unless @tc_db then
 #        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] READ REP"
-        open_tc_db
+        setup_db
       end
 
       place = File.join(klass.name.split("::"), pid)
@@ -646,7 +646,7 @@ module Xampl
       #      puts "#{File.basename(__FILE__)}:#{__LINE__} TC: #{ klass }/#{ pid }" if representation
       $TC_COUNT += 1 if representation
 
-      # puts "read: #{ place }, size: #{ representation.size }"
+      #puts "read: #{ place }, size: #{ (representation || []).size }"
       # puts representation[0..100]
 
       unless representation then
