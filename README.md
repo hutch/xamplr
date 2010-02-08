@@ -18,6 +18,8 @@ For more information, see [the xampl page on xampl.com](http://xampl.com/so/xamp
 
 ## Installation:
 
+If you are a developer then install xamplr-gen:
+
 > sudo gem install xamplr-gen
 
 This will install all three gems.
@@ -27,6 +29,12 @@ you should uninstall them. For some reason, in certain circumstances,
 these might be loaded or partially loaded when trying to use xampl.
 If you don't you'll experience strange exceptions with hutch-xamplr
 or hutch-xamplr-pp on the stack trace.
+
+If you just want the runtime, then:
+
+> sudo gem install xamplr
+
+Though this would normally be done through some sort of dependency management tool (like gems).
 
 
 ## License:
