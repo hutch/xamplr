@@ -1,0 +1,49 @@
+<oadevdoc pid=""
+          xmlns="http://soldierofcode.com/ivorydocs/docmodel">
+
+  <doc pid=""
+       name=""
+       urlid=""
+       state=""
+       stamp=""
+       last-modified=""
+       version="">
+
+    <section pid=""
+             name=""
+             urlid=""
+             state=""
+             stamp=""
+             last-modified=""
+             version=""
+             doc=""
+             title=""
+             zorder=""
+             icon=""
+             tags=""
+             summary="">
+
+        <page pid=""
+              prev-page=""
+              next-page=""
+              state=""
+              stamp=""
+              last-modified=""
+              version=""
+              title=""
+              tags=""
+              section=""
+              urlid="">
+
+          <block id=""
+                 title="">
+            <![CDATA[PUT HTML HERE]]>
+          </block>
+
+        </page>
+
+      </section>
+  </doc>
+
+
+</oadevdoc>

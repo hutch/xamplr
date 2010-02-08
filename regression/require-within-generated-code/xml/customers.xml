@@ -1,0 +1,17 @@
+<ivorydocs pid=""
+           xmlns="http://soldierofcode.com/ivorydocs"
+           xmlns:docs="http://soldierofcode.com/ivorydocs/docmodel">
+
+  <customer pid=""
+            login_id=""
+            login_pwd=""
+            name=""
+            email=""
+            stamp=""
+            state="">
+
+    <docs:doc pid=""/>
+
+  </customer>
+
+</ivorydocs>
