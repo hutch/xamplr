@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{xamplr}
-  s.version = "1.9.5"
+  s.version = "1.9.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bob Hutchison"]
-  s.date = %q{2010-02-01}
+  s.date = %q{2010-02-08}
   s.description = %q{xamplr is the ruby version of xampl.}
   s.email = %q{hutch@recursive.ca}
   s.extra_rdoc_files = [
@@ -47,6 +47,7 @@ Gem::Specification.new do |s|
      "lib/xamplr/persisters/dumb.rb",
      "lib/xamplr/persisters/filesystem.rb",
      "lib/xamplr/persisters/in-memory.rb",
+     "lib/xamplr/persisters/mongo.rb",
      "lib/xamplr/persisters/simple.rb",
      "lib/xamplr/persisters/tokyo-cabinet.rb",
      "lib/xamplr/persisters/tokyo-cabinet.rb.1-DB",
@@ -91,6 +92,10 @@ Gem::Specification.new do |s|
      "regression/parsing-namespaced-xml/project-generator.rb",
      "regression/parsing-namespaced-xml/simple.rb",
      "regression/parsing-namespaced-xml/xml/simple.xml",
+     "regression/require-within-generated-code/project-generator.rb",
+     "regression/require-within-generated-code/test.rb",
+     "regression/require-within-generated-code/xml/customers.xml",
+     "regression/require-within-generated-code/xml/docmodel.xml",
      "regression/tc-indexes-crossing-pid-boundaries/Makefile",
      "regression/tc-indexes-crossing-pid-boundaries/bad-idea.rb",
      "regression/tc-indexes-crossing-pid-boundaries/fail-badly.rb",
