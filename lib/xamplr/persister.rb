@@ -345,6 +345,8 @@ module Xampl
     if require 'tokyocabinet' then
       require "xamplr/persisters/tokyo-cabinet"
     end
+  rescue LoadError => e
+    # Well. No Tokyo Cabinet.
   rescue
     # Well. No Tokyo Cabinet.
   end
@@ -353,7 +355,9 @@ module Xampl
     if require 'mongo' then
       require "xamplr/persisters/mongo"
     end
-  rescue
+  rescue LoadError => e
+    # Well. No MongoDB.
+  rescue 
     # Well. No MongoDB.
   end
 
