@@ -28,7 +28,11 @@ module Xampl
 
       rmsg = nil
       unless result then
-        rmsg = sprintf(msg, @tc_db.errmsg(@tc_db.ecode))
+        if @tc_db then
+          rmsg = sprintf(msg, @tc_db.errmsg(@tc_db.ecode))
+        else
+          rmsg = "either not actually a TokyoCabinet Error, or @tc_db was never opened"
+        end
         STDERR.puts "NOTE: TokyoCabinet Error!"
         STDERR.puts(rmsg)
         STDERR.puts "---------"
@@ -61,11 +65,8 @@ module Xampl
       @tc_db = nil
 #      puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] file: #{ @filename }, db: #{ @tc_db.class.name }"
 
-      setup_db()
+      setup_db
 
-#      note_errors("TC[[#{ @filename }]]:: optimisation error: %s\n") do
-#        @tc_db.optimize(-1, -1, -1, TDB::TDEFLATE)
-#      end
 #      note_errors("TC[[#{ @filename }]]:: close error: %s\n") do
 #        @tc_db.close
 #      end
@@ -78,7 +79,15 @@ module Xampl
       rescue => e
         #TODO -- why do this???
         puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] OH CRAP!!! #{ e }"
+        puts e.backtrace
       end
+    end
+
+    def setup_db
+      open_tc_db
+#      note_errors("TC[[#{ @filename }]]:: optimisation error: %s\n") do
+#        @tc_db.optimize(-1, -1, -1, TDB::TDEFLATE)
+#      end
     end
 
     def open_tc_db
@@ -379,7 +388,7 @@ module Xampl
 #        puts "   1 #{ callers[1] }"
 #        puts "   2 #{ callers[2] }"
 
-#        open_tc_db
+#        setup_db
         @time_stamp = Time.now.to_f.to_s
 
         note_errors("TC[[#{ @filename }]]:: tranbegin error: %s\n") do
