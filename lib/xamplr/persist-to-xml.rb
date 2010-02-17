@@ -199,7 +199,22 @@ module Xampl
         @body << "/>"
       else
         @body << ">"
-        @body << content_esc(xampl._content) if xampl._content
+        begin
+          @body.real_concat(content_esc(xampl._content)) if xampl._content
+        rescue => e
+          begin
+            s = xampl._content.force_encoding(@body.encoding)
+            @body.real_concat(content_esc(s)) if xampl._content
+          rescue => e
+            puts "EXCEPTION: #{ e }"
+            puts "body encoding: #{ @body.encoding }"
+            puts "xampl._content encoding: #{ xampl._content.encoding }"
+            puts "content_esc(xampl._content) encoding: #{ content_esc(xampl._content).encoding }"
+            puts "xampl._content: [[[#{ xampl._content }]]]"
+#          puts "body so far: [[[#{ @body }]]]"
+            raise e
+          end
+        end
         end_element(xampl)
       end
     end

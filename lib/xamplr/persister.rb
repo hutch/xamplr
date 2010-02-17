@@ -138,6 +138,11 @@ module Xampl
         when :ruby_format then
           return xampl.to_ruby(mentions)
       end
+    rescue => e
+      msg = "Failed to represent #{ xampl } due to: #{ e }"
+      puts msg
+      puts e.backtrace
+      raise msg
     end
 
     def realise(representation, target=nil)
@@ -357,7 +362,7 @@ module Xampl
     end
   rescue LoadError => e
     # Well. No MongoDB.
-  rescue 
+  rescue
     # Well. No MongoDB.
   end
 

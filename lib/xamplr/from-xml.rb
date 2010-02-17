@@ -1,3 +1,5 @@
+# encoding utf-8
+
 require 'libxml'
 
 module Xampl
@@ -278,11 +280,13 @@ TODO -- can these ever happen?
             return existing_element || element
           when LibXML::XML::Reader::TYPE_TEXT, LibXML::XML::Reader::TYPE_CDATA, LibXML::XML::Reader::TYPE_SIGNIFICANT_WHITESPACE, LibXML::XML::Reader::TYPE_ENTITY_REFERENCE
             if element.has_mixed_content then
-              text = @reader.read_string
+              text = @reader.read_string.force_encoding('utf-8')
+#              puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] #{ text.encoding } [[#{ text }]]"
               the_text = element.note_adding_text_content(text, @is_realising)
               element << the_text
             else
-              text = @reader.read_string
+              text = @reader.read_string.force_encoding('utf-8')
+#              puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] #{ text.encoding } [[#{ text }]] (#{ @reader.class })"
               the_text = element.note_adding_text_content(text, @is_realising)
               element.add_content(the_text, false)
             end
