@@ -200,11 +200,11 @@ module Xampl
       else
         @body << ">"
         begin
-          @body.real_concat(content_esc(xampl._content)) if xampl._content
+          @body.concat(content_esc(xampl._content)) if xampl._content
         rescue => e
           begin
             s = xampl._content.force_encoding(@body.encoding)
-            @body.real_concat(content_esc(s)) if xampl._content
+            @body.concat(content_esc(s)) if xampl._content
           rescue => e
             puts "EXCEPTION: #{ e }"
             puts "body encoding: #{ @body.encoding }"
