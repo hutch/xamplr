@@ -34,6 +34,10 @@ module Xampl
     def clear_cache
     end
 
+    def read_from_cache(klass, pid, target=nil)
+      return nil, target
+    end
+
     def write(xampl)
       return true
     end
