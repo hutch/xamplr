@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{xamplr}
-  s.version = "1.9.8"
+  s.version = "1.9.9"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bob Hutchison"]
-  s.date = %q{2010-02-18}
+  s.date = %q{2010-03-13}
   s.description = %q{xamplr is the ruby version of xampl.}
   s.email = %q{hutch@recursive.ca}
   s.extra_rdoc_files = [
