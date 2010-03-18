@@ -324,57 +324,58 @@ module Xampl
   end
 
   def Xampl.read_only(target_persister)
-    #TODO -- EXCLUSIVE ACCESS TO THE PERSISTER!!!
-    name = target_persister.name
+    @@xampl_lock.synchronize(:EX) do
+      name = target_persister.name
 
-    if block_given? then
-      initial_persister = @@persister
-      Xampl.enable_persister(name, target_persister.kind, target_persister.format)
+      if block_given? then
+        initial_persister = @@persister
+        Xampl.enable_persister(name, target_persister.kind, target_persister.format)
 
-      rollback = true
-      original_automatic = @@persister.automatic
-      original_changed = @changed
-      @changed = {}
-      begin
-        Xampl.auto_persistence(false)
-        #Xampl.block_future_changes(true)
+        rollback = true
+        original_automatic = @@persister.automatic
+        original_changed = @changed
+        @changed = {}
+        begin
+          Xampl.auto_persistence(false)
+          #Xampl.block_future_changes(true)
 
-        yield
-        rollback = false
-      ensure
-        ####        Xampl.auto_persistence(original_automatic)
-        ####        #Xampl.block_future_changes(false)
-        ####
-        ####        if 0 < @changed.size then
-        ####          puts "CHANGED COUNT: #{@changed.size}"
-        ####          raise BlockedChange.new(target_persister)
-        ####        end
-        ####
-        ####        @changed = original_changed
-        ####
-        ####        puts "ROLLBACK(#{__LINE__})" if rollback
-        ####			  Xampl.rollback if rollback
-        ####	      @@persister = initial_persister
+          yield
+          rollback = false
+        ensure
+          ####        Xampl.auto_persistence(original_automatic)
+          ####        #Xampl.block_future_changes(false)
+          ####
+          ####        if 0 < @changed.size then
+          ####          puts "CHANGED COUNT: #{@changed.size}"
+          ####          raise BlockedChange.new(target_persister)
+          ####        end
+          ####
+          ####        @changed = original_changed
+          ####
+          ####        puts "ROLLBACK(#{__LINE__})" if rollback
+          ####			  Xampl.rollback if rollback
+          ####	      @@persister = initial_persister
 
-        Xampl.auto_persistence(original_automatic)
-        #Xampl.block_future_changes(false)
+          Xampl.auto_persistence(original_automatic)
+          #Xampl.block_future_changes(false)
 
-        if 0 == @changed.size then
-          @changed = original_changed
+          if 0 == @changed.size then
+            @changed = original_changed
 
-          #puts "ROLLBACK(#{__LINE__})" if rollback
-          Xampl.rollback if rollback
-          @@persister = initial_persister
-        else
-          #puts "CHANGED COUNT: #{@changed.size}"
-          @changed = original_changed
+            #puts "ROLLBACK(#{__LINE__})" if rollback
+            Xampl.rollback if rollback
+            @@persister = initial_persister
+          else
+            #puts "CHANGED COUNT: #{@changed.size}"
+            @changed = original_changed
 
-          #puts "ROLLBACK(#{__LINE__})" if rollback
-          Xampl.rollback
+            #puts "ROLLBACK(#{__LINE__})" if rollback
+            Xampl.rollback
 
-          @@persister = initial_persister
+            @@persister = initial_persister
 
-          raise BlockedChange.new(target_persister)
+            raise BlockedChange.new(target_persister)
+          end
         end
       end
     end

@@ -36,12 +36,16 @@ module Xampl
           raise MixedPersisters.new(@persister, self)
         elsif Xampl.persister == @persister then
           if not @persister.syncing then
-            Xampl.lazy_load(self)
+            Xampl.read_only(@persister) do
+              Xampl.lazy_load(self)
+            end
           else
             puts "LOAD NEEDED(3): BAD IDEA, but load anyway (persister: #{@persister.name})"
             puts "                #{self.class.name}"
             puts "                pid: #{self.get_the_index}"
-            Xampl.lazy_load(self)
+            Xampl.read_only(@persister) do
+              Xampl.lazy_load(self)
+            end
 #            puts "LOAD NEEDED(3): REFUSED (persister: #{@persister.name})"
 #            puts "                #{self.class.name}"
 #            puts "                pid: #{self.get_the_index}"
