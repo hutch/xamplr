@@ -243,28 +243,21 @@ module Xampl
       @last_sync_time = Time.now
       #raise XamplException.new(:live_across_rollback) if @rolled_back
       begin
-#        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNC changed: #{@changed.size}" if 0 < @changed.size
-#        @changed.each do | key, value |
-#          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] key: #{key.class.name}, pid: #{key.get_the_index}"
-#        end
-#
-#        if 0 < @changed.size then
+        if 0 < @changed.size then
 #          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNC changed: #{@changed.size}"
+#          @changed.each do | key, value |
+#            puts "    key: #{key.class.name}, pid: #{key.get_the_index}"
+#          end
+
 #          caller(0).each do | trace |
 #            next if /xamplr/ =~ trace
 #            puts " #{trace}"
 #            break if /actionpack/ =~ trace
 #          end
-#        end
-#
-#        puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNC changed: #{@changed.size}"
-        if 0 < @changed.size then
+
+          duration = Time.now
           begin
-#            puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNC changed: #{@changed.size}"
             busy(true)
-#            if @syncing then
-#              puts "\n\n\n\n#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNCING IS ALREADY TRUE!!!!!!\n\n\n"
-#            end
             @syncing = true
 
             start_sync_write
@@ -273,8 +266,14 @@ module Xampl
             done_sync_write
             @syncing = false
           end
-        else
-#          puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SYNC, noting changed"
+
+          duration = Time.now - duration
+          if 0.25 < duration.to_f then
+            puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SLOW SYNC(#{ duration.to_f }s), changed: #{ @changed.size }"
+            @changed.each do | key, value |
+              puts "    key: #{ key.class.name }, pid: #{ key.get_the_index }"
+            end
+          end
         end
 
         @changed = {}
