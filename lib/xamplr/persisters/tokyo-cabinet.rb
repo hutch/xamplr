@@ -670,6 +670,18 @@ module Xampl
 
       return representation
     end
+
+    def backup(base_path)
+
+      dir_path = "#{ base_path }/#{ @root_dir }/"
+      path = "#{ dir_path }/repo.tct"
+
+      FileUtils.mkdir_p(dir_path)
+
+      note_errors("TC[[#{ dir_path }]]:: backup error: %s\n") do
+        @tc_db.copy(path)
+      end
+    end
   end
 
   #
