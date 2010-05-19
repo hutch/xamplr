@@ -33,7 +33,7 @@ module Xampl
         else
           rmsg = "either not actually a TokyoCabinet Error, or @tc_db was never opened"
         end
-        STDERR.puts "NOTE: TokyoCabinet Error!"
+        STDERR.puts "NOTE: TokyoCabinet Error at #{ Time.now }!"
         STDERR.puts(rmsg)
         STDERR.puts "---------"
         STDERR.puts caller(0)

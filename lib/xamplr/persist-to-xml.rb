@@ -44,6 +44,8 @@ module Xampl
       return prefix
     end
 
+=begin
+
     def attr_esc_fast(s)
       #NOTE -- there are known issues with using Ruby 1.9.1 and libxml-ruby, which this is using. Seems to mostly
       #        be related to DOM and XPATH but...
@@ -57,12 +59,12 @@ module Xampl
       (@@doc.root.to_s)[6..-4]
     end
 
+=end
+
     def attr_esc_slow(s)
       if (s.kind_of? XamplObject)
         return attr_esc(s.to_xml)
       end
-
-#      stupid_test()
 
       result = s.to_s.dup
 
@@ -72,34 +74,54 @@ module Xampl
       result.gsub!("'", "&apos;")
       result.gsub!("\"", "&quot;")
 
-      return result
+      return "\"result\""
     end
 
-    alias attr_esc attr_esc_fast
+    def attr_esc_encoding_safe(s)
+      return attr_esc(s.to_xml) if (s.kind_of? XamplObject)
 
-#    def content_esc(s)
-#      #NO! the attribute has the right to compact white space
-#      unless defined?(@@doc) then
-#        @@doc = LibXML::XML::Document.new()
-#        @@doc.root = LibXML::XML::Node.new('r')
-#        @@attr = LibXML::XML::Attr.new(@@doc.root, 'v', 'v')
-#      end
-#
-#      @@attr.value = s
-#      (@@doc.root.to_s)[6..-4]
-#    end
+      begin
+        options = {
+          :invalid => :replace,
+          :undef=>:replace,
+          :xml => :attr
+        }
+        result = s.to_s.dup.encode('UTF-8', 'UTF-8', options)
 
-    #TODO -- use libxml for this too
+#        puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] IN: [[#{ s.to_s }]], OUT: [[#{ result }]]"
+
+        return result
+      rescue => e
+        puts "Naughty Programmer! No! Bad!: #{ e } encoding in: #{ s.encoding }, out: #{ result.encoding }"
+        puts e.backtrace
+      end
+
+
+      return ''
+
+    end
+
+#    alias attr_esc attr_esc_fast
+    alias attr_esc attr_esc_encoding_safe
+
     def content_esc(s)
-      result = s.to_s.dup
+      return content_esc(s.to_s.dup) if (s.kind_of? XamplObject)
 
-      return result if (s.kind_of? XamplObject)
+      begin
+        options = {
+          :invalid => :replace,
+          :undef=>:replace,
+          :xml => :text
+        }
+        result = s.to_s.dup.encode('UTF-8', 'UTF-8', options)
 
-      result.gsub!("&", "&amp;")
-      result.gsub!("<", "&lt;")
-      result.gsub!(">", "&gt;")
+        return result
+      rescue => e
+        puts "Naughty Programmer! No! Bad!: #{ e } encoding in: #{ s.encoding }, out: #{ result.encoding }"
+        puts e.backtrace
+      end
 
-      return result
+      return ''
     end
 
     def attribute(xampl)
@@ -117,7 +139,7 @@ module Xampl
           else
             value = xampl.instance_variable_get(attr_spec[0])
           end
-          @attr_list << (" " << prefix << attr_spec[1] << '="' << attr_esc(value) << '"') unless nil == value
+          @attr_list << (" " << prefix << attr_spec[1] << '=' << attr_esc(value)) unless nil == value
         end
       end
     end
@@ -132,7 +154,7 @@ module Xampl
             value = @pid_substitutions[xampl]
 #            puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] xampl: #{ xampl }, substitute: #{ value }" if value
             value = xampl.instance_variable_get(attr_spec[0]) unless value
-            @attr_list << (" " << prefix << attr_spec[1] << '="' << attr_esc(value) << '"') unless nil == value
+            @attr_list << (" " << prefix << attr_spec[1] << '=' << attr_esc(value)) unless nil == value
             break
           end
         end
