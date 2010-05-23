@@ -79,6 +79,7 @@ module Xampl
   def Xampl.enable_persister(name, kind=nil, format=nil)
     kind = kind || Xampl.default_persister_kind
     format = format || Xampl.default_persister_format
+
     @@persister = @@known_persisters[name]
 
     if @@persister then
@@ -121,12 +122,14 @@ module Xampl
 
   def Xampl.drop_all_persisters(verbose=false)
     puts "Drop All Persisters:: --------------------------" if verbose
+    @@persister = nil
     @@known_persisters.each do |name, persister|
       puts " #{ name } #{ persister.class.name }" if verbose
       next if persister == @@persister
       persister.close
       persister.clear_cache
     end
+    @@known_persisters = {}
     puts "---------------------------------------------" if verbose
     GC.start
     GC.start

@@ -13,7 +13,8 @@ module Xampl
                   :cache_hits, :total_cache_hits,
                   :last_write_count,
                   :rolled_back,
-                  :expunged
+                  :expunged,
+                  :slow_sync
     attr_reader :syncing, :format
 
     def initialize(name=nil, format=nil)
@@ -34,6 +35,7 @@ module Xampl
       @total_rollback_count = 0
       @rolled_back = false
       @syncing = false
+      @slow_sync = 0.25
 
       @busy_count = 0
     end
@@ -268,7 +270,7 @@ module Xampl
           end
 
           duration = Time.now - duration
-          if 0.25 < duration.to_f then
+          if @slow_sync < duration.to_f then
             puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SLOW SYNC(#{ duration.to_f }s), changed: #{ @changed.size }"
             @changed.each do | key, value |
               puts "    key: #{ key.class.name }, pid: #{ key.get_the_index }"
