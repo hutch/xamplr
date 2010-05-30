@@ -28,7 +28,7 @@ module Xampl
 
   def Xampl.disable_all_persisters
     @@persister = nil
-    @@known_persisters.each { | persister | persister.close}
+    @@known_persisters.each { |persister| persister.close }
     @@known_persisters = {}
   end
 
@@ -109,7 +109,7 @@ module Xampl
 
   def Xampl.print_known_persisters
     puts "Known Persisters:: --------------------------"
-    @@known_persisters.each { | n, k | puts " #{n} #{k}" }
+    @@known_persisters.each { |n, k| puts " #{n} #{k}" }
     puts "---------------------------------------------"
   end
 
@@ -174,7 +174,110 @@ module Xampl
     @@verbose_transactions = v
   end
 
-  def Xampl.transaction(thing, kind=nil, automatic=true, format=nil, &block)
+  class TransactionWork
+    def self.setup_work(work)
+      begin
+        define_method(:do_work, work)
+        self.new.do_work
+      ensure
+        remove_method(:do_work)
+      end
+    end
+  end
+
+  @@abnormal_return_from_transactions_are_errors = true
+
+  def Xampl.abnormal_return_from_transactions_are_errors
+    @@abnormal_return_from_transactions_are_errors
+  end
+
+  def Xampl.abnormal_return_from_transactions_are_errors=(v)
+    @@abnormal_return_from_transactions_are_errors = v
+  end
+
+  def Xampl.transaction(thing, kind=nil, automatic=true, format=nil, & block)
+    return nil unless block_given?
+
+    if String === thing then
+      name = thing
+    elsif XamplObject === thing then
+      name = thing.persister.name
+    else
+      raise XamplException.new("can't base a transaction on a #{thing.class.name} (#{thing})")
+    end
+
+    work = Proc.new # get the block into a proc object
+
+    @@xampl_lock.synchronize(:EX) do
+      begin
+        initial_persister = @@persister
+        Xampl.enable_persister(name, kind, format)
+
+        original_automatic = @@persister.automatic
+
+        okay = false
+        rollback = true
+        exception = nil
+        abnormal_return = true
+        result = nil
+
+        begin
+          #TODO -- impose some rules on nested transactions/enable_persisters??
+
+          Xampl.auto_persistence(automatic)
+
+          result = TransactionWork.setup_work(work)
+
+          abnormal_return = false
+
+          Xampl.block_future_changes(true)
+          Xampl.sync
+          rollback = false
+
+          okay = true
+          return result
+        rescue => e
+          exception = e
+        ensure
+          Xampl.block_future_changes(false)
+          Xampl.auto_persistence(original_automatic)
+
+          unless okay then
+            if exception then
+              Xampl.rollback
+            elsif abnormal_return then
+              if Xampl.abnormal_return_from_transactions_are_errors then
+                Xampl.rollback
+                exception = UnexpectedExitFromTransaction.new
+              else
+                begin
+                  Xampl.block_future_changes(true)
+                  Xampl.sync
+                rescue => e
+                  exception = e
+                ensure
+                  Xampl.block_future_changes(false)
+                  Xampl.auto_persistence(original_automatic)
+
+                  Xampl.rollback if exception
+                end
+              end
+            elsif rollback then
+              # don't know how this can happen, but roll it back anyway and treat it as an unexpected exit from transaction
+              Xampl.rollback
+              exception =  UnexpectedExitFromTransaction.new
+            end
+          end
+
+          @@persister = initial_persister
+          raise exception if exception
+        end
+      end
+    end
+  end
+
+  def Xampl.transaction_using_proc(thing, kind=nil, automatic=true, format=nil, & block)
+    # this method cannot account for returns in transactions (proc vs lambda/method issues)
     if String === thing then
       name = thing
     elsif XamplObject === thing then
@@ -263,7 +366,7 @@ module Xampl
     end
   end
 
-  def Xampl.read_only_transaction(thing, kind=nil, automatic=true, format=nil, &block)
+  def Xampl.read_only_transaction(thing, kind=nil, automatic=true, format=nil, & block)
     if String === thing then
       name = thing
     elsif XamplObject === thing then
@@ -425,11 +528,11 @@ module Xampl
   end
 
   def Xampl.sync_all
-    @@known_persisters.each{ | name, persister | persister.sync }
+    @@known_persisters.each { |name, persister| persister.sync }
   end
 
   def Xampl.close_all_persisters
-    @@known_persisters.each do | name, persister |
+    @@known_persisters.each do |name, persister|
       persister.close
     end
   end
@@ -440,7 +543,7 @@ module Xampl
   end
 
   def Xampl.rollback_all
-    @@known_persisters.values.each { | persister | persister.rollback }
+    @@known_persisters.values.each { |persister| persister.rollback }
   end
 
   def Xampl.lazy_load(xampl)
@@ -579,22 +682,22 @@ module Xampl
 
   def Xampl.query(hint=false)
     raise NoActivePersister unless @@persister
-    @@persister.query(hint) { | q | yield q }
+    @@persister.query(hint) { |q| yield q }
   end
 
   def Xampl.find_xampl(hint=false)
     raise NoActivePersister unless @@persister
-    @@persister.find_xampl(hint) { | q | yield q }
+    @@persister.find_xampl(hint) { |q| yield q }
   end
 
   def Xampl.find_meta(hint=false)
     raise NoActivePersister unless @@persister
-    @@persister.find_meta(hint) { | q | yield q }
+    @@persister.find_meta(hint) { |q| yield q }
   end
 
   def Xampl.find_pids(hint=false)
     raise NoActivePersister unless @@persister
-    @@persister.find_pids(hint) { | q | yield q }
+    @@persister.find_pids(hint) { |q| yield q }
   end
 
   def Xampl.find_mentions_of(xampl)

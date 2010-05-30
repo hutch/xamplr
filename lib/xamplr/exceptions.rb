@@ -69,6 +69,18 @@ module Xampl
     end
   end
 
+  class UnexpectedExitFromTransaction < Exception
+    attr_reader :xampl
+
+    def initialize(xampl=nil)
+      @xampl = xampl
+    end
+
+    def message
+      "unexpected exit from a transaction: ROLLBACK"
+    end
+  end
+
   class UnmanagedChange < Exception
     attr_reader :xampl
 
