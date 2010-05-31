@@ -681,6 +681,9 @@ module Xampl
       note_errors("TC[[#{ dir_path }]]:: backup error: %s\n") do
         @tc_db.copy(path)
       end
+      return true
+    rescue => e
+      return false
     end
   end
 
