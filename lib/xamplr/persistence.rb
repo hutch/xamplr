@@ -195,7 +195,8 @@ module Xampl
     @@abnormal_return_from_transactions_are_errors = v
   end
 
-  def Xampl.transaction(thing, kind=nil, automatic=true, format=nil, & block)
+  def Xampl.transaction_safe(thing, kind=nil, automatic=true, format=nil, & block)
+    #TODO -- won't work in xampl-gen
     return nil unless block_given?
 
     if String === thing then
@@ -276,7 +277,8 @@ module Xampl
     end
   end
 
-  def Xampl.transaction_using_proc(thing, kind=nil, automatic=true, format=nil, & block)
+  #def Xampl.transaction_using_proc(thing, kind=nil, automatic=true, format=nil, & block)
+  def Xampl.transaction(thing, kind=nil, automatic=true, format=nil, & block)
     # this method cannot account for returns in transactions (proc vs lambda/method issues)
     if String === thing then
       name = thing
