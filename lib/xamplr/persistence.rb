@@ -195,7 +195,7 @@ module Xampl
     @@abnormal_return_from_transactions_are_errors = v
   end
 
-  def Xampl.transaction_safe(thing, kind=nil, automatic=true, format=nil, & block)
+  def Xampl.transaction_as_a_method(thing, kind=nil, automatic=true, format=nil, & block)
     #TODO -- won't work in xampl-gen
     return nil unless block_given?
 
@@ -276,6 +276,7 @@ module Xampl
       end
     end
   end
+  alias Xampl.transaction_safe Xampl.transaction_as_a_method
 
   #def Xampl.transaction_using_proc(thing, kind=nil, automatic=true, format=nil, & block)
   def Xampl.transaction(thing, kind=nil, automatic=true, format=nil, & block)

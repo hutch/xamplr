@@ -668,6 +668,8 @@ module Xampl
 #      puts "#{File.basename(__FILE__)}:#{__LINE__} ??: #{ klass }/#{ pid }" unless representation
       $NF_COUNT += 1
 
+      #TODO this is coming back as ASCII-8BIT rather than UTF-8!!!!!!!!!!!!!!!!!!
+#      puts "#{ ::File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] encoding #{ representation.encoding }"
       return representation
     end
 

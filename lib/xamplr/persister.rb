@@ -134,12 +134,14 @@ module Xampl
     def represent(xampl, mentions=[])
       #puts "REPRESENT #{xampl} load needed: #{xampl.load_needed}"
       #      return nil if xampl.load_needed
+      rep = nil
       case xampl.default_persister_format || @format
         when nil, :xml_format then
-          return xampl.persist("", mentions)
+          rep = xampl.persist("", mentions)
         when :ruby_format then
-          return xampl.to_ruby(mentions)
+          rep = xampl.to_ruby(mentions)
       end
+      return rep
     rescue => e
       msg = "Failed to represent #{ xampl } due to: #{ e }"
       puts msg
@@ -151,11 +153,15 @@ module Xampl
       # Normally we'd expect to see the representation in the @format format, but
       # that isn't necessarily the case. Try to work out what the format might be...
 
+      #TODO -- this is a bit brutal, but it should work (it is the rule is that this is supposed to be UTF-8)
+      representation_fixed = representation.encode('UTF-8', :invalid => :replace, :undef => :replace)
+#      puts "#{ ::File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] ENCODING: #{ representation.encoding } -> #{ representation_fixed.encoding }"
+
       xampl = nil
-      if representation =~ /^</ then
-        xampl = XamplObject.realise_from_xml_string(representation, target)
+      if representation_fixed =~ /^</ then
+        xampl = XamplObject.realise_from_xml_string(representation_fixed, target)
       else
-        xampl = XamplObject.from_ruby(representation, target)
+        xampl = XamplObject.from_ruby(representation_fixed, target)
       end
       return xampl.note_realised
     end
@@ -220,7 +226,7 @@ module Xampl
 
     def put_changed(msg="")
       puts "Changed::#{msg}:"
-      @changed.each { | xampl, ignore | puts " #{xampl.tag} #{xampl.get_the_index}" }
+      @changed.each { |xampl, ignore| puts " #{xampl.tag} #{xampl.get_the_index}" }
     end
 
     def start_sync_write
@@ -272,7 +278,7 @@ module Xampl
           duration = Time.now - duration
           if @slow_sync < duration.to_f then
             puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] SLOW SYNC(#{ duration.to_f }s), changed: #{ @changed.size }"
-            @changed.each do | key, value |
+            @changed.each do |key, value|
               puts "    key: #{ key.class.name }, pid: #{ key.get_the_index }"
             end
           end

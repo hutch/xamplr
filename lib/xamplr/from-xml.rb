@@ -33,13 +33,13 @@ module Xampl
     end
 
     def FromXML.register(tag, ns_tag, klass)
-      @@by_ns_tag[ns_tag] = [ klass ]
+      @@by_ns_tag[ns_tag] = [klass]
       a = @@by_tag[tag]
       if (nil == a) then
-        @@by_tag[tag] = [ klass ]
+        @@by_tag[tag] = [klass]
       else
         found = false
-        a.each { | thing | found = found | (thing == klass) }
+        a.each { |thing| found = found | (thing == klass) }
         a << klass unless found
       end
     end
@@ -70,7 +70,7 @@ module Xampl
                                                  LibXML::XML::Parser::Options::NOCDATA |
                                                  LibXML::XML::Parser::Options::DTDATTR |
                                                  # LibXML::XML::Parser::Options::COMPACT |
-                                                 0)
+                                         0)
       #TODO CLOSE THIS THING!!
     end
 
@@ -87,7 +87,7 @@ module Xampl
                                                    LibXML::XML::Parser::Options::NOCDATA |
                                                    LibXML::XML::Parser::Options::DTDATTR |
                                                    # LibXML::XML::Parser::Options::COMPACT) |
-                                                   0)
+                                           0)
       #TODO CLOSE THIS THING!!
     end
 
@@ -365,13 +365,13 @@ TODO -- can these ever happen?
 
       #describe_current_element_type
 
-#TODO -- get rid of this, it is for debugging only
+      begin
+#TODO -- get rid of this??
 #TODO -- really?
-begin
-      okay = @reader.read
-rescue => e
-  raise RuntimeError, "WHAT?? -- #{ e }", e.backtrace
-end
+        okay = @reader.read
+      rescue => e
+        raise RuntimeError, "WHAT?? -- #{ e }", e.backtrace
+      end
 
       @just_opened_an_element = start_element?
       @insert_end_element = (@just_opened_an_element and @reader.empty_element?)
@@ -408,7 +408,7 @@ end
       if @reader.has_attributes? then
         attribute_count = @reader.attribute_count
         @reader.move_to_first_attribute
-        attribute_count.times do | i |
+        attribute_count.times do |i|
           if @reader.namespace_declaration? then
             @reader.move_to_next_attribute
             next
