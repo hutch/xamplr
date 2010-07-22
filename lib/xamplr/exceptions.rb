@@ -121,7 +121,7 @@ module Xampl
     attr_reader :msg
 
     def initialize(active, local)
-      @msg = "mixed persisters:: active #{active.name}, local: #{local.name}"
+      @msg = "mixed persisters:: active #{active.name}/#{ active }, local: #{local.name}/#{ local }"
     end
 
     def message

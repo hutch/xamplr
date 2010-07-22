@@ -12,54 +12,15 @@ module Xampl
     end
 
     def accessed
+      return unless @load_needed
+
       raise XamplIsInvalid.new(self) if invalid
-      # TODO -- why do I need to get rid of this line, alternatively, why
-      # is this next line even there? Well, because accessed is now called
-      # differently. But???
-      #raise NoActivePersister unless @persister
+      raise NoActivePersister.new unless @persister
+      raise XamplException(:load_blocked_because_persister_is_syncing,
+                           "often happens when you are describing a xampl object using a different persisted xampl object that hasn't been loaded yet") if @persister.syncing
 
-      if @load_needed and @persister then
-        raise NoActivePersister.new unless @persister
-
-        if nil == Xampl.persister then
-          #raise UnmanagedChange.new(self)
-          if not @persister.syncing then
-            Xampl.read_only(@persister) do
-              Xampl.lazy_load(self)
-            end
-          else
-            puts "LOAD NEEDED(2): REFUSED (persister: #{@persister.name})"
-            puts "                pid: #{self.get_the_index} #{self}"
-            caller(0).each { | trace | puts "  #{trace}"}
-          end
-        elsif Xampl.persister != @persister then
-          raise MixedPersisters.new(@persister, self)
-        elsif Xampl.persister == @persister then
-          if not @persister.syncing then
-            Xampl.read_only(@persister) do
-              Xampl.lazy_load(self)
-            end
-          else
-            puts "LOAD NEEDED(3): BAD IDEA, but load anyway (persister: #{@persister.name})"
-            puts "                #{self.class.name}"
-            puts "                pid: #{self.get_the_index}"
-            Xampl.read_only(@persister) do
-              Xampl.lazy_load(self)
-            end
-#            puts "LOAD NEEDED(3): REFUSED (persister: #{@persister.name})"
-#            puts "                #{self.class.name}"
-#            puts "                pid: #{self.get_the_index}"
-#            caller(0).each { | trace | puts "  #{trace}"}
-          end
-        else
-          puts "LOAD NEEDED(4): REFUSED (persister: #{@persister.name})"
-          puts "                pid: #{self.get_the_index} #{self}"
-          caller(0).each { | trace | puts "  #{trace}"}
-        end
-      else
-        puts "LOAD NEEDED(5): REFUSED (persister: #{@persister})" if @load_needed
-        puts "                pid: #{self.get_the_index} #{self}" if @load_needed
-        caller(0).each { | trace | puts "  #{trace}"} if @load_needed
+      Xampl.read_only(@persister) do
+        Xampl.lazy_load(self)
       end
     end
 
