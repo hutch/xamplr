@@ -148,8 +148,10 @@ module Xampl
     case Xampl.default_persister_kind
       when :tokyo_cabinet then
         Xampl::TokyoCabinetPersister.add_lexical_indexs(indexes)
-      when :monto then
-        Xampl::MongoPersister.add_lexical_indexs(indexes)
+      when :redis then
+        Xampl::RedisPersister.add_lexical_indexs(indexes)
+      #when :mongo then
+      #  Xampl::MongoPersister.add_lexical_indexs(indexes)
       else
         raise IncompatiblePersisterConfiguration.new(Xampl.default_persister_kind, "lexical_indexes")
     end
@@ -159,8 +161,10 @@ module Xampl
     case Xampl.default_persister_kind
       when :tokyo_cabinet then
         Xampl::TokyoCabinetPersister.add_numerical_indexs(indexes)
-      when :mongo then
-        Xampl::MongoPersister.add_numerical_indexs(indexes)
+      when :redis then
+        Xampl::RedisPersister.add_numerical_indexs(indexes)
+      #when :mongo then
+      #  Xampl::MongoPersister.add_numerical_indexs(indexes)
       else
         raise IncompatiblePersisterConfiguration.new(Xampl.default_persister_kind, "numerical_indexs")
     end

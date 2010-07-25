@@ -364,13 +364,13 @@ module Xampl
   end
 
   begin
-    if require 'mongo' then
-      require "xamplr/persisters/mongo"
+    if require 'redis' then
+      require "xamplr/persisters/redis"
     end
   rescue LoadError => e
-    # Well. No MongoDB.
+    # Well. No redis.
   rescue
-    # Well. No MongoDB.
+    # Well. No redis.
   end
 
 end

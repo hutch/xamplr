@@ -17,6 +17,6 @@
    level (below object level) and that this will allow sharing of the DB a
    little better -- still don't know about multiple writers to the same repo...
    can tyrant help here.
--- mongo, and a couple of others might be interesting
+-- redis, and a couple of others might be interesting (mongo didn't work out)
 -- what about SQL dbs? Maybe an SQL or DataMapper version??
 
