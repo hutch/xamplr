@@ -487,7 +487,7 @@ module Xampl
 
     def write(xampl)
 
-#      puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] write #{ xampl }"
+#      STDOUT.puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] write #{ xampl }"
       raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index
 
       expunging = self.expunged.include?(xampl)
@@ -610,7 +610,8 @@ module Xampl
                   end
                 end
               end
-              if index_info[:primary] && 0 < index_info[:secondary].size then
+              #NOTE I've changed to to an || from && (so it'll write if only either primary or secondary is defined)
+              if index_info[:primary] || 0 < index_info[:secondary].size then
                 file_place += ".idx"
                 File.open(file_place, "w") do |out|
                   out.write index_info.to_yaml
