@@ -76,34 +76,40 @@ module Xampl
     @@default_persister_options[:format] = format
   end
 
-  def Xampl.enable_persister(name, kind=nil, format=nil)
-    kind = kind || Xampl.default_persister_kind
-    format = format || Xampl.default_persister_format
+  def Xampl.create_named_persister(name, kind, arg=nil)
+    raise NoAnonymousPersisters.new unless name # there is no such thing as an anonymous persister, maybe later
 
-    @@persister = @@known_persisters[name]
+    persister = @@known_persisters[name]
+    return persister if persister
 
-    if @@persister then
-      #      @@persister.open # this won't work
-      # TODO -- if we know the persister, why are we being so anal about kind and format???
+    persister_class = @@persister_kinds[kind]
+    return nil unless persister_class
 
-      kind = @@persister.kind || kind
-      format = @@persister.format || format
+    persister = persister_class.new(name, :xml_format, arg)
+    @@known_persisters[name] = persister
 
-      if kind and kind != @@persister.kind then
-        raise IncompatiblePersisterRequest.new(@@persister, "kind", kind, @@persister.kind)
-      end
-      if format and format != @@persister.format then
-        raise IncompatiblePersisterRequest.new(@@persister, "format", format, @@persister.format)
-      end
-    end
+    return persister
+  end
 
-    unless @@persister then
-      @@persister = @@persister_kinds[kind].new(name, format)
-      if (nil != name) then
-        @@known_persisters[name] = @@persister
-      end
-    end
+  def Xampl.find_named_persister(name)
+    persister = @@known_persisters[name]
+  end
 
+  def Xampl.enable_named_persister(name)
+    persister = @@known_persisters[name]
+    raise NoPersisterNamed.new(name) unless persister
+
+    @@persister = persister
+  end
+
+  def Xampl.enable_persister(name, preferred_kind=nil)
+    # you'd better know what you are doing if you call this
+
+    raise NoPersisterNamed.new unless name
+
+    preferred_kind = preferred_kind || Xampl.default_persister_kind
+
+    @@persister = @@known_persisters[name] || Xampl.create_named_persister(name, preferred_kind, nil)
     @@persister
   end
 
@@ -115,7 +121,7 @@ module Xampl
 
   def Xampl.flush_persister_caches
     Xampl.print_known_persisters
-    @persister.close
+    @@persister.close
     @@known_persisters.delete(@@persister.name)
     Xampl.print_known_persisters
   end
@@ -217,7 +223,7 @@ module Xampl
     @@xampl_lock.synchronize(:EX) do
       begin
         initial_persister = @@persister
-        Xampl.enable_persister(name, kind, format)
+        Xampl.enable_persister(name, kind)
 
         original_automatic = @@persister.automatic
 
@@ -299,7 +305,7 @@ module Xampl
         begin
 #          @@xampl_lock.sync_lock(:EX)
           initial_persister = @@persister
-          Xampl.enable_persister(name, kind, format)
+          Xampl.enable_persister(name, kind)
 
           rollback = true
           exception = nil
@@ -386,7 +392,7 @@ module Xampl
     if block_given? then
       @@xampl_lock.synchronize(:EX) do
         initial_persister = @@persister
-        Xampl.enable_persister(name, kind, format)
+        Xampl.enable_persister(name, kind)
         target_persister = @@persister
 
         rollback = true
@@ -442,7 +448,7 @@ module Xampl
 
       if block_given? then
         initial_persister = @@persister
-        Xampl.enable_persister(name, target_persister.kind, target_persister.format)
+        Xampl.enable_persister(name, target_persister.kind)
 
         rollback = true
         original_automatic = @@persister.automatic

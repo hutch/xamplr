@@ -132,15 +132,7 @@ module Xampl
     end
 
     def represent(xampl, mentions=[])
-      #puts "REPRESENT #{xampl} load needed: #{xampl.load_needed}"
-      #      return nil if xampl.load_needed
-      rep = nil
-      case xampl.default_persister_format || @format
-        when nil, :xml_format then
-          rep = xampl.persist("", mentions)
-        when :ruby_format then
-          rep = xampl.to_ruby(mentions)
-      end
+      rep = xampl.persist("", mentions)
       return rep
     rescue => e
       msg = "Failed to represent #{ xampl } due to: #{ e }"
@@ -150,15 +142,15 @@ module Xampl
     end
 
     def realise(representation, target=nil)
-      # Normally we'd expect to see the representation in the @format format, but
-      # that isn't necessarily the case. Try to work out what the format might be...
-
-      #TODO -- this is a bit brutal, but it should work (it is the rule is that this is supposed to be UTF-8)
+      # This is a bit brutal, but it works (and, anyway, it *is* the rule is that this is supposed to be UTF-8)
       representation_fixed = representation.encode('UTF-8', :invalid => :replace, :undef => :replace)
-#      puts "#{ ::File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] ENCODING: #{ representation.encoding } -> #{ representation_fixed.encoding }"
 
       xampl = nil
-      if representation_fixed =~ /^</ then
+
+      # These days 'new' representations can only be XML. Historically it could have been Ruby. Check the
+      # representations (quickly) and choose appropriately.
+      if '<' == representation_fixed[0] then
+        # well it isn't ruby, so it must be XML. Of course this means no leading whitespace, which happens to be true.
         xampl = XamplObject.realise_from_xml_string(representation_fixed, target)
       else
         xampl = XamplObject.from_ruby(representation_fixed, target)
