@@ -46,13 +46,23 @@ module Xampl
     end
 
     def changed
-      unless Xampl.persister then
-        raise UnmanagedChange.new(self)
-      end
+      raise UnmanagedChange.new(self) unless Xampl.persister
       unless @is_changed then
         @is_changed = true
-        @parents.each{ | parent | parent.changed } if nil != @parents
+        if nil != @parents
+          @parents.each do |parent|
+            parent.changed
+          end
+        end
       end
+    end
+
+#    def changed?
+#      @is_changed
+#    end
+
+    def dirty?
+      @is_changed
     end
 
     def accessed

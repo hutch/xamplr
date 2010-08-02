@@ -117,6 +117,7 @@ module Xampl
     puts "Known Persisters:: --------------------------"
     @@known_persisters.each { |n, k| puts " #{n} #{k}" }
     puts "---------------------------------------------"
+    puts caller(0)
   end
 
   def Xampl.flush_persister_caches
@@ -143,11 +144,11 @@ module Xampl
   end
 
   def Xampl.drop_persister(name)
-    Xampl.print_known_persisters
+#    Xampl.print_known_persisters
     p = @@known_persisters[name]
     p.close if p
     @@known_persisters.delete(name)
-    Xampl.print_known_persisters
+#    Xampl.print_known_persisters
   end
 
   def Xampl.add_lexical_indexs(indexes)

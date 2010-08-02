@@ -1,9 +1,13 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '../../..'))
 
+#require 'weakref'
+
 require 'xamplr'
 
 Xampl.set_default_persister_kind(:in_memory)
+
+require 'xampl-generated-code/all'
 
 require 'spec'
 require 'spec/autorun'

@@ -29,18 +29,13 @@ module Xampl
     end
 
     def changed
-#      puts "CHANGED: is_changed #{@is_changed} xampl #{self}"
-      unless Xampl.persister then
-        raise UnmanagedChange.new(self)
-      end
+      raise UnmanagedChange.new(self) unless Xampl.persister
+
       if @persister then
-        if Xampl.persister != @persister then
-          raise UnmanagedChange.new(self)
-        end
-        if @persister.block_changes then
-          raise BlockedChange.new(self)
-        end
+        raise UnmanagedChange.new(self) if Xampl.persister != @persister
+        raise BlockedChange.new(self) if @persister.block_changes
       end
+
       unless @is_changed then
         @is_changed = true
         if @persister then

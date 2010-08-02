@@ -72,17 +72,9 @@ module Xampl
     end
 
     def has_changed(xampl)
-      #raise XamplException.new(:live_across_rollback) if @rolled_back
-      # puts "!!!! has_changed #{xampl} #{xampl.get_the_index} -- persist required: #{xampl.persist_required}"
       if xampl.persist_required && xampl.is_changed then
-        unless self == xampl.persister
-          raise MixedPersisters.new(xampl.persister, self)
-        end
+        raise MixedPersisters.new(xampl.persister, self) unless self == xampl.persister
         @changed[xampl] = xampl
-#         puts "!!!! change recorded ==> #{@changed.size}/#{count_changed} #{@changed.object_id} !!!!"
-        #         @changed.each{ | thing, ignore |
-        #           puts "             changed: #{thing}, index: #{thing.get_the_index},  changed: #{thing.is_changed}"
-        #         }
       end
     end
 
@@ -357,6 +349,7 @@ module Xampl
 
   begin
     if require 'redis' then
+      require 'weakref'
       require "xamplr/persisters/redis"
     end
   rescue LoadError => e

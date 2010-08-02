@@ -1,49 +1,48 @@
 module Xampl
 
-#  require "xamplr/persisters/caches"
-
-  require 'weakref'
-
   class RedisPersister < Persister
 
-    # TC has these persister options:
-    # TODO -- do something reasonable with these options??
-#    tokyo-cabinet.rb:        if Xampl.raw_persister_options[:otsync] then
-#    tokyo-cabinet.rb:        if Xampl.raw_persister_options[:mentions] then
-#    tokyo-cabinet.rb:            if Xampl.raw_persister_options[:write_through] then
+    attr_reader :repo_name,
+                :instance_options,
+                :client, # currently it's an instance of ::Redis from the redis-rb library
+                :suggested_repo_properties,
+                :repo_properties
 
-    attr_accessor :mentions, # if true, keep track of other persisted objects mentioned by a persisted object
-                  :db, # which db in redis to use (0 is the default, as it is in redis)
-                  :repo_name
+    @@default_redis_options = {
+            :repo_properties => {
+                    # DB Properties, maybe only set when the DB is created for the first time.
+                    :mentions => true,
+                    },
 
-    @@default_options = {
-            :mentions => false,
-            :db => 0
+            # Connect Properties
+            :thread_safe => true, # redis connections will be thread safe
+            :redis_server => "redis://127.0.0.1:6379/0", #This is the format expected by redis-rb, just use it
+            :clobbering_allowed => false,
+            :allow_connections => true,
+            :connect_to_known => true, # will connect to repos already in the redis db
+            :connect_to_unknown => true, # will connect to repose not in the redis db
+            :testing => false
     }
+
+    REPOSITORIES_KEY = "XAMPL::REPOSITORIES"
 
     def initialize(name=nil, format=nil, options={})
       super(name, format)
 
       @repo_name = name
-      @cache = {}
+#      puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] @@default_redis_options: #{ @@default_redis_options.inspect }"
+#      puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] Xampl.raw_persister_options: #{ Xampl.raw_persister_options.inspect }"
+#      puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] options: #{ options.inspect }"
 
-#      options = @@default_options.merge Xampl.raw_persister_options.merge options
-#
-#      @mentions = options[:mentions]
-#      @db = options[:db]
+      @instance_options = {}
+      @instance_options = @instance_options.merge(@@default_redis_options)
+      @instance_options = @instance_options.merge(Xampl.raw_persister_options)
+      @instance_options = @instance_options.merge(options) if options
 
-      #TODO
-      # connect to the redis db specified in options, or failing that the raw persister options
-      # find options for the persister in the current redis DB
+      @suggested_repo_properties = @instance_options.delete(:repo_properties)
 
-=begin
-
-      @module_map = {}
-      @capacity = capacity
-      @cache = {}
-      @new_cache = {}
-
-=end
+      clear_cache
+      ensure_connected
     end
 
     def RedisPersister.kind
@@ -54,57 +53,190 @@ module Xampl
       RedisPersister.kind
     end
 
-    def connect
-      return if redis
+    def ensure_connected
+      return if @client
+      return unless instance_options[:allow_connections]
 
-      raise "piss off"
+      server = @instance_options[:redis_server]
+      thread_safe = @instance_options[:thread_safe]
+      @client = Redis.connect(:url => server, :thread_safe => thread_safe)
+
+      # This check is necessary to make sure that the connection is made, otherwise the exception will be sometime in the future
+      # the redis exceptions are good enough, so don't bother trapping right here
+      @client.ping
+
+      # check to see if the repository with this name is known (in redis) already
+      load_repo_properties
+
+      if @repo_properties && !@instance_options[:connect_to_known] then
+        ensure_disconnected
+        raise IncompatiblePersisterConfiguration.new('redis', "prevent connections to existing repos named: '#{ repo_name }' in #{ server }")
+      end
+      if @repo_properties.nil? && !@instance_options[:connect_to_unknown] then
+        ensure_disconnected
+        raise IncompatiblePersisterConfiguration.new('redis', "prevent connections to unknown repos named: '#{ repo_name }' in #{ server }")
+      end
+
+      return if @repo_properties
+
+      # if it is unknown, then set it up
+
+      @repo_properties = {}
+      suggested_repo_properties.each do |k, v|
+        @repo_properties[k] = v
+      end
+      @repo_properties['name'] = repo_name
+      @repo_properties['created_at'] = DateTime.now.to_s
+
+      @client.multi do
+        @client.mapped_hmset(repo_properties_key, @repo_properties)
+        @client.sadd(REPOSITORIES_KEY, repo_name)
+      end
+
+      load_repo_properties
     end
 
-    def disconnect
-      return unless redis
+    def ensure_disconnected
+      return unless client
+      return unless instance_options[:allow_connections]
 
-      raise "piss off"
+      @client.quit
+    ensure
+      @repo_properties = nil
+      @client = nil
     end
 
-    def redis
-      @connection
+    def clobber
+      # TODO -- this is a BAD idea if there are any other connections to this repo (i.e. in different processes)
+
+      unless @instance_options[:clobbering_allowed] then
+        raise IncompatiblePersisterConfiguration.new('redis', "clobbering is not enabled for this connection to repo: '#{ repo_name }' in #{ @instance_options[:redis_server] }")
+      end
+
+      #TODO -- getting the keys outside the multi might allow some new key to sneak in there
+      keys = @client.keys("#{ common_key_prefix }*")
+      @client.multi do
+        @client.del(repo_properties_key)
+        @client.srem(REPOSITORIES_KEY, repo_name)
+
+        keys.each do |key|
+          @client.del(key)
+        end
+      end
+
+      ensure_disconnected
     end
 
-    def close
-      disconnect
-      clear_cache
+    def repo_properties_key
+      key = "XAMPL::PROPERTIES::#{ @repo_name }"
+      return key
+    end
+
+    def load_repo_properties
+      key = repo_properties_key()
+      @repo_properties = @client.hgetall(key)
+      @repo_properties = nil if @repo_properties.empty?
     end
 
     def clear_cache
+      @cache_hits = 0
       @cache = {}
+      @new_cache = {}
     end
 
     alias fresh_cache clear_cache
 
+    def close
+      ensure_disconnected
+      clear_cache
+    end
+
+    def common_key_prefix
+      "XAMPL::#{ @repo_name }::"
+    end
+
     def key_for_class(klass, index)
-      "XAMPL::#{ @repo_name }::#{ klass.name }[#{ index }]"
+      #NOTE -- the XAMPL::#{ @repo_name }:: is a prefix common to all keys specific to this repository
+      "#{ common_key_prefix }#{ klass.name }[#{ index }]"
     end
 
     def key_for_xampl(xampl)
       key_for_class(xampl.class, xampl.get_the_index)
     end
 
-    def cache(xampl)
+    def known_repos
+      return @client.smembers(REPOSITORIES_KEY)
+    end
+
+    def perm_cache(xampl)
       raise NotXamplPersistedObject.new(xampl) unless xampl.kind_of?(XamplPersistedObject)
 
       key = key_for_xampl(xampl)
       existing = @cache[key]
 
-      raise DuplicateXamplInPersister.new(existing, xampl, self) if existing && (existing.weakref_alive?) && (existing.__getobj__ != xampl)
+      begin
+#        raise DuplicateXamplInPersister.new(existing, xampl, self) if existing && (existing.weakref_alive?) && (existing.__getobj__ != xampl)
+        raise DuplicateXamplInPersister.new(existing, xampl, self) if existing && (existing.__getobj__ != xampl)
+      rescue WeakRef::RefError => e
+        # key is there but the original object isn't...
+      end
 
       @cache[key] = WeakRef.new(xampl)
     end
 
-    def uncache(xampl)
+    def perm_uncache(xampl)
       raise NotXamplPersistedObject.new(xampl) unless xampl.kind_of?(XamplPersistedObject)
 
       key = key_for_xampl(xampl)
       @cache.delete(key).__getobj__
+    end
+
+    def cache(xampl)
+      # this is called by xampl for the temporary new_cache
+      raise NotXamplPersistedObject.new(xampl) unless xampl.kind_of?(XamplPersistedObject)
+
+      key = key_for_xampl(xampl)
+
+      existing = @new_cache[key]
+      raise DuplicateXamplInPersister.new(existing, xampl, self) if existing && (existing != xampl)
+
+      existing = @cache[key]
+      begin
+#        raise DuplicateXamplInPersister.new(existing, xampl, self) if existing && (existing.weakref_alive?) && (existing.__getobj__ != xampl)
+        raise DuplicateXamplInPersister.new(existing, xampl, self) if existing && (existing.__getobj__ != xampl)
+      rescue WeakRef::RefError => e
+        # key is there but the original object isn't...
+      end
+
+      @new_cache[key] = xampl
+    end
+
+    def uncache(xampl)
+      # this is called by xampl for the temporary new_cache
+      puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] TEST ME"
+      raise NotXamplPersistedObject.new(xampl) unless xampl.kind_of?(XamplPersistedObject)
+      puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] TEST ME"
+
+      key = key_for_xampl(xampl)
+      @new_cache.delete(key)
+    end
+
+    def in_perm_cache?(klass, index)
+      key = key_for_class(klass, index)
+      xampl = @cache[key]
+
+      (xampl && xampl.weakref_alive?) ? true : false
+    end
+
+    alias in_cache? in_perm_cache?
+
+    def in_new_cache?(klass, index)
+      key = key_for_class(klass, index)
+      @new_cache.include?(key)
+    end
+
+    def in_any_cache?(klass, index)
+      in_new_cache?(klass, index) || in_cache?(klass, index)
     end
 
     def read_from_cache(klass, index, target=nil)
@@ -112,66 +244,96 @@ module Xampl
       key = key_for_class(klass, index)
 
       xampl = @cache[key]
-      return (xampl && xampl.weakref_alive?) ? xampl.__getobj__ : nil
-=begin
+      begin
+        xampl = xampl.__getobj__ if xampl
+      rescue WeakRef::RefError => e
+        #not there
+        xampl = nil
+      end
+#      xampl = (xampl && xampl.weakref_alive?) ? xampl.__getobj__ : nil
 
-TODO -- do we need this stuff??
-      xampl = Xampl.lookup_in_map(@cache, klass, pid)
-      if xampl then
-        if target and target != xampl then
-          target.invalidate
-          raise XamplException.new(:cache_conflict)
-        end
-        unless xampl.load_needed then
-          @cache_hits = @cache_hits + 1
-          return xampl, target
-        end
-        return xampl, xampl
+      unless xampl then
+        xampl = @new_cache[key]
       end
 
-      xampl = Xampl.lookup_in_map(@new_cache, klass, pid)
-      if xampl then
-        if target and target != xampl then
-          target.invalidate
-          raise XamplException.new(:cache_conflict)
-        end
-        unless xampl.load_needed then
-          @cache_hits = @cache_hits + 1
-          return xampl, target
-        end
-        return xampl, xampl
+      return nil, target unless xampl
+
+      if target and target != xampl then
+        puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] TEST ME"
+        target.invalidate
+        raise XamplException.new(:cache_conflict)
       end
-
-      return nil, target
-
-=end
+      unless xampl.load_needed then
+        @cache_hits = @cache_hits + 1
+        return xampl, target
+      end
+      puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] TEST ME"
+      return xampl, xampl
     end
 
-
-=begin
-
-
     def sync_done
-      if @new_cache then
-        @new_cache.each { |name1, map1|
-          if map1 then
-            cache_map1 = @cache[name1]
-            @cache[name1] = cache_map1 = {} unless cache_map1
-            map1.each { |name2, map2|
-              if map2 then
-                cache_map2 = cache_map1[name2]
-                cache_map1[name2] = cache_map2 = self.fresh_cache unless cache_map2
-
-                map2.each { |pid, xampl|
-                  cache_map2[pid] = xampl
-                }
-              end
-            }
-          end
-        }
+      # simply moves the new_cache to the permanent cache
+      (@new_cache || {}).each do |key, xampl|
+        @cache[key] = WeakRef.new(xampl)
       end
       @new_cache = {}
     end
+
+    def write(xampl)
+      unless xampl.get_the_index
+        puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] TEST ME"
+        raise NotXamplPersistedObject.new(xampl)
+      end
+
+      #TODO -- honour the mentions config information (FROM THE DB not the configuration!!)
+      mentions = []
+      xml = represent(xampl, mentions)
+      key = key_for_xampl(xampl)
+
+      #TODO save the modified-time-like value to support multi processing
+
+#      puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] redis #{ self }"
+#      puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] write: #{ xampl } --> #{ xml }"
+#      puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] key: #{ key }"
+
+      client.set(key, xml)
+      @write_count = @write_count + 1
+      xampl.changes_accepted
+      return true
+
+    rescue NotXamplPersistedObject => nxpo
+      raise nxpo
+    rescue => e
+      puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] #{ e }"
+      puts e.backtrace
+      return false
+    end
+
+
+    def read(klass, pid, target=nil)
+      xampl, target = read_from_cache(klass, pid, target)
+      return xampl if xampl and !target
+
+      key = key_for_class(klass, pid)
+      xml = client.get(key)
+      unless xml
+        puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] TEST ME"
+        return nil
+      end
+
+      xampl = realise(xml, target)
+      Xampl.store_in_cache(@cache, xampl, self) { xampl }
+      xampl.introduce_persister(self)
+
+      @read_count = @read_count + 1
+      xampl.changes_accepted
+      @changed.delete(xampl)
+      return xampl
+    end
+
+=begin
+
+
 
     def rollback_cleanup
       @new_cache.each { |name, map|
@@ -193,66 +355,6 @@ TODO -- do we need this stuff??
       super
     end
 
-    def write(xampl)
-      raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index
-      #return false unless xampl.get_the_index
-
-      if Xampl.store_in_map(@module_map, xampl) { represent(xampl) } then
-        @write_count = @write_count + 1
-        xampl.changes_accepted
-        return true
-      else
-        return false
-      end
-    end
-
-    def read_from_cache(klass, pid, target=nil)
-      xampl = Xampl.lookup_in_map(@cache, klass, pid)
-      if xampl then
-        if target and target != xampl then
-          target.invalidate
-          raise XamplException.new(:cache_conflict)
-        end
-        unless xampl.load_needed then
-          @cache_hits = @cache_hits + 1
-          return xampl, target
-        end
-        return xampl, xampl
-      end
-
-      xampl = Xampl.lookup_in_map(@new_cache, klass, pid)
-      if xampl then
-        if target and target != xampl then
-          target.invalidate
-          raise XamplException.new(:cache_conflict)
-        end
-        unless xampl.load_needed then
-          @cache_hits = @cache_hits + 1
-          return xampl, target
-        end
-        return xampl, xampl
-      end
-
-      return nil, target
-    end
-
-    def read(klass, pid, target=nil)
-      xampl, target = read_from_cache(klass, pid, target)
-      return xampl if xampl and !target
-
-      representation = Xampl.lookup_in_map(@module_map, klass, pid)
-      return nil unless representation
-
-      xampl = realise(representation, target)
-      Xampl.store_in_cache(@cache, xampl, self) { xampl }
-      xampl.introduce_persister(self)
-
-      @read_count = @read_count + 1
-      xampl.changes_accepted
-      @changed.delete(xampl)
-      return xampl
-    end
-  end
 
 
   def backup(base_path)
