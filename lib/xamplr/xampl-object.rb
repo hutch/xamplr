@@ -40,6 +40,7 @@ module Xampl
     def invalid
       return kind_of?(InvalidXampl)
     end
+    alias invalid? invalid
 
     def changes_accepted
       ResetIsChanged.new.start(self)

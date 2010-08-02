@@ -12,9 +12,10 @@ module Xampl
     end
 
     def accessed
+      raise XamplIsInvalid.new(self) if invalid #need this error to be more prominent
       return unless @load_needed
 
-      raise XamplIsInvalid.new(self) if invalid
+#      raise XamplIsInvalid.new(self) if invalid
       raise NoActivePersister.new unless @persister
       raise XamplException(:load_blocked_because_persister_is_syncing,
                            "often happens when you are describing a xampl object using a different persisted xampl object that hasn't been loaded yet") if @persister.syncing

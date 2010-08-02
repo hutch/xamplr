@@ -289,8 +289,83 @@ module Xampl
     end
   end
 
-  #def Xampl.transaction_using_proc(thing, kind=nil, automatic=true, format=nil, & block)
   def Xampl.transaction(thing, kind=nil, automatic=true, format=nil, & block)
+    # this method cannot account for returns in transactions (proc vs lambda/method issues)
+    if String === thing then
+      name = thing
+    elsif XamplObject === thing then
+      name = thing.persister.name
+    else
+      raise XamplException.new("can't base a transaction on a #{thing.class.name} (#{thing})")
+    end
+
+    if block_given? then
+      @@xampl_lock.synchronize(:EX) do
+        rollback = true
+        exception = nil
+        begin
+          initial_persister = @@persister
+          Xampl.enable_persister(name, kind)
+
+          original_automatic = @@persister.automatic
+
+          begin
+            #TODO -- impose some rules on nested transactions/enable_persisters??
+
+            Xampl.auto_persistence(automatic)
+
+            result = yield
+
+            rollback = false
+            Xampl.block_future_changes(true)
+            Xampl.sync
+            return result
+          rescue => e
+#            puts e.backtrace
+            exception = e
+          ensure
+            Xampl.block_future_changes(false)
+            Xampl.auto_persistence(original_automatic)
+
+            if rollback then
+              # we get here if the transaction block finishes early, for one of three reasons:
+              #    1) exception
+              #    2) throw
+              #    3) explicit return in the block
+              # it is arguable that throw and returns are 'okay', or normal exits from the block... I don't know???
+
+              if exception then
+                # the early finish was caused by an exception
+
+                Xampl.rollback
+              else
+                # this is the throw/explicit-return
+
+                #TODO -- is this a good idea??
+                Xampl.block_future_changes(true)
+                Xampl.sync
+
+
+                #TODO -- uncomment this, it's handy
+#                STDERR.puts "---------"
+#                STDERR.puts "Either a return or a throw from a transaction. The DB is synced, but this is not a good thing to be doing."
+#                STDERR.puts caller(0)
+#                STDERR.puts "---------"
+              end
+            end
+          end
+        ensure
+          @@persister = initial_persister
+
+          if exception then
+            raise RuntimeError, "ROLLBACK(#{__LINE__}):: #{exception}", exception.backtrace
+          end
+        end
+      end
+    end
+  end
+
+  def Xampl.transaction_not_so_good(thing, kind=nil, automatic=true, format=nil, & block)
     # this method cannot account for returns in transactions (proc vs lambda/method issues)
     if String === thing then
       name = thing
@@ -316,22 +391,32 @@ module Xampl
             #TODO -- impose some rules on nested transactions/enable_persisters??
 
             Xampl.auto_persistence(automatic)
+
             result = yield
+
+            rollback = false
             Xampl.block_future_changes(true)
             Xampl.sync
-            rollback = false
             return result
           rescue => e
+            puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] TEST ME"
+            puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] rollback: #{ rollback }"
             exception = e
           ensure
             Xampl.block_future_changes(false)
             Xampl.auto_persistence(original_automatic)
+
+            puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] rollback: #{ rollback }"
             if rollback then
+              puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] TEST ME"
+              puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] rollback: #{ rollback }"
               # we get here if the transaction block finishes early
               if exception then
+                puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] rollback: #{ rollback }"
                 # the early finish was caused by an exception
                 raise RuntimeError, "ROLLBACK(#{__LINE__}):: #{exception}", exception.backtrace
               else
+                puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] TEST ME"
                 # How could we have arrived at this point???
                 # Well, I don't know all the reasons, but the ones I do know are:
                 #  - return was used in the block passed into the transaction
@@ -348,32 +433,30 @@ module Xampl
                   STDERR.puts(trace)
                 end
                 STDERR.puts "---------"
-
-=begin
-
-                begin
-                  puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] "
-                  Xampl.block_future_changes(true)
-                  puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] "
-                  Xampl.sync
-                  rollback = false
-                rescue => e
-                  puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] "
-                  # so we know the persister had a problem
-                  puts "PERSISTER ERROR(#{__LINE__}) #{ e }"
-                ensure
-                  puts "#{ __FILE__ }:#{ __LINE__ } [#{__method__}] "
-                  Xampl.block_future_changes(false)
-                end
-
-=end
               end
+            else
+              puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] TEST ME"
             end
-            Xampl.rollback if rollback
+
+            if rollback then
+              puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] TEST ME"
+              Xampl.rollback
+              rollback = false
+            else
+              puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] TEST ME"
+            end
             @@persister = initial_persister
           end
-          raise exception if exception
-#        ensure
+          puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] rollback: #{ rollback }"
+          if exception
+            puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] rollback: #{ rollback }"
+            raise exception
+          else
+            puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] rollback: #{ rollback }"
+          end
+        ensure
+          puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] TEST ME" if rollback
+          puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] rollback: #{ rollback } ????????????" if rollback
 #          @@xampl_lock.sync_unlock
         end
       end

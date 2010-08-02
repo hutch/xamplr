@@ -213,9 +213,7 @@ module Xampl
 
     def uncache(xampl)
       # this is called by xampl for the temporary new_cache
-      puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] TEST ME"
       raise NotXamplPersistedObject.new(xampl) unless xampl.kind_of?(XamplPersistedObject)
-      puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] TEST ME"
 
       key = key_for_xampl(xampl)
       @new_cache.delete(key)
@@ -267,7 +265,6 @@ module Xampl
         @cache_hits = @cache_hits + 1
         return xampl, target
       end
-      puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] TEST ME"
       return xampl, xampl
     end
 
@@ -309,7 +306,6 @@ module Xampl
       return false
     end
 
-
     def read(klass, pid, target=nil)
       xampl, target = read_from_cache(klass, pid, target)
       return xampl if xampl and !target
@@ -331,29 +327,35 @@ module Xampl
       return xampl
     end
 
-=begin
-
-
-
     def rollback_cleanup
-      @new_cache.each { |name, map|
-        if map then
-          map.each { |name2, map2|
-            if map2 then
-              map2.each { |pid, xampl|
-                @changed.delete(xampl)
-                xampl.invalidate
-              }
-            end
-          }
+
+      @new_cache.each { |name, xampl|
+        if xampl then
+          @changed.delete(xampl)
+          xampl.invalidate
+
+#          map.each { |name2, map2|
+#            if map2 then
+#              map2.each { |pid, xampl|
+#                @changed.delete(xampl)
+#                xampl.invalidate
+#              }
+#            end
+#          }
         end
       }
       @changed.each { |xampl, ignore|
         xampl.force_load
       }
       @new_cache = {}
+
       super
     end
+
+=begin
+
+
+
 
 
 

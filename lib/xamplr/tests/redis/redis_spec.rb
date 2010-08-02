@@ -513,6 +513,203 @@ module Xampl
       end
     end
 
+    it "will rollback a newly created xampl object" do
+      repo_name = XamplTestRedis.scratch_name('redis')
+      redis = Xampl.create_named_persister(repo_name, :redis)
+      redis_client = redis.client
+
+      author_pid = 'anonymous'
+      key = redis.key_for_class(RedisTest::Author, author_pid)
+
+      author = nil
+      lambda do
+        Xampl.transaction(repo_name) do
+          author = RedisTest::Author.new(author_pid)
+          raise 'BOOM!'
+        end
+      end.should raise_exception
+
+      author.should_not be_nil
+      author.should be_invalid # set by the invalidated hook (see author.rb in this directory)
+      author.should be_invalidated # a built-in xampl method based on kind_of?(InvalidXampl)
+
+      author.pid.should == author_pid
+
+      lambda do
+        author.accessed
+      end.should raise_exception(Xampl::XamplIsInvalid)
+    end
+
+    it "will NOT rollback a newly created xampl object when throwing" do
+      repo_name = XamplTestRedis.scratch_name('redis')
+      redis = Xampl.create_named_persister(repo_name, :redis)
+      redis_client = redis.client
+
+      author_pid = 'anonymous'
+      key = redis.key_for_class(RedisTest::Author, author_pid)
+
+      author = nil
+
+      lambda do
+        Xampl.transaction(repo_name) do
+          author = RedisTest::Author.new(author_pid)
+          throw :idiot_move
+        end
+      end.should throw_symbol(:idiot_move)
+
+      author.should_not be_nil
+      author.should_not be_invalid # set by the invalidated hook (see author.rb in this directory)
+      author.should_not be_invalidated # a built-in xampl method based on kind_of?(InvalidXampl)
+
+      author.pid.should == author_pid
+
+      lambda do
+        author.accessed
+      end.should_not raise_exception(Xampl::XamplIsInvalid)
+    end
+
+    it "will rollback a changed xampl object" do
+      repo_name = XamplTestRedis.scratch_name('redis')
+      redis = Xampl.create_named_persister(repo_name, :redis)
+      redis_client = redis.client
+
+      author_pid = 'anonymous'
+      key = redis.key_for_class(RedisTest::Author, author_pid)
+
+      author = nil
+      Xampl.transaction(repo_name) do
+        author = RedisTest::Author.new(author_pid)
+      end
+      author.info.should be_nil
+
+      mentions = []
+      xml1 = redis.represent(author, mentions)
+
+      current_value = redis_client.get(key)
+      current_value.should == xml1
+
+      lambda do
+        Xampl.transaction(repo_name) do
+          author.info = 'changed'
+          author.should be_dirty
+          raise 'BOOM!'
+        end
+      end.should raise_exception
+
+      author.should_not be_dirty
+
+      author.info.should be_nil
+
+      author.should_not be_invalid # set by the invalidated hook (see author.rb in this directory)
+      author.should_not be_invalidated # a built-in xampl method based on kind_of?(InvalidXampl)
+
+      mentions = []
+      xml2 = redis.represent(author, mentions)
+
+      xml2.should == xml1
+
+      current_value = redis_client.get(key)
+      current_value.should == xml2
+    end
+
+    it "will NOT rollback a changed xampl object after throwing" do
+      repo_name = XamplTestRedis.scratch_name('redis')
+      redis = Xampl.create_named_persister(repo_name, :redis)
+      redis_client = redis.client
+
+      author_pid = 'anonymous'
+      key = redis.key_for_class(RedisTest::Author, author_pid)
+
+      author = nil
+      Xampl.transaction(repo_name) do
+        author = RedisTest::Author.new(author_pid)
+      end
+      author.info.should be_nil
+
+      mentions = []
+      xml1 = redis.represent(author, mentions)
+
+      current_value = redis_client.get(key)
+      current_value.should == xml1
+
+      lambda do
+        Xampl.transaction(repo_name) do
+          author.info = 'changed'
+          author.should be_dirty
+          throw :idiot_move
+        end
+      end.should throw_symbol(:idiot_move)
+
+      author.should_not be_dirty
+
+      author.info.should == 'changed'
+
+      author.should_not be_invalid # set by the invalidated hook (see author.rb in this directory)
+      author.should_not be_invalidated # a built-in xampl method based on kind_of?(InvalidXampl)
+
+      mentions = []
+      xml2 = redis.represent(author, mentions)
+
+      xml2.should_not == xml1
+
+      current_value = redis_client.get(key)
+      current_value.should == xml2
+    end
+
+    it "will create an object in a nested transaction" do
+      author_pid = 'anonymous'
+
+      outer_repo_name = XamplTestRedis.scratch_name('redis')
+      outer_redis = Xampl.create_named_persister(outer_repo_name, :redis)
+
+      inner_repo_name = XamplTestRedis.scratch_name('redis')
+      inner_redis = Xampl.create_named_persister(inner_repo_name, :redis)
+
+      outer_redis_client = outer_redis.client
+      inner_redis_client = inner_redis.client
+
+      outer_redis_client.client.should be_connected
+      inner_redis_client.client.should be_connected
+
+      outer_key = outer_redis.key_for_class(RedisTest::Author, author_pid)
+      inner_key = inner_redis.key_for_class(RedisTest::Author, author_pid)
+
+      outer_value = outer_redis_client.get(outer_key)
+      outer_value.should be_nil
+
+      inner_value = inner_redis_client.get(inner_key)
+      inner_value.should be_nil
+
+      author = nil
+
+      Xampl.transaction(outer_repo_name) do
+        Xampl.transaction(inner_repo_name) do
+          author = RedisTest::Author.new(author_pid)
+        end
+      end
+
+      #TODO -- raise exception in inner
+      #TODO -- raise exception in outer
+      #TODO -- throw in inner
+      #TODO -- throw in outer
+
+      outer_value = outer_redis_client.get(outer_key)
+      outer_value.should be_nil
+
+      inner_value = inner_redis_client.get(inner_key)
+      inner_value.should == author.to_xml
+
+      author.should_not be_nil
+      author.should_not be_invalid # set by the invalidated hook (see author.rb in this directory)
+      author.should_not be_invalidated # a built-in xampl method based on kind_of?(InvalidXampl)
+      author.pid.should == author_pid
+      lambda do
+        author.accessed
+      end.should_not raise_exception(Xampl::XamplIsInvalid)
+    end
+
+    # explicit return cannot be tested because rspec is doing something
+
 #    it "will zzz" do
 #      pending
 #    end

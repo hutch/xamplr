@@ -8,6 +8,7 @@ require 'xamplr'
 Xampl.set_default_persister_kind(:in_memory)
 
 require 'xampl-generated-code/all'
+require 'author'
 
 require 'spec'
 require 'spec/autorun'
