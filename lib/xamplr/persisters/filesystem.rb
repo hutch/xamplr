@@ -5,7 +5,8 @@ module Xampl
 
   class FilesystemPersister < AbstractCachingPersister
 
-    def initialize(name=nil, format=nil, root=File.join(".", "repo"))
+    def initialize(name=nil, format=nil, root=nil)
+      root = File.join(".", "repo") if root.nil?
       super(root, name, format)
     end
 

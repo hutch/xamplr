@@ -2,7 +2,7 @@ module Xampl
 
   class DumbPersister < Persister
 
-    def initialize(name=nil, format=nil)
+    def initialize(name=nil, format=nil, ignore=nil)
       super(name, format)
 
       @module_map = {}

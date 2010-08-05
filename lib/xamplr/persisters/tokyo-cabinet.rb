@@ -56,6 +56,7 @@ module Xampl
     end
 
     def initialize(name=nil, format=nil, root=File.join(".", "repo"))
+      root = File.join(".", "repo") if root.nil?
       super(root, name, format)
 
       @files_dir = "#{ @root_dir }/files"

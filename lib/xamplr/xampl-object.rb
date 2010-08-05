@@ -145,7 +145,11 @@ module Xampl
     def to_s
       if self.persisted? then
         persister_name = self.persister ? "#{ self.persister.name }/" : ''
-        "<<#{ self.class.name } #{ self.object_id } [#{ self.persister ? self.persister.name  : 'no-persister' }/#{ self.get_the_index }]#{ @is_changed ? ' DIRTY' : ''}>>"
+        if @load_needed then
+          "<<#{ self.class.name } #{ self.object_id } [#{ self.persister ? self.persister.name  : 'no-persister' }/#{ self.get_the_index }] NOT LOADED>>"
+        else
+          "<<#{ self.class.name } #{ self.object_id } [#{ self.persister ? self.persister.name  : 'no-persister' }/#{ self.get_the_index }]#{ @is_changed ? ' DIRTY' : ''}>>"
+        end
       elsif self.indexed_by then
         "<<#{ self.class.name } #{ self.object_id } [#{ self.get_the_index }]>>"
       else

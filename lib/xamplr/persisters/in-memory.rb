@@ -5,6 +5,7 @@ module Xampl
   class InMemoryPersister < Persister
 
     def initialize(name=nil, format=nil, capacity=20)
+      capacity ||= 20
       super(name, format)
 
       @module_map = {}
