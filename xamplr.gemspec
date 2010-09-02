@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{xamplr}
-  s.version = "1.9.13"
+  s.version = "1.9.14"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bob Hutchison"]
-  s.date = %q{2010-07-14}
+  s.date = %q{2010-09-02}
   s.description = %q{xamplr is the ruby version of xampl.}
   s.email = %q{hutch@recursive.ca}
   s.extra_rdoc_files = [
@@ -36,6 +36,8 @@ Gem::Specification.new do |s|
      "lib/xamplr/exceptions.rb",
      "lib/xamplr/from-xml-orig.rb",
      "lib/xamplr/from-xml.rb",
+     "lib/xamplr/from-xml.rb.libxml",
+     "lib/xamplr/from-xml.rb.nokogiri",
      "lib/xamplr/indexed-array.rb",
      "lib/xamplr/iterator.rb",
      "lib/xamplr/mixins.rb",
@@ -48,7 +50,8 @@ Gem::Specification.new do |s|
      "lib/xamplr/persisters/dumb.rb",
      "lib/xamplr/persisters/filesystem.rb",
      "lib/xamplr/persisters/in-memory.rb",
-     "lib/xamplr/persisters/mongo.rb",
+     "lib/xamplr/persisters/mongo.rb.cannot-use",
+     "lib/xamplr/persisters/redis.rb",
      "lib/xamplr/persisters/simple.rb",
      "lib/xamplr/persisters/tokyo-cabinet.rb",
      "lib/xamplr/persisters/tokyo-cabinet.rb.1-DB",
@@ -72,6 +75,17 @@ Gem::Specification.new do |s|
      "lib/xamplr/test-support/test-names.rb",
      "lib/xamplr/test-support/test-rollback.rb",
      "lib/xamplr/test-support/test.rb",
+     "lib/xamplr/tests/.gitignore",
+     "lib/xamplr/tests/redis/Makefile",
+     "lib/xamplr/tests/redis/author.rb",
+     "lib/xamplr/tests/redis/project-generator.rb",
+     "lib/xamplr/tests/redis/redis_spec.rb",
+     "lib/xamplr/tests/redis/spec.opts",
+     "lib/xamplr/tests/redis/spec_helper.rb",
+     "lib/xamplr/tests/redis/testing-db/.gitignore",
+     "lib/xamplr/tests/redis/testing-db/Makefile",
+     "lib/xamplr/tests/redis/testing-db/unit-testing.redis.conf",
+     "lib/xamplr/tests/redis/xml/redis-test.xml",
      "lib/xamplr/to-ruby.rb",
      "lib/xamplr/to-xml.rb",
      "lib/xamplr/visitor.rb",
@@ -125,14 +139,14 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<xamplr-pp>, [">= 1.2.0"])
-      s.add_runtime_dependency(%q<libxml-ruby>, [">= 1.1.3"])
+      s.add_runtime_dependency(%q<nokogiri>, [">= 1.4.3"])
     else
       s.add_dependency(%q<xamplr-pp>, [">= 1.2.0"])
-      s.add_dependency(%q<libxml-ruby>, [">= 1.1.3"])
+      s.add_dependency(%q<nokogiri>, [">= 1.4.3"])
     end
   else
     s.add_dependency(%q<xamplr-pp>, [">= 1.2.0"])
-    s.add_dependency(%q<libxml-ruby>, [">= 1.1.3"])
+    s.add_dependency(%q<nokogiri>, [">= 1.4.3"])
   end
 end
 
