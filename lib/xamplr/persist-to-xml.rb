@@ -47,24 +47,12 @@ module Xampl
 =begin
 
     def attr_esc_fast(s)
-      #NOTE -- there are known issues with using Ruby 1.9.1 and libxml-ruby, which this is using. Seems to mostly
-      #        be related to DOM and XPATH but...
-      unless defined?(@@doc) then
-        @@doc = LibXML::XML::Document.new()
-        @@doc.root = LibXML::XML::Node.new('r')
-        @@attr = LibXML::XML::Attr.new(@@doc.root, 'v', 'v')
-      end
-
-      @@attr.value = s.to_s
-      (@@doc.root.to_s)[6..-4]
     end
 
 =end
 
     def attr_esc_slow(s)
-      if (s.kind_of? XamplObject)
-        return attr_esc(s.to_xml)
-      end
+      return attr_esc(s.to_xml) if (s.kind_of? XamplObject)
 
       result = s.to_s.dup
 
@@ -77,7 +65,8 @@ module Xampl
       return "\"result\""
     end
 
-    def attr_esc_encoding_safe(s)
+    def attr_esc(s)
+      # This depends on ruby 1.9
       return attr_esc(s.to_xml) if (s.kind_of? XamplObject)
 
       begin
@@ -88,21 +77,14 @@ module Xampl
         }
         result = s.to_s.dup.encode('UTF-8', 'UTF-8', options)
 
-#        puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] IN: [[#{ s.to_s }]], OUT: [[#{ result }]]"
-
         return result
       rescue => e
         puts "Naughty Programmer! No! Bad!: #{ e } encoding in: #{ s.encoding }, out: #{ result.encoding }"
         puts e.backtrace
       end
 
-
       return ''
-
     end
-
-#    alias attr_esc attr_esc_fast
-    alias attr_esc attr_esc_encoding_safe
 
     def content_esc(s)
       return content_esc(s.to_s.dup) if (s.kind_of? XamplObject)

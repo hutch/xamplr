@@ -68,25 +68,25 @@ module Xampl
     def initialize(out="", skip=[])
       super()
 
-      @out = out
-      @indent = ""
-      @indent_step = "  "
+      @out               = out
+      @indent            = ""
+      @indent_step       = "  "
       @start_attr_indent = ""
-      @was_attr = false
+      @was_attr          = false
 
-      @depth = 0
+      @depth             = 0
 
-      @skip = {}
-      skip.each{ | ns |
+      @skip              = {}
+      skip.each { |ns|
         @skip[ns] = ns
       }
 
-      @ns_to_prefix = {}
-      @start_body = nil
-      @body = ""
-      @attr_list = nil
+      @ns_to_prefix      = {}
+      @start_body        = nil
+      @body              = ""
+      @attr_list         = nil
 
-      @insert_comment = nil
+      @insert_comment    = nil
     end
 
     def short_circuit
@@ -95,7 +95,7 @@ module Xampl
     end
 
     def cycle(xampl)
-      @short_circuit = true
+      @short_circuit  = true
       @insert_comment = "<!-- CYCLE -->"
       return true
     end
@@ -113,7 +113,7 @@ module Xampl
 
       prefix = ns_to_prefix[ns]
       if (nil == prefix) then
-        preferred = XamplObject.lookup_preferred_ns_prefix(ns)
+        preferred        = XamplObject.lookup_preferred_ns_prefix(ns)
         prefix = "" << preferred << ":" if preferred
         prefix = "ns" << ns_to_prefix.size.to_s << ":" unless prefix
         ns_to_prefix[ns] = prefix
@@ -150,7 +150,7 @@ module Xampl
 
     def attribute(xampl)
       @attr_list = []
-      pid = nil
+      pid        = nil
       if (nil != xampl.attributes) then
         xampl.attributes.each do |attr_spec|
           unless @skip[attr_spec[2]] then
@@ -207,15 +207,15 @@ module Xampl
         attribute(xampl)
       end
 
-      tag = xampl.tag
-      ns = xampl.ns
-      indent = do_indent
-      tag_info = "" << "<" << register_ns(ns) << tag
+      tag         = xampl.tag
+      ns          = xampl.ns
+      indent      = do_indent
+      tag_info    = "" << "<" << register_ns(ns) << tag
       attr_indent = "" << indent << (" " * tag_info.size)
       unless @start_body then
         @start_attr_indent = attr_indent
-        attr_defn = show_attributes(attr_indent)
-        @start_body = "" << indent << tag_info << attr_defn
+        attr_defn          = show_attributes(attr_indent)
+        @start_body        = "" << indent << tag_info << attr_defn
         @was_attr = true if 0 < attr_defn.size
       else
         @body << indent << tag_info << show_attributes(attr_indent)
@@ -224,7 +224,7 @@ module Xampl
 
     def end_element(xampl)
       tag = xampl.tag
-      ns = xampl.ns
+      ns  = xampl.ns
       if @@compact then
         @body << "</" << register_ns(ns) << tag << ">"
       else
@@ -310,33 +310,33 @@ module Xampl
     end
 
     def make_copy(root, translate_pids)
-      @was_attr = false
+      @was_attr                    = false
 
-      @ns_to_prefix = {}
-      @start_body = nil
-      @body = ""
-      @attr_list = nil
+      @ns_to_prefix                = {}
+      @start_body                  = nil
+      @body                        = ""
+      @attr_list                   = nil
 
       @pid_translations_old_to_new = translate_pids
       @pid_translations_new_to_old = translate_pids.invert
 
 #      @persisted_xampl_found = { @current_root.get_the_index => root }
-      @persisted_xampl_found = { (@current_root || root).get_the_index => root } #TODO -- is root ever okay here?
-      @copies_by_old_pid = {}
+      @persisted_xampl_found       = {(@current_root || root).get_the_index => root} #TODO -- is root ever okay here?
+      @copies_by_old_pid           = {}
 
       while true do
-        copy_these = []
+        copy_these             = []
 
-        @persisted_xampl_found.each do | pid, xampl |
+        @persisted_xampl_found.each do |pid, xampl|
           copy_these << xampl unless @copies_by_old_pid[pid]
         end
 
         break if 0 == copy_these.length
 
         @persisted_xampl_found = {}
-        copy_these.each do | xampl |
-          @current_root = xampl
-          @out = ""
+        copy_these.each do |xampl|
+          @current_root                                   = xampl
+          @out                                            = ""
           @copies_by_old_pid[@current_root.get_the_index] = @out
 
           copy_xampl(@current_root)
@@ -351,20 +351,20 @@ module Xampl
     end
 
     @@base_pid = Time.now.to_i.to_s + "_"
-    @@gen_pid = 0
+    @@gen_pid  = 0
 
     def get_the_new_pid(xampl)
-      current_pid = xampl.get_the_index
+      current_pid                         = xampl.get_the_index
       @persisted_xampl_found[current_pid] = xampl
 
-      new_pid = @pid_translations_old_to_new[current_pid]
+      new_pid                             = @pid_translations_old_to_new[current_pid]
 
       unless new_pid then
-        @@gen_pid += 1
-        new_pid = @@base_pid + @@gen_pid.to_s
+        @@gen_pid                                 += 1
+        new_pid                                   = @@base_pid + @@gen_pid.to_s
 
         @pid_translations_old_to_new[current_pid] = new_pid
-        @pid_translations_new_to_old[new_pid] = current_pid
+        @pid_translations_new_to_old[new_pid]     = current_pid
       end
 
       return new_pid
@@ -386,7 +386,7 @@ module Xampl
 
       prefix = ns_to_prefix[ns]
       if (nil == prefix) then
-        preferred = XamplObject.lookup_preferred_ns_prefix(ns)
+        preferred        = XamplObject.lookup_preferred_ns_prefix(ns)
         prefix = "" << preferred << ":" if preferred
         prefix = "ns" << ns_to_prefix.size.to_s << ":" unless prefix
         ns_to_prefix[ns] = prefix
@@ -424,9 +424,9 @@ module Xampl
     def attribute(xampl)
       @attr_list = []
       if (nil != xampl.attributes) then
-        xampl.attributes.each{ | attr_spec |
+        xampl.attributes.each { |attr_spec|
           prefix = (2 < attr_spec.length) ? register_ns(attr_spec[2]) : ""
-          value = get_the_new_pid(xampl.instance_variable_get(attr_spec[0]))
+          value  = get_the_new_pid(xampl.instance_variable_get(attr_spec[0]))
           @attr_list << (" " << prefix << attr_spec[1] << "='" << attr_esc(value) << "'") \
                 unless nil == value
         }
@@ -435,12 +435,12 @@ module Xampl
 
     def persist_attribute(xampl)
       @attr_list = []
-      pattr = xampl.indexed_by.to_s
+      pattr      = xampl.indexed_by.to_s
       if (nil != xampl.attributes) then
-        xampl.attributes.each{ | attr_spec |
+        xampl.attributes.each { |attr_spec|
           if pattr == attr_spec[1] then
             prefix = (2 < attr_spec.length) ? register_ns(attr_spec[2]) : ""
-            value = xampl.instance_variable_get(attr_spec[0])
+            value  = xampl.instance_variable_get(attr_spec[0])
             @attr_list << (" " << prefix << attr_spec[1] << "='" << attr_esc(value) << "'") \
                   unless nil == value
             break
@@ -459,12 +459,12 @@ module Xampl
     end
 
     def start_element(xampl)
-      tag = xampl.tag
-      ns = xampl.ns
+      tag      = xampl.tag
+      ns       = xampl.ns
       tag_info = "" << "<" << register_ns(ns) << tag
       unless @start_body then
         attribute(xampl)
-        attr_defn = show_attributes
+        attr_defn   = show_attributes
         @start_body = "" << tag_info << attr_defn
         @was_attr = true if 0 < attr_defn.size
       else
@@ -480,13 +480,13 @@ module Xampl
 
     def end_element(xampl)
       tag = xampl.tag
-      ns = xampl.ns
+      ns  = xampl.ns
       @body << "</" << register_ns(ns) << tag << ">"
     end
 
     def define_ns
       result = ""
-      ns_to_prefix.each{ | ns, prefix |
+      ns_to_prefix.each { |ns, prefix|
         result = sprintf("%s xmlns:%s='%s'", result, prefix[0..-2], ns)
       }
       return result

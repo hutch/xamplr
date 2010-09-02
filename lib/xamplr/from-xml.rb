@@ -1,6 +1,6 @@
 # encoding utf-8
 
-require 'libxml'
+require 'nokogiri'
 
 module Xampl
 
@@ -45,33 +45,20 @@ module Xampl
     end
 
     def FromXML.registered(name)
-      #puts "registered by ns tag: #{ @@by_ns_tag.keys.sort.inspect }"
       klass = @@by_ns_tag[name]
-      #puts "registered by tag: #{ @@by_tag.keys.sort.inspect }"
       klass = @@by_tag[name] unless klass
       klass = [] unless klass
       return klass
     end
 
     def resolve(name)
-      #TODO -- ???
+      #TODO -- ??? don't seem to need it, this is for specific named entities
       return name
     end
 
     def setup_parse(filename, tokenise_content=true, is_realising=false)
-      @resolver         = self
-
-      @is_realising     = is_realising
-      @tokenise_content = tokenise_content
-
-      @reader           = LibXML::XML::Reader.file(filename,
-                                                   :options => LibXML::XML::Parser::Options::NOENT |
-                                                           LibXML::XML::Parser::Options::NONET |
-                                                           LibXML::XML::Parser::Options::NOCDATA |
-                                                           LibXML::XML::Parser::Options::DTDATTR |
-                                                           # LibXML::XML::Parser::Options::COMPACT |
-                                                   0)
-      #TODO CLOSE THIS THING!!
+      xml = File.read(filename)
+      setup_parse_string(xml, tokenise_content, is_realising)
     end
 
     def setup_parse_string(string, tokenise_content=true, is_realising=false)
@@ -80,15 +67,35 @@ module Xampl
       @is_realising     = is_realising
       @tokenise_content = tokenise_content
 
-      #      setInput(string)
-      @reader           = LibXML::XML::Reader.string(string,
-                                                     :options => LibXML::XML::Parser::Options::NOENT |
-                                                             LibXML::XML::Parser::Options::NONET |
-                                                             LibXML::XML::Parser::Options::NOCDATA |
-                                                             LibXML::XML::Parser::Options::DTDATTR |
-                                                             # LibXML::XML::Parser::Options::COMPACT) |
-                                                     0)
-      #TODO CLOSE THIS THING!!
+=begin
+      STRICT	=	0	 	 Strict parsing
+      RECOVER	=	1 << 0	 	 Recover from errors
+      NOENT	=	1 << 1	 	 Substitute entities
+      DTDLOAD	=	1 << 2	 	 Load external subsets
+      DTDATTR	=	1 << 3	 	 Default DTD attributes
+      DTDVALID	=	1 << 4	 	 validate with the DTD
+      NOERROR	=	1 << 5	 	 suppress error reports
+      NOWARNING	=	1 << 6	 	 suppress warning reports
+      PEDANTIC	=	1 << 7	 	 pedantic error reporting
+      NOBLANKS	=	1 << 8	 	 remove blank nodes
+      SAX1	=	1 << 9	 	 use the SAX1 interface internally
+      XINCLUDE	=	1 << 10	 	 Implement XInclude substitition
+      NONET	=	1 << 11	 	 Forbid network access
+      NODICT	=	1 << 12	 	 Do not reuse the context dictionnary
+      NSCLEAN	=	1 << 13	 	 remove redundant namespaces declarations
+      NOCDATA	=	1 << 14	 	 merge CDATA as text nodes
+      NOXINCNODE	=	1 << 15	 	 do not generate XINCLUDE START/END nodes
+      DEFAULT_XML	=	RECOVER	 	 the default options used for parsing XML documents
+      DEFAULT_HTML	=	RECOVER | NOERROR | NOWARNING | NONET	 	 the default options used for parsing HTML documents
+=end
+
+      options           = Nokogiri::XML::ParseOptions::RECOVER | Nokogiri::XML::ParseOptions::NOENT | Nokogiri::XML::ParseOptions::NONET | Nokogiri::XML::ParseOptions::NOCDATA | Nokogiri::XML::ParseOptions::DTDATTR
+
+      utf8_string       = string.force_encoding('utf-8')
+      url               = nil
+      encoding          = nil
+
+      @reader           = Nokogiri::XML::Reader.from_memory(utf8_string, url, encoding, options)
     end
 
     def parse(filename, tokenise_content=true, is_realising=false)
@@ -115,20 +122,25 @@ module Xampl
       end
     end
 
-    def FromXML.tokenise_string(str, strip=true)
-      return nil unless str
-      str.strip! if strip
-      str.gsub!(/[ \n\r\t][ \n\r\t]*/, " ")
-      return str
+    def chew
+      xml   = @reader.outer_xml
+      depth = @reader.depth
+      @reader.read
+      while depth != @reader.depth do
+        @reader.read
+      end
+      return xml
     end
 
+
     def parse_element(parent=nil, target=nil)
+#      puts caller(0)[0..5]
+
       find_the_first_element
       return unless start_element?
 
       namespace        = @reader.namespace_uri
       name             = @reader.local_name
-
       existing_element = nil
       element          = nil
 
@@ -143,12 +155,11 @@ module Xampl
           # The class has not been registered (either it was never generated, or it was never loaded)
           begin
             #discard this node and all children, but say something
-            thing = @reader.expand
+            thing = chew
             puts "#{ ::File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] UNRECOGNISED CHILD ELEMENTS: class: #{ klass_name }\n#{ thing }"
-            @reader.read
             return nil, true
           rescue => e
-            puts "#{ ::File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] CRAP! #{ e }"
+            puts "Ohhhh NO! #{ e }"
             puts e.backtrace
             raise e
           end
@@ -238,62 +249,42 @@ module Xampl
         element.init_attributes(@attribute_name, @attribute_namespace, @attribute_value)
         element.note_attributes_initialised(@is_realising)
 
-        if requires_caching and element and element.persist_required then
-          Xampl.cache(element)
-        end
-
-        #element = element.note_add_to_parent(parent, @is_realising)
-        #element.append_to(parent) if parent
+        Xampl.cache(element) if requires_caching && element && element.persist_required
       end
 
-      while next_reader_event
-        case current_node_type
-
-=begin
-TODO -- can these ever happen?
-          when START_DOCUMENT
-            return element if @recovering
-            return existing_element || element
-          when END_DOCUMENT
-            return element if @recovering
-            return existing_element || element
-
-=end
-
-          when LibXML::XML::Reader::TYPE_ELEMENT
-            child, ignore_child = parse_element(element)
-
-            unless ignore_child then
-              case child
-                when XamplObject then
-                  child = child.note_add_to_parent(element, @is_realising) if child
-                  child = element.note_add_child(child, @is_realising) if element
-                  child.append_to(element) if element and child
-                when XMLText then
-                  #TODO -- get rid of this puts
-                  puts "UNRECOGNISED Well-formed XML: #{child.to_s[0..25]}..."
-                else
-                  #TODO -- get rid of this puts
-                  puts "WHAT IS THIS??? #{child.class.name}"
-              end
-            end
-          when LibXML::XML::Reader::TYPE_END_ELEMENT
-            element = element.note_closed(@is_realising)
-            return element if @recovering
-            return existing_element || element
-          when LibXML::XML::Reader::TYPE_TEXT, LibXML::XML::Reader::TYPE_CDATA, LibXML::XML::Reader::TYPE_SIGNIFICANT_WHITESPACE, LibXML::XML::Reader::TYPE_ENTITY_REFERENCE
-            if element.has_mixed_content then
-              text     = @reader.read_string.force_encoding('utf-8')
-#              puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] #{ text.encoding } [[#{ text }]]"
-              the_text = element.note_adding_text_content(text, @is_realising)
-              element << the_text
-            else
-              text     = @reader.read_string.force_encoding('utf-8')
-#              puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] #{ text.encoding } [[#{ text }]] (#{ @reader.class })"
-              the_text = element.note_adding_text_content(text, @is_realising)
-              element.add_content(the_text, false)
-            end
+      while next_reader_event do
+        if @reader.value? then
+          text = @reader.value
+          text = text.force_encoding('utf-8') unless 'UTF-8' == text.encoding
+          the_text = element.note_adding_text_content(text, @is_realising)
+          if element.has_mixed_content then
+            element << the_text
           else
+            element.add_content(the_text, false)
+          end
+        elsif Nokogiri::XML::Node::ELEMENT_NODE == @reader.node_type then
+          child, ignore_child = parse_element(element)
+
+          unless ignore_child then
+            case child
+              when XamplObject then
+                child = child.note_add_to_parent(element, @is_realising) if child
+                child = element.note_add_child(child, @is_realising) if element
+                child.append_to(element) if element && child
+              when XMLText then
+                #TODO -- get rid of this puts
+                puts "UNRECOGNISED Well-formed XML: #{child.to_s[0..25]}..."
+              else
+                #TODO -- get rid of this puts
+                puts "WHAT IS THIS??? #{child.class.name}"
+            end
+          end
+        elsif Nokogiri::XML::Node::ELEMENT_DECL == @reader.node_type then
+          element = element.note_closed(@is_realising)
+          return element if @recovering
+          return existing_element || element
+        else
+          puts "WTF??(#{ @reader.depth }) name: #{ @reader.name }, #{ say_node_type(@reader.node_type)}/#{ @reader.node_type }\n#{ @reader.outer_xml }"
         end
       end
 
@@ -301,61 +292,20 @@ TODO -- can these ever happen?
       return existing_element || element
     end
 
+    def FromXML.tokenise_string(str, strip=true)
+      return nil unless str
+      str.strip! if strip
+      str.gsub!(/[ \n\r\t][ \n\r\t]*/, " ")
+      return str
+    end
+
     def current_node_type
       if @faking_an_end_element then
-        LibXML::XML::Reader::TYPE_END_ELEMENT
+        Nokogiri::XML::Node::ELEMENT_DECL
       else
         @reader.node_type
       end
     end
-
-=begin
-    def describe_current_element_type()
-      case @reader.node_type
-        when LibXML::XML::Reader::TYPE_ATTRIBUTE
-          puts "ATTRIBUTE"
-        when LibXML::XML::Reader::TYPE_DOCUMENT
-          puts "DOCUMENT"
-        when LibXML::XML::Reader::TYPE_ELEMENT
-          attribute_count = @reader.attribute_count
-          puts "ELEMENT #{ @reader.local_name }, ns: #{ @reader.namespace_uri }, #attributes: #{ attribute_count }, depth: #{ @reader.depth }"
-          puts "        FAKING END ELEMENT" if @faking_an_end_element
-        when LibXML::XML::Reader::TYPE_END_ELEMENT
-          puts "END ELEMENT"
-        when LibXML::XML::Reader::TYPE_TEXT
-          puts "TEXT [[#{ @reader.read_string }]]"
-        when LibXML::XML::Reader::TYPE_CDATA
-          puts "CDATA [[#{ @reader.read_string }]]"
-        when LibXML::XML::Reader::TYPE_SIGNIFICANT_WHITESPACE
-          puts "SIGNIFICANT white space [[#{ @reader.read_string }]]"
-        when LibXML::XML::Reader::TYPE_ENTITY_REFERENCE
-          puts "entity ref"
-        when LibXML::XML::Reader::TYPE_WHITESPACE
-          puts "whitespace"
-        when LibXML::XML::Reader::TYPE_PROCESSING_INSTRUCTION
-          puts "processing instruction"
-        when LibXML::XML::Reader::TYPE_COMMENT
-          puts "comment"
-        when LibXML::XML::Reader::TYPE_DOCUMENT_TYPE
-          puts "doc type"
-
-        when LibXML::XML::Reader::TYPE_XML_DECLARATION
-          puts "xml decl"
-        when LibXML::XML::Reader::TYPE_NONE
-          puts "NONE!!"
-        when LibXML::XML::Reader::TYPE_NOTATION
-          puts "notifiation"
-        when LibXML::XML::Reader::TYPE_DOCUMENT_FRAGMENT
-          puts "doc fragment"
-        when LibXML::XML::Reader::TYPE_ENTITY
-          puts "entity"
-        when LibXML::XML::Reader::TYPE_END_ENTITY
-          puts "end entity"
-        else
-          puts "UNKNOWN: #{@reader.node_type}"
-      end
-    end
-=end
 
     def next_reader_event
       if @insert_end_element then
@@ -366,30 +316,25 @@ TODO -- can these ever happen?
 
       @faking_an_end_element  = false
 
-      #describe_current_element_type
-
       begin
-#TODO -- get rid of this??
-#TODO -- really?
         okay = @reader.read
       rescue => e
         raise RuntimeError, "WHAT?? -- #{ e }", e.backtrace
       end
 
-      @just_opened_an_element = start_element?
+      @just_opened_an_element = self.start_element?
       @insert_end_element     = (@just_opened_an_element and @reader.empty_element?)
-
-      #describe_current_element_type
-
       okay
     end
 
     def start_element?
-      current_node_type == LibXML::XML::Reader::TYPE_ELEMENT
+      current_node_type == Nokogiri::XML::Node::ELEMENT_NODE
     end
 
     def whitespace?
-      current_note_type == LibXML::XML::Reader::TYPE_WHITESPACE
+      #there is no whitespace type with nokogiri
+      #TODO -- this is not actually called, so...
+      @reader.value? && @reader.value.match(/\S/).nil?
     end
 
     def find_the_first_element
@@ -398,31 +343,20 @@ TODO -- can these ever happen?
         break unless next_reader_event
       end
       @just_opened_an_element = start_element?
+      @insert_end_element     = (@just_opened_an_element and @reader.empty_element?)
     end
 
     def build_attribute_arrays
-
       @attribute_name.clear
       @attribute_namespace.clear
       @attribute_value.clear
 
-      return unless LibXML::XML::Reader::TYPE_ELEMENT == current_node_type
+      return unless @reader.attributes?
 
-      if @reader.has_attributes? then
-        attribute_count = @reader.attribute_count
-        @reader.move_to_first_attribute
-        attribute_count.times do |i|
-          if @reader.namespace_declaration? then
-            @reader.move_to_next_attribute
-            next
-          end
-
-          @attribute_name << @reader.local_name
-          @attribute_namespace << @reader.namespace_uri
-          @attribute_value << @reader.value
-
-          @reader.move_to_next_attribute
-        end
+      @reader.attributes.each do |name, value|
+        @attribute_name << name
+        @attribute_namespace << nil
+        @attribute_value << value
       end
     end
 

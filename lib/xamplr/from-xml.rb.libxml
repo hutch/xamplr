@@ -122,6 +122,8 @@ module Xampl
       return str
     end
 
+    $idiot = 0
+
     def parse_element(parent=nil, target=nil)
       find_the_first_element
       return unless start_element?
@@ -282,15 +284,18 @@ TODO -- can these ever happen?
             return element if @recovering
             return existing_element || element
           when LibXML::XML::Reader::TYPE_TEXT, LibXML::XML::Reader::TYPE_CDATA, LibXML::XML::Reader::TYPE_SIGNIFICANT_WHITESPACE, LibXML::XML::Reader::TYPE_ENTITY_REFERENCE
+            text     = @reader.read_string.force_encoding('utf-8')
+
+#            text = "[#{ $idiot += 1 }]#{ element.has_mixed_content ? 'mixed' : 'data' }[#{ text }]"
+#            puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] element: #{ element } {{#{ text }}}"
+#            the_text = text
+
+            the_text = element.note_adding_text_content(text, @is_realising)
             if element.has_mixed_content then
-              text     = @reader.read_string.force_encoding('utf-8')
-#              puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] #{ text.encoding } [[#{ text }]]"
-              the_text = element.note_adding_text_content(text, @is_realising)
+#              puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] MIXED #{ text.encoding } #{ text }"
               element << the_text
             else
-              text     = @reader.read_string.force_encoding('utf-8')
-#              puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] #{ text.encoding } [[#{ text }]] (#{ @reader.class })"
-              the_text = element.note_adding_text_content(text, @is_realising)
+#              puts "#{ File.basename __FILE__ }:#{ __LINE__ } [#{__method__}] NOT MIXED #{ text.encoding } #{ text }"
               element.add_content(the_text, false)
             end
           else
