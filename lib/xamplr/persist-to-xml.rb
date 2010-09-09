@@ -1,4 +1,3 @@
-#require 'libxml'
 
 module Xampl
 
