@@ -135,7 +135,7 @@ module Xampl
 
     def realise(representation, target=nil)
       # This is a bit brutal, but it works (and, anyway, it *is* the rule is that this is supposed to be UTF-8)
-      representation_fixed = representation.encode('UTF-8', :invalid => :replace, :undef => :replace)
+      representation_fixed = representation.encode('UTF-8', 'UTF-8', :invalid => :replace, :undef => :replace)
 
       xampl = nil
 
