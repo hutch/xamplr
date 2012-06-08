@@ -1,6 +1,29 @@
 #encoding: utf-8
 module Xampl
 
+  class RemoveWhitespaceContentVisitor < Visitor
+    #
+    # This can be useful for cleaning up DSLs embedded in XML/xampl
+    #
+    def initialize
+      super
+    end
+
+    def after_visit(xampl)
+      xampl.after_visit_by_element_kind(self) if xampl.respond_to? "after_visit_by_element_kind"
+    end
+
+    def after_visit_simple_content(xampl)
+      text = xampl.content
+      xampl.content = nil if text && text.match(/\S/).nil?
+    end
+
+    def after_visit_data_content(xampl)
+      text = xampl.content
+      xampl.content = nil if text && text.match(/\S/).nil?
+    end
+  end
+
   class CountingVisitor < Visitor
     attr_accessor :count
 
@@ -557,6 +580,10 @@ module Xampl
   end
 
   module XamplObject
+    def remove_ws_content()
+      RemoveWhitespaceContentVisitor.new.start(self)
+    end
+
     def pp_xml(out="", skip=[])
       PrettyXML.new(out, skip).start(self).done
     end

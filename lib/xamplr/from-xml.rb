@@ -224,7 +224,7 @@ module Xampl
                 element = existing_element #TODO -- IS THIS RIGHT????????????????????????
               end
               unless element then
-                element          = klasses[0].new
+                element          = klasses[0].discriminate(@attribute_name, @attribute_namespace, @attribute_value).new
                 requires_caching = @recovering
 #                  puts "#{File.basename(__FILE__)} #{__LINE__} WOW, what about recovering????"
                 #TODO -- IS THIS RIGHT????????????????????????
@@ -241,7 +241,7 @@ module Xampl
         end
 
         unless element then
-          element = klasses[0].new
+          element = klasses[0].discriminate(@attribute_name, @attribute_namespace, @attribute_value).new
           element.note_created(@is_realising)
         end
 

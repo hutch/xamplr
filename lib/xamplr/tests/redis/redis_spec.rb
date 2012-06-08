@@ -5,9 +5,9 @@ module Xampl
   describe 'redis creation and connections' do
     before :each do
       Xampl.drop_all_persisters
-      Xampl.set_default_persister_properties(:testing => true,
-                                             :allow_connections => false,
-                                             :connect_to_known => false,
+      Xampl.set_default_persister_properties(:testing            => true,
+                                             :allow_connections  => false,
+                                             :connect_to_known   => false,
                                              :connect_to_unknown => false)
     end
     after :each do
@@ -15,7 +15,7 @@ module Xampl
 
     it 'will create a named instance of the redis persister' do
       repo_name = XamplTestRedis.scratch_name('redis')
-      redis = Xampl.create_named_persister(repo_name, :redis)
+      redis     = Xampl.create_named_persister(repo_name, :redis)
 
       redis.should be_an_instance_of(RedisPersister)
       redis.repo_name.should == repo_name
@@ -38,7 +38,7 @@ module Xampl
     end
 
     it 'will generate useful keys' do
-      redis = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis)
+      redis  = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis)
 
       thing1 = XamplTestRedis::DroolingIdiotPersistedObject.new(XamplTestRedis.scratch_name('xo'))
       thing2 = XamplTestRedis::DroolingIdiotPersistedObject.new(XamplTestRedis.scratch_name('xo'))
@@ -54,7 +54,7 @@ module Xampl
       redis1 = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis)
       redis2 = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis)
 
-      thing = XamplTestRedis::DroolingIdiotPersistedObject.new('test')
+      thing  = XamplTestRedis::DroolingIdiotPersistedObject.new('test')
 
       redis1.key_for_class(thing.class, thing.get_the_index).should_not == redis2.key_for_class(thing.class, thing.get_the_index).should
       redis1.key_for_xampl(thing).should_not == redis2.key_for_xampl(thing).should_not
@@ -74,7 +74,7 @@ module Xampl
     end
 
     it 'will moan if two different objects are cached under the same key' do
-      redis = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis)
+      redis  = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis)
 
       thing1 = XamplTestRedis::DroolingIdiotPersistedObject.new('test')
       thing2 = XamplTestRedis::DroolingIdiotPersistedObject.new('test')
@@ -90,10 +90,10 @@ module Xampl
     end
 
     it 'will store if two different objects are cached under the same key if the first is removed from the cache first' do
-      redis = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis)
+      redis    = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis)
 
-      thing1 = XamplTestRedis::DroolingIdiotPersistedObject.new('test')
-      thing2 = XamplTestRedis::DroolingIdiotPersistedObject.new('test')
+      thing1   = XamplTestRedis::DroolingIdiotPersistedObject.new('test')
+      thing2   = XamplTestRedis::DroolingIdiotPersistedObject.new('test')
 
       redis.perm_cache(thing1)
       uncached = redis.perm_uncache(thing1)
@@ -120,7 +120,7 @@ module Xampl
     end
 
     it 'will have weak cache references' do
-      redis = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis)
+      redis            = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis)
 
       thing_referenced = XamplTestRedis::DroolingIdiotPersistedObject.new('referenced')
 
@@ -142,12 +142,12 @@ module Xampl
     end
 
     it 'will establish a redis connection to an unknown redis database' do
-      redis = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis,
-                                           :allow_connections => true,
-                                           :connect_to_known => false,
-                                           :connect_to_unknown => true)
+      redis           = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis,
+                                                     :allow_connections  => true,
+                                                     :connect_to_known   => false,
+                                                     :connect_to_unknown => true)
 
-      client = redis.client
+      client          = redis.client
       client.should be_an_instance_of(::Redis)
 
       repo_properties = redis.repo_properties
@@ -157,13 +157,13 @@ module Xampl
     end
 
     it 'will establish a redis connection to an known redis database' do
-      repo_name = XamplTestRedis.scratch_name('redis')
-      redis1 = Xampl.create_named_persister(repo_name, :redis,
-                                            :allow_connections => true,
-                                            :connect_to_known => false,
-                                            :connect_to_unknown => true)
+      repo_name       = XamplTestRedis.scratch_name('redis')
+      redis1          = Xampl.create_named_persister(repo_name, :redis,
+                                                     :allow_connections  => true,
+                                                     :connect_to_known   => false,
+                                                     :connect_to_unknown => true)
 
-      client = redis1.client
+      client          = redis1.client
       client.should be_an_instance_of(::Redis)
 
       repo_properties = redis1.repo_properties
@@ -173,12 +173,12 @@ module Xampl
 
       Xampl.drop_persister(repo_name)
 
-      redis2 = Xampl.create_named_persister(repo_name, :redis,
-                                            :allow_connections => true,
-                                            :connect_to_known => true,
-                                            :connect_to_unknown => false)
+      redis2          = Xampl.create_named_persister(repo_name, :redis,
+                                                     :allow_connections  => true,
+                                                     :connect_to_known   => true,
+                                                     :connect_to_unknown => false)
 
-      client = redis2.client
+      client          = redis2.client
       client.should be_an_instance_of(::Redis)
     end
 
@@ -186,42 +186,42 @@ module Xampl
       repo_name = XamplTestRedis.scratch_name('redis')
       lambda do
         Xampl.create_named_persister(repo_name, :redis,
-                                     :allow_connections => true,
-                                     :connect_to_known => true,
+                                     :allow_connections  => true,
+                                     :connect_to_known   => true,
                                      :connect_to_unknown => false)
       end.should raise_exception(IncompatiblePersisterConfiguration)
     end
 
     it 'will prevent connections to existing repositories' do
       repo_name = XamplTestRedis.scratch_name('redis')
-      redis1 = Xampl.create_named_persister(repo_name, :redis,
-                                            :allow_connections => true,
-                                            :connect_to_known => false,
-                                            :connect_to_unknown => true)
+      redis1    = Xampl.create_named_persister(repo_name, :redis,
+                                               :allow_connections  => true,
+                                               :connect_to_known   => false,
+                                               :connect_to_unknown => true)
 
-      client = redis1.client
+      client    = redis1.client
       client.should be_an_instance_of(::Redis)
 
       Xampl.drop_persister(repo_name)
 
       lambda do
         Xampl.create_named_persister(repo_name, :redis,
-                                     :allow_connections => true,
-                                     :connect_to_known => false,
+                                     :allow_connections  => true,
+                                     :connect_to_known   => false,
                                      :connect_to_unknown => true)
       end.should raise_exception(IncompatiblePersisterConfiguration)
     end
 
     it "will connect to two different repositories in the same redis db" do
-      redis1 = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis,
-                                            :allow_connections => true,
-                                            :connect_to_known => false,
-                                            :connect_to_unknown => true)
+      redis1      = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis,
+                                                 :allow_connections  => true,
+                                                 :connect_to_known   => false,
+                                                 :connect_to_unknown => true)
       redis1.should_not be_nil
-      redis2 = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis,
-                                            :allow_connections => true,
-                                            :connect_to_known => false,
-                                            :connect_to_unknown => true)
+      redis2      = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis,
+                                                 :allow_connections  => true,
+                                                 :connect_to_known   => false,
+                                                 :connect_to_unknown => true)
       redis2.should_not be_nil
       redis2.should_not == redis1
 
@@ -231,32 +231,32 @@ module Xampl
 
     it "will only create one persister wiith a given name" do
       repo_name = XamplTestRedis.scratch_name('redis')
-      redis1 = Xampl.create_named_persister(repo_name, :redis,
-                                            :allow_connections => true,
-                                            :connect_to_known => true,
-                                            :connect_to_unknown => true)
-      redis2 = Xampl.create_named_persister(repo_name, :redis,
-                                            :allow_connections => true,
-                                            :connect_to_known => true,
-                                            :connect_to_unknown => true)
+      redis1    = Xampl.create_named_persister(repo_name, :redis,
+                                               :allow_connections  => true,
+                                               :connect_to_known   => true,
+                                               :connect_to_unknown => true)
+      redis2    = Xampl.create_named_persister(repo_name, :redis,
+                                               :allow_connections  => true,
+                                               :connect_to_known   => true,
+                                               :connect_to_unknown => true)
 
       redis1.should == redis2
     end
 
     it 'will allow clobbering an entire redis database when clobbering is explicitly enabled' do
-      repo_name1 = XamplTestRedis.scratch_name('redis')
-      redis1 = Xampl.create_named_persister(repo_name1, :redis,
-                                            :clobbering_allowed => true,
-                                            :allow_connections => true,
-                                            :connect_to_known => true,
-                                            :connect_to_unknown => true)
-      repo_name2 = XamplTestRedis.scratch_name('redis')
-      redis2 = Xampl.create_named_persister(repo_name2, :redis,
-                                            :allow_connections => true,
-                                            :connect_to_known => true,
-                                            :connect_to_unknown => true)
+      repo_name1                 = XamplTestRedis.scratch_name('redis')
+      redis1                     = Xampl.create_named_persister(repo_name1, :redis,
+                                                                :clobbering_allowed => true,
+                                                                :allow_connections  => true,
+                                                                :connect_to_known   => true,
+                                                                :connect_to_unknown => true)
+      repo_name2                 = XamplTestRedis.scratch_name('redis')
+      redis2                     = Xampl.create_named_persister(repo_name2, :redis,
+                                                                :allow_connections  => true,
+                                                                :connect_to_known   => true,
+                                                                :connect_to_unknown => true)
 
-      known_repos = redis2.known_repos
+      known_repos                = redis2.known_repos
       known_repos.should include(repo_name1, repo_name2)
 
       redis1_repo_properties_key = redis1.repo_properties_key
@@ -264,12 +264,12 @@ module Xampl
       redis2.client.exists(redis1_repo_properties_key).should be_true
 
       # add some non-standard keys for this
-      prefix = redis1.common_key_prefix
-      extra1 = "#{ prefix }one"
+      prefix                     = redis1.common_key_prefix
+      extra1                     = "#{ prefix }one"
       redis1.client.set(extra1, "one")
-      extra2 = "#{ prefix }two"
+      extra2                     = "#{ prefix }two"
       redis1.client.set(extra2, "two")
-      extra3 = "#{ prefix }three"
+      extra3                     = "#{ prefix }three"
       redis1.client.set(extra3, "three")
 
       redis2.client.get(extra1).should == "one"
@@ -278,7 +278,7 @@ module Xampl
 
       redis1.clobber
 
-      known_repos = redis2.known_repos
+      known_repos                = redis2.known_repos
       known_repos.should_not include(repo_name1)
       known_repos.should include(repo_name2)
 
@@ -291,10 +291,10 @@ module Xampl
 
     it 'will *not* allow clobbering an entire redis database when clobbering is *not* explicitly enabled' do
       repo_name1 = XamplTestRedis.scratch_name('redis')
-      redis1 = Xampl.create_named_persister(repo_name1, :redis,
-                                            :allow_connections => true,
-                                            :connect_to_known => true,
-                                            :connect_to_unknown => true)
+      redis1     = Xampl.create_named_persister(repo_name1, :redis,
+                                                :allow_connections  => true,
+                                                :connect_to_known   => true,
+                                                :connect_to_unknown => true)
 
       lambda do
         redis1.clobber
@@ -303,10 +303,10 @@ module Xampl
 
 
     it 'will re-establish a redis connection' do
-      redis = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis,
-                                           :allow_connections => true,
-                                           :connect_to_known => true,
-                                           :connect_to_unknown => true)
+      redis        = Xampl.create_named_persister(XamplTestRedis.scratch_name('redis'), :redis,
+                                                  :allow_connections  => true,
+                                                  :connect_to_known   => true,
+                                                  :connect_to_unknown => true)
 
       redis_client = redis.client
       redis_client.client.should be_connected
@@ -326,9 +326,9 @@ module Xampl
   describe 'redis reading and writing xampl objects' do
     before :each do
       Xampl.drop_all_persisters
-      Xampl.set_default_persister_properties(:testing => true,
-                                             :allow_connections => true,
-                                             :connect_to_known => true,
+      Xampl.set_default_persister_properties(:testing            => true,
+                                             :allow_connections  => true,
+                                             :connect_to_known   => true,
                                              :connect_to_unknown => true)
     end
     after :each do
@@ -336,14 +336,14 @@ module Xampl
 
 
     it "will write an xampl object" do
-      repo_name = XamplTestRedis.scratch_name('redis')
-      redis = Xampl.create_named_persister(repo_name, :redis)
+      repo_name     = XamplTestRedis.scratch_name('redis')
+      redis         = Xampl.create_named_persister(repo_name, :redis)
 
-      redis_client = redis.client
+      redis_client  = redis.client
       redis_client.client.should be_connected
 
-      author_pid = 'anonymous'
-      key = redis.key_for_class(RedisTest::Author, author_pid)
+      author_pid    = 'anonymous'
+      key           = redis.key_for_class(RedisTest::Author, author_pid)
 
       redis.in_any_cache?(RedisTest::Author, author_pid).should be_false
 
@@ -352,7 +352,7 @@ module Xampl
 
       redis.in_any_cache?(RedisTest::Author, author_pid).should be_false
 
-      author = nil
+      author        = nil
       Xampl.transaction(repo_name) do
         author = RedisTest::Author.new(author_pid)
 
@@ -361,8 +361,8 @@ module Xampl
         redis.in_cache?(RedisTest::Author, author_pid).should be_false
       end
 
-      mentions = []
-      xml = redis.represent(author, mentions)
+      mentions      = []
+      xml           = redis.represent(author, mentions)
 
       current_value = redis_client.get(key)
       current_value.should == xml
@@ -375,7 +375,7 @@ module Xampl
 
       redis.in_cache?(RedisTest::Author, author_pid).should be_true
 
-      author = nil
+      author        = nil
 
       GC.start
 
@@ -386,20 +386,20 @@ module Xampl
     end
 
     it "will write a changed xampl object" do
-      repo_name = XamplTestRedis.scratch_name('redis')
-      redis = Xampl.create_named_persister(repo_name, :redis)
-      redis_client = redis.client
+      repo_name     = XamplTestRedis.scratch_name('redis')
+      redis         = Xampl.create_named_persister(repo_name, :redis)
+      redis_client  = redis.client
 
-      author_pid = 'anonymous'
-      key = redis.key_for_class(RedisTest::Author, author_pid)
+      author_pid    = 'anonymous'
+      key           = redis.key_for_class(RedisTest::Author, author_pid)
 
-      author = nil
+      author        = nil
       Xampl.transaction(repo_name) do
         author = RedisTest::Author.new(author_pid)
       end
 
-      mentions = []
-      xml1 = redis.represent(author, mentions)
+      mentions      = []
+      xml1          = redis.represent(author, mentions)
 
       current_value = redis_client.get(key)
       current_value.should == xml1
@@ -410,8 +410,8 @@ module Xampl
       end
       author.should_not be_dirty
 
-      mentions = []
-      xml2 = redis.represent(author, mentions)
+      mentions      = []
+      xml2          = redis.represent(author, mentions)
 
       xml2.should_not == xml1
 
@@ -420,16 +420,16 @@ module Xampl
     end
 
     it "will read a xampl object with different redis instances" do
-      repo_name = XamplTestRedis.scratch_name('redis')
+      repo_name                 = XamplTestRedis.scratch_name('redis')
       Xampl.create_named_persister(repo_name, :redis)
 
-      author_pid = 'anonymous'
+      author_pid                = 'anonymous'
 
-      author_info = XamplTestRedis.scratch_name('author-info')
+      author_info               = XamplTestRedis.scratch_name('author-info')
       author_object_id_original = nil
       Xampl.transaction(repo_name) do
-        author = RedisTest::Author.new(author_pid)
-        author.info = author_info
+        author                    = RedisTest::Author.new(author_pid)
+        author.info               = author_info
         author_object_id_original = author.object_id
       end
 
@@ -440,7 +440,7 @@ module Xampl
 
       Xampl.create_named_persister(repo_name, :redis)
 
-      author = nil
+      author                    = nil
       Xampl.transaction(repo_name) do
         author = RedisTest::Author[author_pid]
       end
@@ -451,22 +451,22 @@ module Xampl
     end
 
     it "will read a xampl object from cache of same redis instance" do
-      repo_name = XamplTestRedis.scratch_name('redis')
+      repo_name                 = XamplTestRedis.scratch_name('redis')
       Xampl.create_named_persister(repo_name, :redis)
 
-      author_pid = 'anonymous'
+      author_pid                = 'anonymous'
 
-      author_info = XamplTestRedis.scratch_name('author-info')
+      author_info               = XamplTestRedis.scratch_name('author-info')
       author_object_id_original = nil
       Xampl.transaction(repo_name) do
-        author = RedisTest::Author.new(author_pid)
-        author.info = author_info
+        author                    = RedisTest::Author.new(author_pid)
+        author.info               = author_info
         author_object_id_original = author.object_id
       end
 
       Xampl.create_named_persister(repo_name, :redis)
 
-      author = nil
+      author                    = nil
       Xampl.transaction(repo_name) do
         author = RedisTest::Author[author_pid]
       end
@@ -477,16 +477,16 @@ module Xampl
     end
 
     it "will read a xampl object flushed from the cache cache of same redis instance" do
-      repo_name = XamplTestRedis.scratch_name('redis')
+      repo_name                 = XamplTestRedis.scratch_name('redis')
       Xampl.create_named_persister(repo_name, :redis)
 
-      author_pid = 'anonymous'
+      author_pid                = 'anonymous'
 
-      author_info = XamplTestRedis.scratch_name('author-info')
+      author_info               = XamplTestRedis.scratch_name('author-info')
       author_object_id_original = nil
       Xampl.transaction(repo_name) do
-        author = RedisTest::Author.new(author_pid)
-        author.info = author_info
+        author                    = RedisTest::Author.new(author_pid)
+        author.info               = author_info
         author_object_id_original = author.object_id
       end
 
@@ -514,14 +514,14 @@ module Xampl
     end
 
     it "will rollback a newly created xampl object" do
-      repo_name = XamplTestRedis.scratch_name('redis')
-      redis = Xampl.create_named_persister(repo_name, :redis)
+      repo_name    = XamplTestRedis.scratch_name('redis')
+      redis        = Xampl.create_named_persister(repo_name, :redis)
       redis_client = redis.client
 
-      author_pid = 'anonymous'
-      key = redis.key_for_class(RedisTest::Author, author_pid)
+      author_pid   = 'anonymous'
+      key          = redis.key_for_class(RedisTest::Author, author_pid)
 
-      author = nil
+      author       = nil
       lambda do
         Xampl.transaction(repo_name) do
           author = RedisTest::Author.new(author_pid)
@@ -541,14 +541,14 @@ module Xampl
     end
 
     it "will NOT rollback a newly created xampl object when throwing" do
-      repo_name = XamplTestRedis.scratch_name('redis')
-      redis = Xampl.create_named_persister(repo_name, :redis)
+      repo_name    = XamplTestRedis.scratch_name('redis')
+      redis        = Xampl.create_named_persister(repo_name, :redis)
       redis_client = redis.client
 
-      author_pid = 'anonymous'
-      key = redis.key_for_class(RedisTest::Author, author_pid)
+      author_pid   = 'anonymous'
+      key          = redis.key_for_class(RedisTest::Author, author_pid)
 
-      author = nil
+      author       = nil
 
       lambda do
         Xampl.transaction(repo_name) do
@@ -569,21 +569,21 @@ module Xampl
     end
 
     it "will rollback a changed xampl object" do
-      repo_name = XamplTestRedis.scratch_name('redis')
-      redis = Xampl.create_named_persister(repo_name, :redis)
-      redis_client = redis.client
+      repo_name     = XamplTestRedis.scratch_name('redis')
+      redis         = Xampl.create_named_persister(repo_name, :redis)
+      redis_client  = redis.client
 
-      author_pid = 'anonymous'
-      key = redis.key_for_class(RedisTest::Author, author_pid)
+      author_pid    = 'anonymous'
+      key           = redis.key_for_class(RedisTest::Author, author_pid)
 
-      author = nil
+      author        = nil
       Xampl.transaction(repo_name) do
         author = RedisTest::Author.new(author_pid)
       end
       author.info.should be_nil
 
-      mentions = []
-      xml1 = redis.represent(author, mentions)
+      mentions      = []
+      xml1          = redis.represent(author, mentions)
 
       current_value = redis_client.get(key)
       current_value.should == xml1
@@ -603,8 +603,8 @@ module Xampl
       author.should_not be_invalid # set by the invalidated hook (see author.rb in this directory)
       author.should_not be_invalidated # a built-in xampl method based on kind_of?(InvalidXampl)
 
-      mentions = []
-      xml2 = redis.represent(author, mentions)
+      mentions      = []
+      xml2          = redis.represent(author, mentions)
 
       xml2.should == xml1
 
@@ -613,21 +613,21 @@ module Xampl
     end
 
     it "will NOT rollback a changed xampl object after throwing" do
-      repo_name = XamplTestRedis.scratch_name('redis')
-      redis = Xampl.create_named_persister(repo_name, :redis)
-      redis_client = redis.client
+      repo_name     = XamplTestRedis.scratch_name('redis')
+      redis         = Xampl.create_named_persister(repo_name, :redis)
+      redis_client  = redis.client
 
-      author_pid = 'anonymous'
-      key = redis.key_for_class(RedisTest::Author, author_pid)
+      author_pid    = 'anonymous'
+      key           = redis.key_for_class(RedisTest::Author, author_pid)
 
-      author = nil
+      author        = nil
       Xampl.transaction(repo_name) do
         author = RedisTest::Author.new(author_pid)
       end
       author.info.should be_nil
 
-      mentions = []
-      xml1 = redis.represent(author, mentions)
+      mentions      = []
+      xml1          = redis.represent(author, mentions)
 
       current_value = redis_client.get(key)
       current_value.should == xml1
@@ -647,8 +647,8 @@ module Xampl
       author.should_not be_invalid # set by the invalidated hook (see author.rb in this directory)
       author.should_not be_invalidated # a built-in xampl method based on kind_of?(InvalidXampl)
 
-      mentions = []
-      xml2 = redis.represent(author, mentions)
+      mentions      = []
+      xml2          = redis.represent(author, mentions)
 
       xml2.should_not == xml1
 
@@ -657,13 +657,13 @@ module Xampl
     end
 
     it "will create an object in a nested transaction" do
-      author_pid = 'anonymous'
+      author_pid         = 'anonymous'
 
-      outer_repo_name = XamplTestRedis.scratch_name('redis')
-      outer_redis = Xampl.create_named_persister(outer_repo_name, :redis)
+      outer_repo_name    = XamplTestRedis.scratch_name('redis')
+      outer_redis        = Xampl.create_named_persister(outer_repo_name, :redis)
 
-      inner_repo_name = XamplTestRedis.scratch_name('redis')
-      inner_redis = Xampl.create_named_persister(inner_repo_name, :redis)
+      inner_repo_name    = XamplTestRedis.scratch_name('redis')
+      inner_redis        = Xampl.create_named_persister(inner_repo_name, :redis)
 
       outer_redis_client = outer_redis.client
       inner_redis_client = inner_redis.client
@@ -671,16 +671,16 @@ module Xampl
       outer_redis_client.client.should be_connected
       inner_redis_client.client.should be_connected
 
-      outer_key = outer_redis.key_for_class(RedisTest::Author, author_pid)
-      inner_key = inner_redis.key_for_class(RedisTest::Author, author_pid)
+      outer_key          = outer_redis.key_for_class(RedisTest::Author, author_pid)
+      inner_key          = inner_redis.key_for_class(RedisTest::Author, author_pid)
 
-      outer_value = outer_redis_client.get(outer_key)
+      outer_value        = outer_redis_client.get(outer_key)
       outer_value.should be_nil
 
-      inner_value = inner_redis_client.get(inner_key)
+      inner_value        = inner_redis_client.get(inner_key)
       inner_value.should be_nil
 
-      author = nil
+      author             = nil
 
       Xampl.transaction(outer_repo_name) do
         Xampl.transaction(inner_repo_name) do
@@ -693,10 +693,10 @@ module Xampl
       #TODO -- throw in inner
       #TODO -- throw in outer
 
-      outer_value = outer_redis_client.get(outer_key)
+      outer_value        = outer_redis_client.get(outer_key)
       outer_value.should be_nil
 
-      inner_value = inner_redis_client.get(inner_key)
+      inner_value        = inner_redis_client.get(inner_key)
       inner_value.should == author.to_xml
 
       author.should_not be_nil
@@ -707,6 +707,11 @@ module Xampl
         author.accessed
       end.should_not raise_exception(Xampl::XamplIsInvalid)
     end
+
+#    def blah
+#      blahblah(:a => 1, :b =>2)
+#      blahblah(a: 1, b: 2)
+#    end
 
     # explicit return cannot be tested because rspec is doing something
 

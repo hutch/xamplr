@@ -324,7 +324,7 @@ module Xampl
     def find_mentions_of(xampl)
       setup_db
 
-      place = File.join(xampl.class.name.split("::"), xampl.get_the_index)
+      place = File.join(xampl.class.persistence_class.name.split("::"), xampl.get_the_index)
 
       query = TableQuery.new(@tc_db)
       query.add_condition('xampl-to', :equals, place)
@@ -435,7 +435,7 @@ module Xampl
 
     def how_indexed(xampl)
       raise XamplException.new(:no_index_so_no_persist) unless xampl.get_the_index
-      place = File.join(xampl.class.name.split("::"), xampl.get_the_index)
+      place = File.join(xampl.class.persistence_class.name.split("::"), xampl.get_the_index)
 
       setup_db
 
@@ -497,7 +497,7 @@ module Xampl
 #        puts "#{File.basename(__FILE__)}:#{__LINE__} [#{ __method__ }] EXPUNGING #{ xampl }/#{ expunging }"
 #      end
 
-      place_dir = xampl.class.name.split("::")
+      place_dir = xampl.class.persistence_class.name.split("::")
       place = File.join( place_dir, xampl.get_the_index)
       place_dir = File.join( @files_dir, place_dir )
       mentions = Set.new
@@ -533,7 +533,7 @@ module Xampl
         if Xampl.raw_persister_options[:mentions] then
           # TODO -- This can be slow
           mentions.each do | mention |
-            mention_place = File.join(mention.class.name.split("::"), mention.get_the_index)
+            mention_place = File.join(mention.class.persistence_class.name.split("::"), mention.get_the_index)
             #TODO -- will repeadedly changing a persisted xampl object fragment the TC db?
 
             pk = @tc_db.genuid
@@ -649,7 +649,7 @@ module Xampl
         setup_db
       end
 
-      place = File.join(klass.name.split("::"), pid)
+      place = File.join(klass.persistence_class.name.split("::"), pid)
 
       meta = @tc_db[place]
       representation = meta['xampl'] if meta
@@ -662,7 +662,7 @@ module Xampl
 
       unless representation then
         # try the filesystem if it is not in the TC repository
-        place = File.join(@root_dir, klass.name.split("::"), pid)
+        place = File.join(@root_dir, klass.persistence_class.name.split("::"), pid)
         representation = File.read(place) if File.exist?(place)
         $FS_COUNT += 1 if representation
 #        puts "#{File.basename(__FILE__)}:#{__LINE__} FS: #{ klass }/#{ pid } (FS: #{ $FS_COUNT}, TC: #{ $TC_COUNT }, NF: #{ $NF_COUNT }" if representation

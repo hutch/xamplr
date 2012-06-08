@@ -204,6 +204,11 @@ module Xampl
       xampl = read(klass, pid, target)
 
       # puts "   LAZY_LOAD --> #{xampl}"
+      unless xampl
+        puts "*******************************************************************************"
+        puts "***** LAZY_LOAD FAILED:: klass: #{klass} pid: #{pid} target: #{target}"
+        puts "*******************************************************************************"
+      end
 
       return xampl
     end

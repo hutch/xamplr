@@ -23,7 +23,8 @@ module Xampl
       raise XamplException.new("no_index_so_no_persist [#{xampl.class.name}]") unless xampl.get_the_index or xampl.ignore_when_no_index
       return unless xampl.get_the_index
 
-      place = File.join(@root_dir, xampl.class.name.split("::"))
+      #place = File.join(@root_dir, xampl.class.name.split("::"))
+      place = File.join(@root_dir, xampl.class.persistence_class.name.split("::"))
 
       FileUtils.mkdir_p(place) unless File.exist?(place)
 
@@ -46,7 +47,8 @@ module Xampl
     end
 
     def read_representation(klass, pid)
-      place = File.join(@root_dir, klass.name.split("::"), pid)
+      place = File.join(@root_dir, klass.persistence_class.name.split("::"), pid)
+      #place = File.join(@root_dir, klass.name.split("::"), pid)
 
       return nil unless File.exist?(place)
       representation = File.read(place)

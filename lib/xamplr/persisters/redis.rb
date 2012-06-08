@@ -157,7 +157,7 @@ module Xampl
 
     def key_for_class(klass, index)
       #NOTE -- the XAMPL::#{ @repo_name }:: is a prefix common to all keys specific to this repository
-      "#{ common_key_prefix }#{ klass.name }[#{ index }]"
+      "#{ common_key_prefix }#{ klass.persistence_class.name }[#{ index }]"
     end
 
     def key_for_xampl(xampl)
