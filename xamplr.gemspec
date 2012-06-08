@@ -4,14 +4,14 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{xamplr}
-  s.version = "1.9.15"
+  s.name = "xamplr"
+  s.version = "1.9.16"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bob Hutchison"]
-  s.date = %q{2010-09-09}
-  s.description = %q{xamplr is the ruby version of xampl.}
-  s.email = %q{hutch@recursive.ca}
+  s.date = "2012-06-08"
+  s.description = "xamplr is the ruby version of xampl."
+  s.email = "hutch@recursive.ca"
   s.extra_rdoc_files = [
     "LICENSE",
      "README.md"
@@ -127,14 +127,13 @@ Gem::Specification.new do |s|
      "regression/tightly-nested-mutual-mentions/xml/stuff.xml",
      "xamplr.gemspec"
   ]
-  s.homepage = %q{http://github.com/hutch/xamplr}
+  s.homepage = "http://github.com/hutch/xamplr"
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.7}
-  s.summary = %q{xamplr is the ruby version of xampl}
+  s.rubygems_version = "1.8.24"
+  s.summary = "xamplr is the ruby version of xampl"
 
   if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
