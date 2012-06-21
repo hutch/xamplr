@@ -7,7 +7,10 @@ module Xampl
 
     def initialize(name=nil, format=nil, root=nil)
       root = File.join(".", "repo") if root.nil?
+
       super(root, name, format)
+
+      @deliberate_sync = $is_darwin && (not Xampl.raw_persister_options[:sloppy_sync])
     end
 
     def FilesystemPersister.kind
@@ -35,7 +38,8 @@ module Xampl
         File.open(place, "w") do |out|
           out.puts representation
           out.fsync
-          if $is_darwin then
+          #if $is_darwin then
+          if @deliberate_sync then
             out.fcntl(51, 0) # Attempt an F_FULLFSYNC fcntl to commit data to disk
           end
 
