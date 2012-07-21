@@ -12,7 +12,7 @@ begin
     gem.authors = ["Bob Hutchison"]
 
     gem.add_dependency('xamplr-pp', '>=1.2.0')
-    gem.add_dependency('nokogiri', '=1.5.2')
+    gem.add_dependency('nokogiri', '>=1.5.5')
 
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
