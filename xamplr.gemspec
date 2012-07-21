@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bob Hutchison"]
-  s.date = "2012-06-08"
+  s.date = "2012-07-21"
   s.description = "xamplr is the ruby version of xampl."
   s.email = "hutch@recursive.ca"
   s.extra_rdoc_files = [
